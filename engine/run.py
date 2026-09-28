@@ -138,6 +138,30 @@ def dq_pass(frames, master):
 
 
 # ---------------------------------------------------------------- jobs
+def repair_ledger(site):
+    """One-time, explicit repair: if the repo file data/repair/restore_ledger.txt names a backup that has not been
+    restored yet, copy that backup over the ledger (used after a run traded on stale feed data). Logged in data/repairs.json."""
+    req = os.path.join(ROOT, "data", "repair", "restore_ledger.txt")
+    if not os.path.exists(req):
+        return
+    name = open(req).read().strip()
+    log_path = os.path.join(site.data, "repairs.json")
+    done = json.load(open(log_path)) if os.path.exists(log_path) else []
+    if any(d.get("restored") == name for d in done):
+        return
+    src = os.path.join(site.data, "backups", name)
+    if not os.path.exists(src):
+        log("repair: backup not found", name); return
+    cur = os.path.join(site.data, "ledger.json")
+    if os.path.exists(cur):
+        shutil.copy(cur, os.path.join(site.data, "backups", "ledger-before-repair-" + dt.datetime.now(IST).strftime("%Y%m%d-%H%M") + ".json"))
+    shutil.copy(src, cur)
+    reason = open(os.path.join(ROOT, "data", "repair", "reason.txt")).read().strip() if os.path.exists(os.path.join(ROOT, "data", "repair", "reason.txt")) else ""
+    done.append({"restored": name, "at": api.now(), "reason": reason})
+    json.dump(done, open(log_path, "w"), indent=1)
+    log("repair: ledger restored from", name)
+
+
 def sector_momentum(stocks, sectors, days=63):
     acc = {}
     for k, df in stocks.items():
@@ -150,6 +174,7 @@ def sector_momentum(stocks, sectors, days=63):
 
 def job_eod(site, offline=False, universe_limit=None, fetch_news=True, weekend=False):
     log("EOD run start; mode", C.MODE, "offline" if offline else "online")
+    repair_ledger(site)
     site.backup_ledger()
     M = load_market(site, offline, universe_limit)
     master, frames, metas = M["master"], M["frames"], M["metas"]
@@ -174,6 +199,12 @@ def job_eod(site, offline=False, universe_limit=None, fetch_news=True, weekend=F
                 "note": f"Offline: signals are the preserved run of {leg.get('date')} ({leg.get('run')}), engine v1"}
     scan["data_status"] = data_status
     bar_date = reg["date"]
+    # never trade on data OLDER than a session the ledger has already processed (feed hiccups can return a stale last bar)
+    done_dates = sorted(os.path.basename(f)[:-5] for f in glob.glob(os.path.join(site.data, "runs", "*.json")) if os.path.basename(f)[:4].isdigit())
+    if done_dates and str(bar_date) < done_dates[-1]:
+        log(f"latest bar {bar_date} is older than already-processed {done_dates[-1]}: marking BEHIND, no trading")
+        data_status = "BEHIND"
+        scan["data_status"] = data_status
     # ---- event filters (F&O ban, results / ex-dividend) on candidates only
     ev = {"ban": {"status": "offline", "symbols": []}, "checks": {}}
     if not offline and stocks:
@@ -210,7 +241,7 @@ def job_eod(site, offline=False, universe_limit=None, fetch_news=True, weekend=F
             if "trend_breakout_swing" in a["strategies"]:
                 actions[aid] = P.paper_run(L, aid, stocks, bar_date, scan["buys"], reg, "trend_breakout_swing", data_status, M["sectors"])
     else:
-        why = "offline" if not stocks else ("data STALE" if data_status != "OK" else f"mode {C.MODE}")
+        why = "offline" if not stocks else (f"data {data_status}" if data_status != "OK" else f"mode {C.MODE}")
         for aid, a in L.state["accounts"].items():
             if a["strategies"] and a["strategies"][0] in ("trend_breakout_swing_us", "index_options_regime"):
                 continue
@@ -356,8 +387,9 @@ def job_eod(site, offline=False, universe_limit=None, fetch_news=True, weekend=F
                "regime": scan["regime"], "buys": scan["buys"], "sells": scan["sells"], "blocked": scan["blocked"], "scanned": scan["scanned"],
                "universe": scan["universe"], "universe_source": M["universe_source"], "strategy": scan["strategy"], "paper_actions": actions,
                "rejected_dq": rejected, "failed_download": M["failed"][:50], "skipped": dict(list(scan.get("skipped", {}).items())[:200])}
-    with open(os.path.join(site.data, "runs", f"{bar_date}.json"), "w") as f:
-        json.dump(run_rec, f, indent=1, default=api._enc)
+    if data_status != "BEHIND":                       # never overwrite the record of a session with a stale re-run
+        with open(os.path.join(site.data, "runs", f"{bar_date}.json"), "w") as f:
+            json.dump(run_rec, f, indent=1, default=api._enc)
     # ---- outputs
     write_common(site, M, clean, rejected, dqrep, reg, scan, L, actions, data_status, offline, scan_us=scan_us, opt_sig=opt_sig, intel=intel)
     log("EOD done:", reg["state"], len(scan["buys"]), "buys", len(scan["sells"]), "sells", scan["scanned"], "scanned")

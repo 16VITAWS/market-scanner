@@ -4,7 +4,7 @@ Secrets (broker keys, Telegram token) come ONLY from environment variables / Git
 """
 import os
 
-ENGINE_VERSION = "2.4.0"
+ENGINE_VERSION = "2.4.1"
 
 # ---- MODE (one word, never mixed) --------------------------------------------
 # Paper trading and live trading are SEPARATE and both stay available:
