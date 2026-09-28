@@ -1,0 +1,30 @@
+name: Intraday quotes refresh
+
+on:
+  schedule:
+    - cron: "*/15 3-10 * * 1-5"   # every 15 min, 08:30-15:59 IST window (03:00-10:59 UTC), weekdays
+  workflow_dispatch:
+
+concurrency: { group: vision-site, cancel-in-progress: false }
+permissions: { contents: write }
+
+jobs:
+  intraday:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Fetch site state
+        run: |
+          git fetch origin gh-pages:gh-pages || exit 0
+          mkdir -p site && git --work-tree=site checkout gh-pages -- . || true
+          cp docs/index.html site/index.html
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.11" }
+      - run: pip install -r requirements.txt
+      - run: python -m engine.run intraday --site site
+      - name: Publish
+        run: |
+          cd site && touch .nojekyll && git init -q && git config user.name "vision-ai-bot" && git config user.email "vision-ai-bot@users.noreply.github.com"
+          git checkout -q -b gh-pages && git add -A && git commit -q -m "intraday $(date -u +%FT%TZ)"
+          git push -f "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" gh-pages

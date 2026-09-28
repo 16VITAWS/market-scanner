@@ -1,0 +1,49 @@
+name: EOD scan + paper trading
+
+on:
+  schedule:
+    - cron: "50 10 * * 1-5"    # 16:20 IST, Monday-Friday (Actions cron may be delayed 5-30 min)
+  workflow_dispatch:
+
+concurrency: { group: vision-site, cancel-in-progress: false }
+permissions: { contents: write }
+
+jobs:
+  eod:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+      - name: Fetch site state (gh-pages)
+        run: |
+          git fetch origin gh-pages:gh-pages || echo "no gh-pages yet"
+          mkdir -p site
+          if git show-ref --quiet refs/heads/gh-pages; then git --work-tree=site checkout gh-pages -- . || true; fi
+          cp docs/index.html site/index.html
+          cp -r docs/assets site/ 2>/dev/null || true
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.11" }
+      - run: pip install -r requirements.txt
+      - name: Run engine (EOD)
+        env:
+          TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          ANGEL_API_KEY: ${{ secrets.ANGEL_API_KEY }}
+          TWELVEDATA_API_KEY: ${{ secrets.TWELVEDATA_API_KEY }}
+        run: python -m engine.run eod --site site
+      - name: Telegram summary (only if token is set)
+        env:
+          TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: python -m engine.notify --site site || true
+      - name: Publish site (single-commit gh-pages, history never grows)
+        run: |
+          cd site
+          touch .nojekyll
+          git init -q
+          git config user.name "vision-ai-bot"
+          git config user.email "vision-ai-bot@users.noreply.github.com"
+          git checkout -q -b gh-pages
+          git add -A
+          git commit -q -m "EOD $(date -u +%FT%TZ)"
+          git push -f "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" gh-pages
