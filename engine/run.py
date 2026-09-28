@@ -205,7 +205,7 @@ def job_eod(site, offline=False, universe_limit=None, fetch_news=True, weekend=F
     # ---- paper trading
     L = site.ledger()
     actions = {}
-    if stocks and data_status == "OK" and C.MODE == "PAPER":
+    if stocks and data_status == "OK" and C.PAPER_ON:
         for aid, a in L.state["accounts"].items():
             if "trend_breakout_swing" in a["strategies"]:
                 actions[aid] = P.paper_run(L, aid, stocks, bar_date, scan["buys"], reg, "trend_breakout_swing", data_status, M["sectors"])
@@ -217,7 +217,7 @@ def job_eod(site, offline=False, universe_limit=None, fetch_news=True, weekend=F
             prices = {s: float(frames[s]["Close"].iloc[-1]) for s in L.account(aid)["positions"] if s in frames}
             L.mark(aid, prices, bar_date)
             actions[aid] = [f"No trading this run ({why}); positions marked to market only."]
-    if scan_us and us_status == "OK" and C.MODE == "PAPER":
+    if scan_us and us_status == "OK" and C.PAPER_ON:
         for aid, a in L.state["accounts"].items():
             if "trend_breakout_swing_us" in a["strategies"]:
                 actions[aid] = P.paper_run(L, aid, us_stocks, scan_us["regime"]["date"], scan_us["buys"], scan_us["regime"], "trend_breakout_swing_us", us_status)
@@ -225,7 +225,7 @@ def job_eod(site, offline=False, universe_limit=None, fetch_news=True, weekend=F
         actions["US-SWING"] = ["No US trading this run (" + ("offline / no US data" if not scan_us else f"US data {us_status}") + ")."]
     # ---- index options (modeled prices)
     opt_sig = None
-    if data_status == "OK" and C.MODE == "PAPER" and "IN-OPTIONS" in L.state["accounts"]:
+    if data_status == "OK" and C.PAPER_ON and "IN-OPTIONS" in L.state["accounts"]:
         today = pd.Timestamp(bar_date).date()
         hol = list(cal.CALENDARS["NSE"]["holidays"].keys())
         actions["IN-OPTIONS"], opt_sig = OPT.run(L, "IN-OPTIONS", clean if "NIFTY" in clean else frames, reg, today, bar_date, hol)

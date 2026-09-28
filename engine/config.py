@@ -4,15 +4,16 @@ Secrets (broker keys, Telegram token) come ONLY from environment variables / Git
 """
 import os
 
-ENGINE_VERSION = "2.3.2"
+ENGINE_VERSION = "2.4.0"
 
 # ---- MODE (one word, never mixed) --------------------------------------------
-# RESEARCH               analysis and reports only, nothing traded
-# PAPER                  automatic paper trading with simulated funds (default)
-# APPROVAL               real orders only after the user taps Approve (needs broker API) - NOT BUILT
-# CONTROLLED_AUTOMATION  automatic real orders inside risk limits - NOT BUILT
-MODE = (os.environ.get("VISION_MODE") or "PAPER").strip().upper()   # empty repo variable -> PAPER
-LIVE_MODE = MODE in ("APPROVAL", "CONTROLLED_AUTOMATION")
+# Paper trading and live trading are SEPARATE and both stay available:
+#   paper trading  - always ON (simulated money), unless the repo variable VISION_MODE is set to RESEARCH
+#   live trading   - controlled only by the LIVE_* repo variables + the runner on your static-IP machine (engine/live)
+_mode = (os.environ.get("VISION_MODE") or "PAPER").strip().upper()
+MODE = "RESEARCH" if _mode == "RESEARCH" else "PAPER"      # any other value keeps paper trading ON
+PAPER_ON = MODE == "PAPER"
+LIVE_MODE = False                            # the paper engine never sends real orders; live orders come only from runner/
 LIVE_EXECUTION_IMPLEMENTED = False          # hard fact: no broker adapter is wired to a real order path
 
 # ---- paper accounts ------------------------------------------------------------

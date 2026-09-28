@@ -50,7 +50,7 @@ def gate(order, account_summary, positions, limits=None, data_status="OK", kill_
 
     if not chk("kill_switch", not kill_switch, "kill switch is ON" if kill_switch else "off"):
         return decision(False, "kill switch is on", checks)
-    if not chk("mode", C.MODE in ("PAPER", "RESEARCH"), f"mode {C.MODE}"):
+    if not chk("mode", C.MODE in ("PAPER", "RESEARCH"), f"paper engine mode {C.MODE}"):
         return decision(False, "live modes are not implemented; paper only", checks)
     if not chk("data_fresh", data_status == "OK", f"data status {data_status}"):
         return decision(False, f"market data is {data_status}; no new orders", checks)
