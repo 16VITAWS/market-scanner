@@ -1,0 +1,122 @@
+{
+ "mood": {
+  "state": "BEAR",
+  "text": "Market is in a downtrend. No new buys \u2014 protect your money.",
+  "close": 22780.25,
+  "date": "2026-09-28",
+  "vol": 10.2,
+  "high_vol": false,
+  "ret3m": -0.04548359050103179
+ },
+ "buys": [],
+ "sells": [
+  {
+   "symbol": "HDFCAMC",
+   "score": -6,
+   "why": [
+    "Downtrend (price below 50 and 200 day averages)",
+    "Weak momentum (RSI 31)",
+    "Broke 20 day low on strong volume",
+    "Lagging Nifty by 11.6% over 3 months"
+   ],
+   "entry": 2302.3,
+   "news": [],
+   "news_risk": false
+  },
+  {
+   "symbol": "HINDUNILVR",
+   "score": -6,
+   "why": [
+    "Downtrend (price below 50 and 200 day averages)",
+    "Weak momentum (RSI 35)",
+    "Broke 20 day low on strong volume",
+    "Lagging Nifty by 8.6% over 3 months"
+   ],
+   "entry": 1896.0,
+   "news": [
+    {
+     "title": "Hindustan Unilever (NSE: HINDUNILVR) at \u20b91,935.0: EMA 51, RSI and Q1 Numbers - Kalkine India",
+     "link": "https://news.google.com/rss/articles/CBMi2wFBVV95cUxOaENxYkhWS0NqVlpfNjg2MTJPVFc0T2pkcGh2cC1UQjRpYk51dGFjWkpXUjVteU9NRGttSzBlUlZiLXV2OFcyZ3o2bVB1YTJOdzhNUDQzREVCVUxNSVBPLXM3Qk5aeUVUVklQQ3Y4OWRKdVNRVEVfcjM4YVV6NG5obV9WNDdsUEdSU1hBQk9sT0dPTEhiWGZFNVRHbjFVUEVQM05GWk9iRkRQYktVdXV4ZmdMcUNVckJoYXpkU3FvUHZhSnFUekJzRUJkZGw3OVRrRlJVcUxjX19SZlU?oc=5"
+    }
+   ],
+   "news_risk": true
+  },
+  {
+   "symbol": "BANKINDIA",
+   "score": -5,
+   "why": [
+    "Downtrend (price below 50 and 200 day averages)",
+    "Broke 20 day low on strong volume",
+    "Lagging Nifty by 3.7% over 3 months"
+   ],
+   "entry": 129.99,
+   "news": [],
+   "news_risk": false
+  },
+  {
+   "symbol": "BAYERCROP",
+   "score": -5,
+   "why": [
+    "Downtrend (price below 50 and 200 day averages)",
+    "Broke 20 day low on strong volume",
+    "Lagging Nifty by 5.3% over 3 months"
+   ],
+   "entry": 3671.8,
+   "news": [],
+   "news_risk": false
+  },
+  {
+   "symbol": "COCHINSHIP",
+   "score": -5,
+   "why": [
+    "Downtrend (price below 50 and 200 day averages)",
+    "21 day average just crossed below 50 day",
+    "Weak momentum (RSI 36)",
+    "Lagging Nifty by 7.0% over 3 months"
+   ],
+   "entry": 1329.0,
+   "news": [],
+   "news_risk": false
+  }
+ ],
+ "waits": [
+  {
+   "symbol": "GESHIP",
+   "reason": "score +5, but market is in a downtrend"
+  },
+  {
+   "symbol": "ZYDUSLIFE",
+   "reason": "score +6, but market is in a downtrend"
+  }
+ ],
+ "paper": {
+  "closed": 0,
+  "wins": 0,
+  "open": 0,
+  "win_rate": null,
+  "avg_pct": null
+ },
+ "pf": {
+  "cash": 200000,
+  "start": 200000,
+  "positions": [],
+  "pending": [],
+  "equity": [
+   {
+    "date": "2026-09-28",
+    "value": 200000
+   }
+  ],
+  "log": [
+   {
+    "date": "2026-09-28",
+    "actions": []
+   }
+  ]
+ },
+ "actions": [],
+ "pstats": null,
+ "count": 495,
+ "source": "Nifty 500 (official NSE list)",
+ "stale": false
+}
