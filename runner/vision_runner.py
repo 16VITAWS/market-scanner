@@ -27,9 +27,9 @@ import os, sys, json, time, hashlib, base64, datetime as dt, traceback
 import requests
 
 IST = dt.timezone(dt.timedelta(hours=5, minutes=30))
-SITE = os.environ.get("VISION_SITE", "https://16vitaws.github.io/market-scanner").rstrip("/")
-TOPIC = os.environ.get("NTFY_TOPIC", "vision-ai-16vitaws-k7q2m9x4")
-DRY = os.environ.get("RUNNER_DRY_RUN", "1") == "1"
+SITE = (os.environ.get("VISION_SITE") or "https://16vitaws.github.io/market-scanner").rstrip("/")
+TOPIC = os.environ.get("NTFY_TOPIC") or "vision-ai-16vitaws-k7q2m9x4"
+DRY = (os.environ.get("RUNNER_DRY_RUN") or "1").strip() != "0"   # anything but an explicit 0 stays dry
 STATE = os.path.expanduser("~/.vision_runner_state.json")
 AUDIT = os.path.expanduser("~/vision_runner_audit.jsonl")
 REPO = "16VITAWS/market-scanner"

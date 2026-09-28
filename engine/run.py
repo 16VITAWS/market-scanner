@@ -298,7 +298,7 @@ def job_eod(site, offline=False, universe_limit=None, fetch_news=True, weekend=F
         api.write(site.path, "mf.json", {"available": False, "reason": "offline - AMFI / mfapi not reachable from this environment"})
     if not offline:
         try:
-            api.write(site.path, "macro.json", MAC.run())
+            api.write(site.path, "macro.json", MAC.run(frames))
         except Exception as e:  # noqa
             log("macro failed:", e)
     elif not site.load_json("api/macro.json"):
@@ -446,7 +446,12 @@ def write_common(site, M, clean, rejected, dqrep, reg, scan, L, actions, data_st
     write_feeds(site, offline)
     try:
         news_items = (site.load_json("api/news.json", {}).get("live") or {}).get("items", [])
-        intel["impact"] = IM.run(frames, news_items)
+        stk = {k: v for k, v in clean.items() if k in master.index and master.loc[k, "kind"] == "stock" and master.loc[k, "currency"] == "INR"}
+        bk = IM.baskets(stk, M.get("sectors") or {}) if stk else {}
+        if bk:
+            json.dump({k: {"d": [str(d.date()) for d in v.index], "c": [round(float(x), 3) for x in v["Close"]]} for k, v in bk.items()},
+                      open(os.path.join(site.data, "sector_baskets.json"), "w"))
+        intel["impact"] = IM.run(frames, news_items, bk)
         if not offline:
             n4 = NOTIFY.Notifier(site.path)
             for sh in intel["impact"]["shocks"][:4]:
@@ -690,7 +695,13 @@ def job_premarket(site, offline=False):
     intel["forecast"] = fc
     try:
         news_items = (site.load_json("api/news.json", {}).get("live") or {}).get("items", [])
-        intel["impact"] = IM.run(frames, news_items)
+        bk = {}
+        try:
+            for k, v in json.load(open(os.path.join(site.data, "sector_baskets.json"))).items():
+                bk[k] = pd.DataFrame({"Close": v["c"]}, index=pd.to_datetime(v["d"]))
+        except Exception:
+            pass
+        intel["impact"] = IM.run(frames, news_items, bk)
         intel["impact"]["made_at"] = "pre-market"
         if not offline:
             n0 = NOTIFY.Notifier(site.path)

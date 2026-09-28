@@ -45,7 +45,7 @@ def _series(df):
 
 
 def _chg(s, how):
-    return s.diff() * 10 if how == "bp" else s.pct_change() * 100      # ^TNX is yield x10 -> diff*10 = basis points
+    return s.diff() * 100 if how == "bp" else s.pct_change() * 100     # Yahoo ^TNX is the yield in percent -> diff*100 = basis points
 
 
 def aligned(frames, driver, target):
@@ -77,14 +77,34 @@ def ols(df):
     return {"beta": b, "t": b / se if se else 0.0, "r2": r2, "resid_sd": float(res.std()), "n": n}
 
 
-def table(frames, window=500):
+def baskets(stocks, sectors, min_members=5):
+    """Equal-weight daily-rebalanced sector baskets from the scanned NSE stocks (used when Yahoo lacks history for the
+    official sector index). Labelled 'SEC:<sector>'; NOT the official NSE index."""
+    groups = {}
+    for k, df in stocks.items():
+        sec = sectors.get(k)
+        if sec and len(df) > 250:
+            c = _series(df)
+            groups.setdefault(sec, []).append(c.pct_change())
+    out = {}
+    for sec, rets in groups.items():
+        if len(rets) < min_members:
+            continue
+        r = pd.concat(rets, axis=1).clip(-0.2, 0.2)
+        cnt = r.notna().sum(1)
+        m = r.mean(1)[cnt >= min_members].fillna(0)
+        if len(m) > 250:
+            out["SEC:" + sec] = pd.DataFrame({"Close": 1000 * (1 + m).cumprod()})
+    return out
+
+
+def table(frames, window=500, min_bars=250):
     rows = []
+    targets = [t for t in TARGETS if t in frames and len(frames[t]) >= min_bars] + sorted(k for k in frames if k.startswith("SEC:"))
     for d in DRIVERS:
         if d not in frames or len(frames[d]) < 120:
             continue
-        for t in TARGETS:
-            if t not in frames or len(frames[t]) < 120:
-                continue
+        for t in targets:
             df = aligned(frames, d, t).tail(window)
             o = ols(df)
             if not o:
@@ -135,7 +155,8 @@ def tag_news(items):
     return out
 
 
-def run(frames, news_items=None):
+def run(frames, news_items=None, extra=None):
+    frames = {**frames, **(extra or {})}
     rows = table(frames)
     sh = shocks(frames, rows)
     tagged = tag_news(news_items)
@@ -144,4 +165,5 @@ def run(frames, news_items=None):
     # strongest stable links per target (the "graph" edges)
     edges = sorted([r for r in rows if r["significant"]], key=lambda r: -r["r2"])
     return {"table": rows, "edges": edges[:60], "shocks": sh, "news_tagged": tagged[:40], "drivers": {k: v[0] for k, v in DRIVERS.items()},
-            "targets": TARGETS, "method": __doc__.strip(), "status": "STATISTICAL (not causal)"}
+            "targets": sorted({r["target"] for r in rows}),
+            "target_note": "Official NSE sector indices are used where the free feed has >= 1 year of history; otherwise 'SEC:<sector>' is an equal-weight basket of the scanned Nifty 500 stocks in that sector (not the official index).", "method": __doc__.strip(), "status": "STATISTICAL (not causal)"}

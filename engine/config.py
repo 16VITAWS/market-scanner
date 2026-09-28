@@ -4,14 +4,14 @@ Secrets (broker keys, Telegram token) come ONLY from environment variables / Git
 """
 import os
 
-ENGINE_VERSION = "2.3.0"
+ENGINE_VERSION = "2.3.1"
 
 # ---- MODE (one word, never mixed) --------------------------------------------
 # RESEARCH               analysis and reports only, nothing traded
 # PAPER                  automatic paper trading with simulated funds (default)
 # APPROVAL               real orders only after the user taps Approve (needs broker API) - NOT BUILT
 # CONTROLLED_AUTOMATION  automatic real orders inside risk limits - NOT BUILT
-MODE = os.environ.get("VISION_MODE", "PAPER")
+MODE = (os.environ.get("VISION_MODE") or "PAPER").strip().upper()   # empty repo variable -> PAPER
 LIVE_MODE = MODE in ("APPROVAL", "CONTROLLED_AUTOMATION")
 LIVE_EXECUTION_IMPLEMENTED = False          # hard fact: no broker adapter is wired to a real order path
 
@@ -44,7 +44,7 @@ RISK = {
 US_LIMITS = {"min_price": 10, "min_turnover_cr": 5}      # US: $10 min price, ~$50M/day traded value
 
 # ---- notifications (ntfy.sh: free push to phone/PC; topic is a random name, not a secret password)
-NTFY_TOPIC = os.environ.get("NTFY_TOPIC", "vision-ai-16vitaws-k7q2m9x4")
+NTFY_TOPIC = os.environ.get("NTFY_TOPIC") or "vision-ai-16vitaws-k7q2m9x4"
 NTFY_SERVER = "https://ntfy.sh"
 ALERTS = {"index_move_pct": 1.0, "vix_move_pct": 8.0, "stock_move_pct": 4.0}
 
