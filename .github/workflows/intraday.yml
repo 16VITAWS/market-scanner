@@ -6,11 +6,12 @@ on:
   workflow_dispatch:
 
 concurrency: { group: vision-site, cancel-in-progress: false }
-permissions: { contents: write }
+permissions: { contents: write, pages: write, id-token: write }
 
 jobs:
   intraday:
     runs-on: ubuntu-latest
+    environment: { name: github-pages }
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
@@ -28,3 +29,11 @@ jobs:
           cd site && touch .nojekyll && git init -q && git config user.name "vision-ai-bot" && git config user.email "vision-ai-bot@users.noreply.github.com"
           git checkout -q -b gh-pages && git add -A && git commit -q -m "intraday $(date -u +%FT%TZ)"
           git push -f "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" gh-pages
+      - run: rm -rf site/.git
+      - name: Configure Pages (switches the site to Actions deploys)
+        uses: actions/configure-pages@v5
+        with: { enablement: true }
+      - uses: actions/upload-pages-artifact@v3
+        with: { path: site }
+      - id: deploy
+        uses: actions/deploy-pages@v4
