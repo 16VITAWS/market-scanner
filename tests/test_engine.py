@@ -390,7 +390,8 @@ def test_live_control_defaults_off_and_gate(monkeypatch):
 def test_live_proposals_hash_and_approval(tmp_path, monkeypatch):
     ctl = {"mode": "APPROVAL", "limits": {"max_order_value_inr": 25000, "segments": ["CASH"]}, "broker": "groww"}
     scan = {"buys": [{"symbol": "AAA", "entry": 500.0, "stop": 480.0, "target": 530.0, "why": ["x"], "score": 6}], "sells": []}
-    pr = LPROP.build(scan, None, ctl, "2026-09-25", 100000)
+    today = dt.datetime.now(dt.timezone(dt.timedelta(hours=5, minutes=30))).date().isoformat()
+    pr = LPROP.build(scan, None, ctl, today, 100000)          # proposals expire, so build for today
     p = pr["items"][0]
     assert p["id"] == LPROP.pid(p) and p["qty"] * p["limit"] <= 25000 and p["order_type"] == "LIMIT"
     assert p["qty"] * (p["limit"] - p["stop"]) <= 100000 * 0.011
