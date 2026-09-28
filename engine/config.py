@@ -4,7 +4,7 @@ Secrets (broker keys, Telegram token) come ONLY from environment variables / Git
 """
 import os
 
-ENGINE_VERSION = "2.3.1"
+ENGINE_VERSION = "2.3.2"
 
 # ---- MODE (one word, never mixed) --------------------------------------------
 # RESEARCH               analysis and reports only, nothing traded

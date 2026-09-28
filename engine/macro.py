@@ -44,7 +44,14 @@ BLS = {"CPIAUCSL": "CUUR0000SA0", "UNRATE": "LNS14000000"}
 
 def parse_bls(j, how):
     data = j["Results"]["series"][0]["data"]
-    rows = {pd.Timestamp(int(x["year"]), int(x["period"][1:]), 1): float(x["value"]) for x in data if x["period"].startswith("M") and x["period"] != "M13"}
+    rows = {}
+    for x in data:
+        if not x["period"].startswith("M") or x["period"] == "M13":
+            continue
+        try:
+            rows[pd.Timestamp(int(x["year"]), int(x["period"][1:]), 1)] = float(str(x["value"]).replace(",", ""))
+        except ValueError:
+            continue                                   # BLS marks missing months with "-"
     s = pd.Series(rows).sort_index()
     if how == "yoy":
         s = (s / s.shift(12) - 1).dropna() * 100
@@ -98,6 +105,7 @@ def run(frames=None):
                 s = fred(sid, how)
             except Exception as e0:  # noqa
                 if sid in BLS:
+                    src = "BLS (FRED unreachable)"
                     s, src = bls(sid, how), "BLS (FRED unreachable)"
                 elif sid == "FEDFUNDS":
                     s, src = nyfed_effr(), "NY Fed EFFR (FRED unreachable)"
