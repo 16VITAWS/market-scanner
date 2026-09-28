@@ -141,7 +141,7 @@ class Ledger:
         return [o for o in self.state["orders"] if o["status"] in ("PENDING", "PARTIAL") and (account is None or o["account"] == account)]
 
     # ---------------------------------------------------------------- fills
-    def fill(self, order, price, qty, bar_date, note="", fill_rule="next_bar_open"):
+    def fill(self, order, price, qty, bar_date, note="", fill_rule="next_bar_open", fee_override=None):
         """Apply a (possibly partial) fill. Updates cash, position, fees. Raises on insufficient cash/qty."""
         a = self.account(order["account"])
         price, qty = D(str(price)), D(str(qty))
@@ -150,8 +150,12 @@ class Ledger:
         if qty <= 0:
             return None
         value = price * qty
-        ch = costs.charges(value, order["side"], a["currency"], order.get("segment", "delivery"))
-        fee = D(ch["total"])
+        if fee_override is not None:
+            fee = D(str(fee_override)).quantize(D("0.01"))
+            ch = {"total": fee, "method": "override (multi-leg / modeled)"}
+        else:
+            ch = costs.charges(value, order["side"], a["currency"], order.get("segment", "delivery"))
+            fee = D(ch["total"])
         pos = a["positions"].get(order["symbol"])
         if order["side"] == "buy":
             need = value + fee

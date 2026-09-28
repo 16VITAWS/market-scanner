@@ -81,3 +81,17 @@ class TrendBreakoutSwing(Strategy):
         if regime == "SIDEWAYS" and score < self.params["buy_score"] + 1:
             return f"score {score:+d}, not strong enough for a SIDEWAYS regime (needs {self.params['buy_score'] + 1:+d})"
         return None
+
+
+class TrendBreakoutSwingUS(TrendBreakoutSwing):
+    """Same rules applied to US large caps with the S&P 500 as the regime index. Paper only; not yet validated on US data."""
+    id = "trend_breakout_swing_us"
+    name = "Trend + Breakout Swing (US large caps)"
+    version = "1.1.0-us"
+    status = "experimental"
+    universe = "~100 US large caps (S&P 100-style list, not point-in-time), price >= $10, ~$50M/day traded"
+    failure_modes = TrendBreakoutSwing.failure_modes + ["universe list has survivorship bias", "US open is overnight in IST: fills use the next US session open"]
+
+    def regime_block(self, action, score, regime):
+        r = super().regime_block(action, score, regime)
+        return r.replace("NIFTY", "S&P 500") if r else r

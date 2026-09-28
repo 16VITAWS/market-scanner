@@ -94,18 +94,36 @@ class NSEWeb(Provider):
         return s
 
     def option_chain(self, underlying="NIFTY"):
+        errors, j = [], None
         try:
             s = self._session()
-            r = s.get(f"https://www.nseindia.com/api/option-chain-indices?symbol={underlying}", timeout=20)
-            r.raise_for_status()
-            j = r.json()
         except Exception as e:
-            raise ProviderError(f"NSE option chain unavailable: {e}")
+            raise ProviderError(f"NSE session failed: {e}")
+        # newer endpoint (2025+): contract info for expiries, then v3 chain per expiry
+        try:
+            info = s.get(f"https://www.nseindia.com/api/option-chain-contract-info?symbol={underlying}", timeout=20)
+            info.raise_for_status()
+            exps = info.json().get("expiryDates", [])
+            if exps:
+                r = s.get(f"https://www.nseindia.com/api/option-chain-v3?type=Indices&symbol={underlying}&expiry={exps[0]}", timeout=20)
+                r.raise_for_status()
+                j = r.json(); j.setdefault("records", {}).setdefault("expiryDates", exps)
+        except Exception as e:
+            errors.append(f"v3: {e}")
+        if j is None:
+            try:
+                r = s.get(f"https://www.nseindia.com/api/option-chain-indices?symbol={underlying}", timeout=20)
+                r.raise_for_status()
+                j = r.json()
+            except Exception as e:
+                errors.append(f"legacy: {e}")
+        if j is None or not j.get("records", {}).get("data"):
+            raise ProviderError("NSE option chain unavailable (" + " | ".join(errors or ["empty response"]) + ")")
         rec = j["records"]
         rows = []
         for it in rec["data"]:
             ce, pe = it.get("CE") or {}, it.get("PE") or {}
-            rows.append({"expiry": it["expiryDate"], "strike": it["strikePrice"],
+            rows.append({"expiry": it.get("expiryDate") or it.get("expiryDates"), "strike": it["strikePrice"],
                          "c": {k: ce.get(v) for k, v in [("oi", "openInterest"), ("chg", "changeinOpenInterest"), ("vol", "totalTradedVolume"),
                                ("iv", "impliedVolatility"), ("ltp", "lastPrice"), ("ch", "change"), ("bid", "bidprice"), ("ask", "askPrice"), ("bq", "bidQty"), ("aq", "askQty")]},
                          "p": {k: pe.get(v) for k, v in [("oi", "openInterest"), ("chg", "changeinOpenInterest"), ("vol", "totalTradedVolume"),

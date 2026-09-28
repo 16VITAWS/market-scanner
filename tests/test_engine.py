@@ -1,4 +1,4 @@
-import os, sys, json, datetime as dt
+import os, sys, json, math, datetime as dt
 from decimal import Decimal
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import numpy as np, pandas as pd, pytest
@@ -258,3 +258,249 @@ def test_seasonality_has_holm_correction():
 def test_catalogue_has_all_seven_vault_cards():
     ids = {c["id"] for c in catalogue()}
     assert {"trend_breakout_swing", "ma_cross_21_50", "vol_trend_atr", "nifty_short_straddle_sl", "nifty_breakout_precision", "nifty_channel_surge", "nifty_gold_pair"} <= ids
+
+
+# ---------------------------------------------------------------- v2.1: options, US, risk, notify
+from engine import options as OPT, analytics as AN
+
+
+def test_black_scholes_put_call_parity():
+    S, K, T, r, v = 23000, 23000, 30 / 365, 0.065, 0.15
+    c, p = OPT.bs(S, K, T, r, v, "C")["price"], OPT.bs(S, K, T, r, v, "P")["price"]
+    assert abs((c - p) - (S - K * math.exp(-r * T))) < 0.5
+
+
+def test_expiries_are_tuesdays_and_future():
+    today = dt.date(2026, 9, 28)
+    ex = OPT.expiries("NIFTY", today, 3)
+    assert len(ex) == 3 and all(e >= today for e in ex)
+    assert all(e.weekday() == 1 or e.isoformat() in () for e in ex)
+    bn = OPT.expiries("BANKNIFTY", today, 2)
+    assert all((e + dt.timedelta(days=7)).month != e.month for e in bn)
+
+
+def test_options_engine_defined_risk_and_sizing(tmp_path):
+    L = Ledger(str(tmp_path / "l.json")).load([{"id": "IN-OPTIONS", "name": "o", "currency": "INR", "cash": "200000", "strategies": ["index_options_regime"]}])
+    idx = mk(300, seed=21, drift=-0.004, start=24000)
+    frames = {"NIFTY": idx}
+    reg = P.regime(idx)
+    assert reg["state"] == "BEAR"
+    today = idx.index[-1].date()
+    acts, sig = OPT.run(L, "IN-OPTIONS", frames, reg, today, str(today))
+    pos = [p for p in L.account("IN-OPTIONS")["positions"].values() if p.get("spread")]
+    if sig["action"] == "BUY" and pos:
+        p = pos[0]
+        assert float(p["max_loss"]) <= 200000 * OPT.PARAMS["risk_pct"] * 1.02   # risk cap incl. charges
+        assert p["spread"]["kind"] == "P" and p["spread"]["k_short"] < p["spread"]["k_long"]   # put debit spread, no naked short
+    else:
+        assert any("NOT traded" in a or "No new options trade" in a for a in acts)
+    # a flat/sideways market produces no trade
+    side = mk(300, seed=3, drift=0.0, start=24000)
+    r2 = dict(reg, state="SIDEWAYS")
+    s2 = OPT.signal({"NIFTY": side}, r2, side.index[-1].date())
+    assert s2["action"] == "NONE"
+
+
+def test_us_scan_uses_us_limits_and_spx_regime():
+    idx = mk(drift=0.003, seed=31, start=5000)
+    data = {f"U{i}": mk(seed=200 + i, drift=0.006, start=30, vol=5e6) for i in range(5)}
+    res = P.scan(data, idx, "trend_breakout_swing_us", limits=C.US_LIMITS)
+    assert res["strategy"]["id"] == "trend_breakout_swing_us" and res["scanned"] == 5
+
+
+def test_var_cvar_and_stress():
+    eq = [{"date": str(d.date()), "value": v} for d, v in zip(pd.bdate_range("2026-01-01", periods=60), 200000 * np.cumprod(1 + np.random.default_rng(1).normal(0, 0.01, 60)))]
+    r = AN.portfolio_risk(eq, {}, {}, 200000)
+    assert r["method"].startswith("historical") and r["cvar_pct"] >= r["var_pct"] > 0
+    assert set(r["stress"]) == {"-20%", "-10%", "-5%", "+5%", "+10%"}
+
+
+def test_notifier_dedupes(tmp_path):
+    from engine.notify import Notifier
+    os.makedirs(tmp_path / "data"); os.makedirs(tmp_path / "api")
+    n = Notifier(str(tmp_path), dry=True)
+    assert n.push("t", "m", key="k1") and not n.push("t", "m", key="k1")
+    n.save()
+    assert json.load(open(tmp_path / "api" / "notifications.json"))["items"][0]["title"] == "t"
+
+
+# ---------------------------------------------------------------- v2.2: intelligence, execution, margin, live
+from engine import forecast as FC, contagion as CG, anomaly as AM, execalgo as EX, margin as MG, ml as ML
+from engine.live import control as LCTL, proposals as LPROP
+
+
+def test_forecast_walk_forward_outputs_probabilities():
+    frames = {"NIFTY": mk(900, seed=41, start=18000), "SPX": mk(900, seed=42, start=5000), "BRENT": mk(900, seed=43, start=80)}
+    r = FC.run(frames)
+    assert r["available"] and 0 < r["p_up"] < 1 and r["oos"]["n"] > 100
+    assert r["lean"] in ("UP", "DOWN", "NO CLEAR EDGE") and "baseline" in r["note"]
+
+
+def test_granger_detects_a_real_lead():
+    rng = np.random.default_rng(5); n = 600
+    x = rng.normal(0, 0.01, n); y = np.r_[0, 0.8 * x[:-1]] + rng.normal(0, 0.004, n)
+    ix = pd.bdate_range("2023-01-02", periods=n)
+    g = CG.granger(pd.Series(x, ix), pd.Series(y, ix))
+    assert g["p"] < 0.01
+    g2 = CG.granger(pd.Series(y, ix), pd.Series(rng.normal(0, 0.01, n), ix))
+    assert g2["p"] > 0.01
+
+
+def test_anomaly_flags_volume_spike_and_big_move():
+    df = mk(200, seed=9); df.iloc[-1, df.columns.get_loc("Volume")] = 2e7
+    df.iloc[-1, df.columns.get_loc("Close")] = df["Close"].iloc[-2] * 1.12
+    df.iloc[-1, df.columns.get_loc("High")] = df["Close"].iloc[-1] * 1.01
+    types = {f["type"] for f in AM.symbol_flags(df)}
+    assert {"volume spike", "big move"} <= types
+
+
+def test_execution_algos_formulas():
+    ix = pd.date_range("2026-09-25 03:45", periods=4, freq="5min", tz="UTC")
+    bars = pd.DataFrame({"Open": [100, 101, 102, 103], "High": [101, 102, 103, 104], "Low": [99, 100, 101, 102], "Close": [100, 101, 102, 103], "Volume": [100, 300, 100, 500]}, index=ix)
+    v = EX.simulate(bars, 1000, "buy", "VWAP", spread_bps=0)
+    tp = (bars.High + bars.Low + bars.Close) / 3
+    assert abs(v["avg"] - float((tp * bars.Volume).sum() / bars.Volume.sum())) < 0.05
+    t = EX.simulate(bars, 1000, "buy", "TWAP", spread_bps=0)
+    assert abs(t["avg"] - float(tp.mean())) < 0.01 and t["filled"] == 1000
+    p = EX.simulate(bars, 1000, "buy", "POV", pov=0.1, spread_bps=0)
+    assert p["filled"] == 100 and p["unfilled"] == 900       # 10% of 1000 total volume
+    assert EX.shortfall(101, 100, "buy") == 100.0 and EX.shortfall(99, 100, "sell") == 100.0
+
+
+def test_margin_short_straddle_far_above_debit_spread():
+    today = dt.date(2026, 9, 28); e = "2026-10-06"
+    straddle = MG.estimate([{"kind": "C", "strike": 23000, "expiry": e, "qty": -65}, {"kind": "P", "strike": 23000, "expiry": e, "qty": -65}], 23000, 0.14, today)
+    spread = MG.spread_margin({"kind": "P", "k_long": 23000, "k_short": 22800, "expiry": e}, 65, 23000, 0.14, today)
+    assert straddle["estimated_margin"] > 100000 and straddle["estimated_margin"] > 5 * spread["capital_required"] and straddle["status"] == "ESTIMATE"
+    assert spread["capital_required"] == spread["max_loss"] < 200 * 65
+
+
+def test_live_control_defaults_off_and_gate(monkeypatch):
+    for k in ("LIVE_TRADING", "LIVE_AUTO", "LIVE_CONSENT", "LIVE_KILL"):
+        monkeypatch.delenv(k, raising=False)
+    c = LCTL.build([])
+    assert c["mode"] == "OFF" and not c["auto_allowed"]
+    monkeypatch.setenv("LIVE_TRADING", "ON"); monkeypatch.setenv("LIVE_AUTO", "ON"); monkeypatch.setenv("LIVE_CONSENT", LCTL.CONSENT_PHRASE)
+    c = LCTL.build([{"account": "IN-SWING", "analytics": {"trades": {"n": 5, "profit_factor": 3, "expectancy": 10}, "equity": {"max_drawdown_pct": -2}}}])
+    assert c["mode"] == "APPROVAL" and not c["auto_allowed"] and "paper track-record gate not passed" in c["auto_blockers"]
+    monkeypatch.setenv("LIVE_KILL", "ON")
+    assert LCTL.build([])["mode"] == "OFF"
+
+
+def test_live_proposals_hash_and_approval(tmp_path, monkeypatch):
+    ctl = {"mode": "APPROVAL", "limits": {"max_order_value_inr": 25000, "segments": ["CASH"]}, "broker": "groww"}
+    scan = {"buys": [{"symbol": "AAA", "entry": 500.0, "stop": 480.0, "target": 530.0, "why": ["x"], "score": 6}], "sells": []}
+    pr = LPROP.build(scan, None, ctl, "2026-09-25", 100000)
+    p = pr["items"][0]
+    assert p["id"] == LPROP.pid(p) and p["qty"] * p["limit"] <= 25000 and p["order_type"] == "LIMIT"
+    assert p["qty"] * (p["limit"] - p["stop"]) <= 100000 * 0.011
+    os.makedirs(tmp_path / "api"); json.dump(pr, open(tmp_path / "api" / "live_proposals.json", "w"))
+    from engine.live import approve
+    monkeypatch.setenv("PID", p["id"]); monkeypatch.setenv("DECISION", "APPROVE"); monkeypatch.setenv("CONFIRM", "YES")
+    approve.main(str(tmp_path))
+    a = json.load(open(tmp_path / "data" / "approvals.json"))
+    assert a["items"][0]["id"] == p["id"] and a["items"][0]["decision"] == "APPROVE"
+    monkeypatch.setenv("CONFIRM", "no")
+    with pytest.raises(SystemExit):
+        approve.main(str(tmp_path))
+
+
+def test_runner_dry_cycle_places_only_approved(tmp_path, monkeypatch):
+    sys.path.insert(0, os.path.join(ROOT, "runner"))
+    import importlib; vr = importlib.import_module("vision_runner")
+    monkeypatch.setattr(vr, "DRY", True); monkeypatch.setattr(vr, "AUDIT", str(tmp_path / "audit.jsonl")); monkeypatch.setattr(vr, "notify", lambda *a, **k: None)
+    monkeypatch.setattr(vr, "now", lambda: dt.datetime(2026, 9, 28, 10, 0, tzinfo=vr.IST))
+    ctl = {"mode": "APPROVAL", "live_trading": True, "kill": False, "auto_allowed": False, "limits": {"max_orders_per_day": 3, "max_order_value_inr": 25000, "max_daily_loss_inr": 2000}}
+    mkp = lambda sym: (lambda p: {**p, "id": vr.phash(p)})({"symbol": sym, "side": "BUY", "qty": 10, "limit": 100.0, "valid_until": "2026-09-29", "segment": "CASH", "stop": 95, "target": 110})
+    p1, p2 = mkp("AAA"), mkp("BBB")
+    data = {"api/live_control.json": ctl, "api/live_proposals.json": {"items": [p1, p2]}, "data/approvals.json": {"items": [{"id": p1["id"], "hash": p1["id"], "decision": "APPROVE"}]}}
+    monkeypatch.setattr(vr, "fetch", lambda path: data[path])
+    st = {"day": "2026-09-28", "orders": 0, "done": {}, "realized_loss": 0.0}
+    vr.cycle(None, st)
+    lines = [json.loads(l) for l in open(tmp_path / "audit.jsonl")]
+    assert [l["symbol"] for l in lines if l["event"] == "DRY_BUY"] == ["AAA"] and st["orders"] == 1
+    data["api/live_control.json"] = {**ctl, "kill": True}
+    st2 = {"day": "2026-09-28", "orders": 0, "done": {}, "realized_loss": 0.0}
+    vr.cycle(None, st2)
+    assert st2["orders"] == 0
+
+
+def test_ml_shadow_runs_walk_forward():
+    idx = mk(520, seed=51, start=20000)
+    stocks = {f"S{i}": mk(520, seed=300 + i, drift=0.0005 * (i % 3), start=100, vol=3e6) for i in range(40)}
+    r = ML.run(stocks, idx)
+    assert r["available"] and len(r["today"]) == 15 and "SHADOW" in r["note"]
+
+
+# ---------------------------------------------------------------- v2.3
+from engine import regime_hmm as HMM, impact as IMP, flows as FLW, mf as MFS, rules as RUL, macro as MAC
+
+
+def test_hmm_finds_regimes_without_lookahead():
+    rng = np.random.default_rng(5)
+    r = np.r_[rng.normal(0.002, 0.006, 300), rng.normal(-0.003, 0.02, 200), rng.normal(0.0003, 0.008, 300)]
+    idx = pd.bdate_range("2023-01-02", periods=len(r), tz="UTC")
+    df = pd.DataFrame({"Close": 100 * np.exp(np.cumsum(r))}, index=idx)
+    out = HMM.run(df, min_obs=500, oos_days=150)
+    assert out["available"] and set(out["probabilities"]) == {"BULL", "SIDEWAYS", "BEAR"}
+    assert abs(sum(out["probabilities"].values()) - 1) < 0.01
+    # filtered labels for the past must not change when future data is appended beyond them
+    first = HMM.run(df.iloc[:700], min_obs=500, oos_days=150)
+    assert first["history"][-1]["date"] == str(idx[699].date())
+    bear = next(s for s in out["states"] if s["state"] == "BEAR"); bull = next(s for s in out["states"] if s["state"] == "BULL")
+    assert bear["avg_daily_return_pct"] < bull["avg_daily_return_pct"]
+
+
+def test_impact_recovers_lagged_beta_and_flags_shock():
+    rng = np.random.default_rng(9)
+    idx = pd.bdate_range("2023-01-02", periods=600, tz="UTC")
+    br = rng.normal(0, 2, 600); br[-1] = 10
+    tgt = np.r_[0, -0.3 * br[:-1]] + rng.normal(0, 1, 600)
+    f = lambda r: pd.DataFrame({"Close": 100 * np.exp(np.cumsum(r / 100))}, index=idx)
+    out = IMP.run({"BRENT": f(br), "NIFTYENERGY": f(tgt), "NIFTY": f(rng.normal(0, 1, 600))}, [{"title": "Brent crude surges on OPEC cut"}])
+    row = next(r for r in out["table"] if r["target"] == "NIFTYENERGY")
+    assert row["significant"] and -0.36 < row["beta"] < -0.24 and row["timing"] == "next"
+    sh = out["shocks"][0]
+    assert sh["driver"] == "BRENT" and sh["effects"][0]["target"] == "NIFTYENERGY" and sh["news"]
+
+
+def test_flows_parsers_and_accumulation():
+    deals = FLW.parse_deals("Date,Symbol,Security Name,Client Name,Buy/Sell,Quantity Traded,Trade Price / Wght. Avg. Price,Remarks\n"
+                            "28-SEP-2026,ABC,Abc Ltd,FUND A,BUY,1000000,500.00,-\n28-SEP-2026,ABC,Abc Ltd,TRADER B,SELL,400000,501.00,-\n", "bulk")
+    s = FLW.summarise_deals(deals, {"ABC"})[0]
+    assert s["net_value_cr"] == round(50.0 - 20.04, 2) and s["in_universe"]
+    rows = FLW.parse_bhavdata("SYMBOL, SERIES, DATE1, PREV_CLOSE, OPEN_PRICE, HIGH_PRICE, LOW_PRICE, LAST_PRICE, CLOSE_PRICE, AVG_PRICE, TTL_TRD_QNTY, TURNOVER_LACS, NO_OF_TRADES, DELIV_QTY, DELIV_PER\n"
+                              "ABC, EQ, 26-Sep-2026, 100, 100, 106, 99, 105, 105.00, 103, 3000000, 3000, 1, 2100000, 70.00\n"
+                              "XYZ, BL, 26-Sep-2026, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1\n")
+    assert list(rows) == ["ABC"] and rows["ABC"]["deliv_pct"] == 70.0
+    hist = {f"2026-09-{d:02d}": {"ABC": [40.0, 1000000]} for d in range(10, 20)}
+    acc = FLW.accumulation(hist, rows)
+    assert acc and acc[0]["signal"] == "ACCUMULATION" and acc[0]["volume_x_avg"] == 3.0
+
+
+def test_mf_parse_select_score():
+    txt = ("Scheme Code;ISIN Div Payout/ ISIN Growth;ISIN Div Reinvestment;Scheme Name;Plan;Option;Net Asset Value;Date\n\n"
+           "Open Ended Schemes(Equity Scheme - Large Cap Fund)\n\nA MF\n\n"
+           "1;I;-;A Large;Direct Plan;Growth Option;10;25-Sep-2026\n2;I;-;A Large;Regular Plan;Growth Option;9;25-Sep-2026\n"
+           "Close Ended Schemes(Equity Scheme - ELSS)\nB MF\n3;I;-;B ELSS;Direct Plan;Growth Option;10;25-Sep-2026\n")
+    sel = MFS.select(MFS.parse_navall(txt))
+    assert [r["code"] for r in sel] == [1]
+    idx = pd.bdate_range("2021-01-01", "2026-09-25")
+    funds = []
+    for i, d in enumerate((0.0002, 0.0006, 0.001)):
+        s = pd.Series(10 * np.exp(np.cumsum(np.full(len(idx), d))), index=idx)
+        funds.append({"code": i, "name": f"F{i}", "cat": "Large Cap Fund", **MFS.metrics(s)})
+    sc = MFS.score(funds)
+    assert max(sc, key=lambda f: f["score"])["code"] == 2 and sc[2]["cagr_3y"] > sc[0]["cagr_3y"]
+
+
+def test_alert_rules_parse_and_fire():
+    rules, bad = RUL.parse("RELIANCE>3000; nifty%<-1.5; junk")
+    assert len(rules) == 2 and bad == ["JUNK"]
+    hits = RUL.evaluate(rules, {"RELIANCE": {"p": 3001, "chg_pct": 0.1}, "NIFTY": {"p": 24000, "chg_pct": -1.2}})
+    assert [h["symbol"] for h in hits] == ["RELIANCE"]
+
+
+def test_macro_fred_parser_yoy():
+    s = MAC.parse_fred("observation_date,CPIAUCSL\n" + "\n".join(f"20{20 + i // 12}-{i % 12 + 1:02d}-01,{100 * 1.03 ** (i / 12)}" for i in range(30)), "yoy")
+    assert abs(s.iloc[-1] - 3.0) < 0.01

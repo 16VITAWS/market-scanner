@@ -1,23 +1,24 @@
-name: Weekend review
+name: Pre-market forecast
 
 on:
   schedule:
-    - cron: "30 3 * * 6"    # Saturday 09:00 IST
+    - cron: "45 2 * * 1-5"   # 08:15 IST weekdays
   workflow_dispatch:
 
 concurrency: { group: vision-site, cancel-in-progress: false }
 permissions: { contents: write, pages: write, id-token: write }
 
 jobs:
-  weekend:
+  premarket:
     runs-on: ubuntu-latest
     environment: { name: github-pages }
-    timeout-minutes: 40
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
-      - run: |
-          git fetch origin gh-pages:gh-pages || echo "no gh-pages yet"
-          mkdir -p site && (git show-ref --quiet refs/heads/gh-pages && git --work-tree=site checkout gh-pages -- . || true)
+      - name: Fetch site state
+        run: |
+          git fetch origin gh-pages:gh-pages || exit 0
+          mkdir -p site && git --work-tree=site checkout gh-pages -- . || true
           cp -r docs/. site/
       - name: Live results from runner (if any)
         run: |
@@ -40,10 +41,11 @@ jobs:
           TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
           VISION_MODE: ${{ vars.VISION_MODE }}
-        run: python -m engine.run weekend --site site
-      - run: |
+        run: python -m engine.run premarket --site site
+      - name: Publish
+        run: |
           cd site && touch .nojekyll && git init -q && git config user.name "vision-ai-bot" && git config user.email "vision-ai-bot@users.noreply.github.com"
-          git checkout -q -b gh-pages && git add -A && git commit -q -m "weekend $(date -u +%FT%TZ)"
+          git checkout -q -b gh-pages && git add -A && git commit -q -m "premarket $(date -u +%FT%TZ)"
           git push -f "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" gh-pages
       - run: rm -rf site/.git
       - name: Configure Pages (switches the site to Actions deploys)

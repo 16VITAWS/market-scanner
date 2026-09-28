@@ -4,7 +4,7 @@ Secrets (broker keys, Telegram token) come ONLY from environment variables / Git
 """
 import os
 
-ENGINE_VERSION = "2.0.0"
+ENGINE_VERSION = "2.3.0"
 
 # ---- MODE (one word, never mixed) --------------------------------------------
 # RESEARCH               analysis and reports only, nothing traded
@@ -21,6 +21,8 @@ DEFAULT_ACCOUNTS = [
     {"id": "IN-SWING", "name": "India swing (auto)", "currency": "INR", "cash": "200000", "strategies": ["trend_breakout_swing"]},
     {"id": "IN-MANUAL", "name": "India manual practice", "currency": "INR", "cash": "200000", "strategies": []},
     {"id": "US-MANUAL", "name": "US manual practice", "currency": "USD", "cash": "10000", "strategies": []},
+    {"id": "US-SWING", "name": "US swing (auto)", "currency": "USD", "cash": "10000", "strategies": ["trend_breakout_swing_us"]},
+    {"id": "IN-OPTIONS", "name": "India index options (auto, modeled prices)", "currency": "INR", "cash": "200000", "strategies": ["index_options_regime"]},
 ]
 
 # ---- risk limits (the risk engine enforces these; strategies cannot override) ---
@@ -38,6 +40,13 @@ RISK = {
     "max_data_age_days": 4,           # older -> STALE: report only, no new orders
     "max_orders_per_run": 10,
 }
+
+US_LIMITS = {"min_price": 10, "min_turnover_cr": 5}      # US: $10 min price, ~$50M/day traded value
+
+# ---- notifications (ntfy.sh: free push to phone/PC; topic is a random name, not a secret password)
+NTFY_TOPIC = os.environ.get("NTFY_TOPIC", "vision-ai-16vitaws-k7q2m9x4")
+NTFY_SERVER = "https://ntfy.sh"
+ALERTS = {"index_move_pct": 1.0, "vix_move_pct": 8.0, "stock_move_pct": 4.0}
 
 # ---- strategy defaults ---------------------------------------------------------
 SIGNALS = {
@@ -58,7 +67,7 @@ FILL = {
 
 # ---- data ------------------------------------------------------------------------
 UNIVERSE_URL = "https://archives.nseindia.com/content/indices/ind_nifty500list.csv"
-HISTORY_YEARS = 2
+HISTORY_YEARS = 3
 PATHS = {
     "data": "data", "paper": "data/paper", "runs": "data/runs", "api": "docs/api",
     "raw": "data/raw", "legacy": "data/legacy", "candles": "docs/api/candles",

@@ -19,11 +19,29 @@ jobs:
         run: |
           git fetch origin gh-pages:gh-pages || exit 0
           mkdir -p site && git --work-tree=site checkout gh-pages -- . || true
-          cp docs/index.html site/index.html
+          cp -r docs/. site/
+      - name: Live results from runner (if any)
+        run: |
+          git fetch origin live-results:live-results 2>/dev/null && mkdir -p site/live && git --work-tree=site/live checkout live-results -- . || echo "no live results"
       - uses: actions/setup-python@v5
         with: { python-version: "3.11" }
       - run: pip install -r requirements.txt
-      - run: python -m engine.run intraday --site site
+      - name: Run engine
+        env:
+          LIVE_TRADING: ${{ vars.LIVE_TRADING }}
+          LIVE_AUTO: ${{ vars.LIVE_AUTO }}
+          LIVE_CONSENT: ${{ vars.LIVE_CONSENT }}
+          LIVE_KILL: ${{ vars.LIVE_KILL }}
+          LIVE_MAX_ORDERS_DAY: ${{ vars.LIVE_MAX_ORDERS_DAY }}
+          LIVE_MAX_ORDER_VALUE: ${{ vars.LIVE_MAX_ORDER_VALUE }}
+          LIVE_MAX_DAILY_LOSS: ${{ vars.LIVE_MAX_DAILY_LOSS }}
+          LIVE_SEGMENTS: ${{ vars.LIVE_SEGMENTS }}
+          LIVE_CAPITAL: ${{ vars.LIVE_CAPITAL }}
+          ALERT_RULES: ${{ vars.ALERT_RULES }}
+          TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          VISION_MODE: ${{ vars.VISION_MODE }}
+        run: python -m engine.run intraday --site site
       - name: Publish
         run: |
           cd site && touch .nojekyll && git init -q && git config user.name "vision-ai-bot" && git config user.email "vision-ai-bot@users.noreply.github.com"

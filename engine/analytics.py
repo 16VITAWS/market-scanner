@@ -137,4 +137,70 @@ def outcome_range(trades, start_cash, horizon_trades=50, sims=2000, seed=7):
 def full(equity, trades, start_cash, benchmark=None):
     es = equity_stats(equity, benchmark, start_cash)
     ts = trade_stats(trades)
-    return {"equity": es, "trades": ts, "diagnosis": diagnose(ts, es), "outcome_range": outcome_range(trades, start_cash)}
+    return {"equity": es, "trades": ts, "diagnosis": diagnose(ts, es), "outcome_range": outcome_range(trades, start_cash), "kelly": kelly(ts)}
+
+
+def kelly(ts):
+    """Kelly fraction from realised trade stats; informational only. The risk engine still caps risk at 1% per trade."""
+    if not ts or ts.get("n", 0) < 30 or not ts.get("avg_win") or not ts.get("avg_loss"):
+        return {"available": False, "reason": "needs 30+ closed trades"}
+    p = ts["wins"] / ts["n"]; b = ts["avg_win"] / abs(ts["avg_loss"])
+    f = p - (1 - p) / b
+    return {"available": True, "full_kelly": round(f, 3), "half_kelly": round(f / 2, 3), "win_prob": round(p, 3), "payoff": round(b, 2),
+            "note": "Growth-optimal fraction if the past win rate and payoff held exactly. Half-Kelly shown for context; the engine does NOT size by Kelly (1% risk cap applies)."}
+
+
+def portfolio_risk(equity_curve, positions, frames, equity, bench_id="NIFTY", conf=0.95):
+    """1-day VaR/CVaR. Historical from the account's own daily returns when >= 30 points,
+    otherwise parametric from current positions' 60-day return history (historical simulation on holdings)."""
+    out = {"confidence": conf, "equity": float(equity)}
+    eq = [float(p["value"]) for p in equity_curve]
+    if len(eq) >= 31:
+        r = pd.Series(eq).pct_change().dropna()
+        q = float(np.percentile(r, (1 - conf) * 100))
+        out.update(method="historical (account returns)", var_pct=round(-q * 100, 2), cvar_pct=round(-float(r[r <= q].mean()) * 100, 2), n=int(len(r)))
+    else:
+        legs = []
+        for sym, p in positions.items():
+            df = frames.get(sym)
+            val = float(p.get("last", p.get("avg_price", 0))) * float(p["qty"])
+            if df is None or len(df) < 61 or val <= 0:
+                continue
+            legs.append((df["Close"].pct_change().tail(60).reset_index(drop=True), val))
+        if not legs:
+            out.update(method="no open exposure" if not positions else "insufficient history for held positions", var_pct=0.0, cvar_pct=0.0, n=0)
+        else:
+            pnl = sum(r * v for r, v in legs) / float(equity)
+            q = float(np.percentile(pnl, (1 - conf) * 100))
+            out.update(method="historical simulation on current holdings (60 days)", var_pct=round(-q * 100, 2), cvar_pct=round(-float(pnl[pnl <= q].mean()) * 100, 2), n=int(len(pnl)))
+    # stress: index shocks both ways. Stocks via beta (1 if unknown); option spreads repriced (Black-Scholes) at the shocked spot.
+    import datetime as _dt
+    from . import options as _opt
+    stress = {}
+    b = frames.get(bench_id)
+    for shock in (-0.20, -0.10, -0.05, 0.05, 0.10):
+        pnl = 0.0
+        for sym, p in positions.items():
+            val = float(p.get("last", p.get("avg_price", 0))) * float(p["qty"])
+            sp = p.get("spread")
+            if sp:
+                u = frames.get(sp["underlying"])
+                if u is None or not len(u):
+                    pnl -= min(val, float(p.get("max_loss", val))); continue
+                S = float(u["Close"].iloc[-1]); today = u.index[-1].date()
+                sig, _ = _opt.vol_input(sp["underlying"], frames)
+                now, _, _ = _opt.spread_value(sp, S, today, sig)
+                shocked, _, _ = _opt.spread_value(sp, S * (1 + shock), today, sig * (1.3 if shock < 0 else 0.9))
+                pnl += (shocked - now) * float(p["qty"])
+                continue
+            beta = 1.0
+            df = frames.get(sym)
+            if df is not None and b is not None and len(df) > 61:
+                j = pd.concat([df["Close"].pct_change(), b["Close"].pct_change()], axis=1).dropna().tail(120)
+                if len(j) > 30 and j.iloc[:, 1].var() > 0:
+                    beta = float(j.cov().iloc[0, 1] / j.iloc[:, 1].var())
+            pnl += val * beta * shock
+        stress[f"{int(shock*100):+d}%"] = {"pnl": round(pnl, 0), "pnl_pct": round(pnl / float(equity) * 100, 2) if equity else 0}
+    out["stress"] = stress
+    out["note"] = "Stress = P&L if the index moved instantly by the shown %, IV +30% on falls / -10% on rises for options. VaR = loss not exceeded on 95% of days; CVaR = average loss on the worst 5%. Estimates from past data; real losses can be larger (gaps, regime change)."
+    return out

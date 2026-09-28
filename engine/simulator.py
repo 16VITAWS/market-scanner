@@ -1,7 +1,7 @@
 """
 Order simulator on OHLC bars. Deterministic. Fill rules (documented, conservative):
 
-  MARKET       fills at next bar's OPEN * (1 +/- slippage)
+  MARKET       fills at next bar's OPEN * (1 +/- (slippage + impact)), impact = 0.1 x range/close x sqrt(qty/volume)
   LIMIT buy    fills if bar LOW <= limit, at min(open, limit)          (no slippage benefit)
   LIMIT sell   fills if bar HIGH >= limit, at max(open, limit)
   STOP buy     triggers if bar HIGH >= stop, fills at max(open, stop)*(1+slip)
@@ -11,6 +11,7 @@ Order simulator on OHLC bars. Deterministic. Fill rules (documented, conservativ
   Halts: bar with zero volume => no fill. Orders expire after `expires_after_bars` bars.
 Only OHLC is available, so intra-bar path is unknown: this is an approximation and is labelled so.
 """
+import math
 from decimal import Decimal, ROUND_HALF_UP
 from . import config as C
 
@@ -28,6 +29,13 @@ def apply_bar(ledger, account, symbol, bar, bar_date, slippage=None, max_vol_sha
     o_, h_, l_, c_, v_ = (D(str(bar[k])) for k in ("Open", "High", "Low", "Close", "Volume"))
     acts = []
     liq_cap = int(v_ * share) if v_ > 0 else 0
+    day_sig = (h_ - l_) / c_ if c_ > 0 else D("0")          # range as a crude daily volatility proxy
+
+    def impact(q):
+        """Square-root market-impact model: 0.1 x daily range x sqrt(qty / bar volume). Added to base slippage."""
+        if v_ <= 0 or q <= 0:
+            return D("0")
+        return D("0.1") * day_sig * D(str(math.sqrt(float(q) / float(v_))))
 
     # 1. pending orders for this symbol decided before this bar
     for o in [o for o in ledger.pending(account) if o["symbol"] == symbol]:
@@ -39,7 +47,8 @@ def apply_bar(ledger, account, symbol, bar, bar_date, slippage=None, max_vol_sha
         if v_ == 0:
             acts.append(f"{symbol}: no volume on {bar_date} (halt / no trade) - order waits")
         elif o["type"] == "MARKET":
-            fill_px = o_ * (1 + slip) if o["side"] == "buy" else o_ * (1 - slip)
+            imp = impact(remaining)
+            fill_px = o_ * (1 + slip + imp) if o["side"] == "buy" else o_ * (1 - slip - imp)
         elif o["type"] == "LIMIT":
             lim = D(o["limit"])
             if o["side"] == "buy" and l_ <= lim:

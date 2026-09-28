@@ -30,20 +30,21 @@ def regime(idx):
             "computed_at": dt.datetime.now(IST).isoformat(timespec="seconds")}
 
 
-def scan(data, idx, strategy_id="trend_breakout_swing", news_fn=None, sectors=None):
+def scan(data, idx, strategy_id="trend_breakout_swing", news_fn=None, sectors=None, limits=None):
     """data: {symbol: OHLCV DataFrame (clean)}. Returns the full signal table plus buy/sell/blocked lists."""
     S = get_strategy(strategy_id)
     reg = regime(idx)
     ctx = {"regime": reg["state"], "index_ret3m": reg["ret3m"]}
+    Lm = {**C.RISK, **(limits or {})}
     rows, buys, sells, blocked, skipped = [], [], [], [], {}
     for sym, df in data.items():
         try:
             d = I.enrich(df)
             last = d.iloc[-1]
-            if last.Close < C.RISK["min_price"]:
-                skipped[sym] = f"price {last.Close:.2f} below minimum {C.RISK['min_price']}"; continue
-            if not (last.turnover_cr == last.turnover_cr) or last.turnover_cr < C.RISK["min_turnover_cr"]:
-                skipped[sym] = f"20-day turnover {0 if last.turnover_cr != last.turnover_cr else last.turnover_cr:.1f} cr below {C.RISK['min_turnover_cr']} cr"; continue
+            if last.Close < Lm["min_price"]:
+                skipped[sym] = f"price {last.Close:.2f} below minimum {Lm['min_price']}"; continue
+            if not (last.turnover_cr == last.turnover_cr) or last.turnover_cr < Lm["min_turnover_cr"]:
+                skipped[sym] = f"20-day turnover {0 if last.turnover_cr != last.turnover_cr else last.turnover_cr:.1f} (x1e7) below {Lm['min_turnover_cr']}"; continue
             sig = S.signal(d, ctx)
         except Exception as e:  # noqa
             skipped[sym] = f"error: {e}"; continue

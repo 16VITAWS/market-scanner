@@ -16,6 +16,16 @@ CORE = [
     ("BANKNIFTY",  "NIFTY Bank",           "index",  "NSE",   "INR", "^NSEBANK",  None,       "BANKNIFTY",  "NSE",  "AT",  "Index", 15),
     ("FINNIFTY",   "NIFTY Financial Svcs", "index",  "NSE",   "INR", "NIFTY_FIN_SERVICE.NS", None, "FINNIFTY", "NSE", "AT", "Index", 25),
     ("NIFTYMIDCAP","NIFTY Midcap 100",     "index",  "NSE",   "INR", "^CNXMIDCAP",None,       None,         "NSE",  "AT",  "Index", None),
+    ("NIFTYIT", "NIFTY IT", "index", "NSE", "INR", "^CNXIT", None, None, "NSE", "AT", "Sector index", None),
+    ("NIFTYAUTO", "NIFTY Auto", "index", "NSE", "INR", "^CNXAUTO", None, None, "NSE", "AT", "Sector index", None),
+    ("NIFTYPHARMA", "NIFTY Pharma", "index", "NSE", "INR", "^CNXPHARMA", None, None, "NSE", "AT", "Sector index", None),
+    ("NIFTYFMCG", "NIFTY FMCG", "index", "NSE", "INR", "^CNXFMCG", None, None, "NSE", "AT", "Sector index", None),
+    ("NIFTYMETAL", "NIFTY Metal", "index", "NSE", "INR", "^CNXMETAL", None, None, "NSE", "AT", "Sector index", None),
+    ("NIFTYENERGY", "NIFTY Energy", "index", "NSE", "INR", "^CNXENERGY", None, None, "NSE", "AT", "Sector index", None),
+    ("NIFTYREALTY", "NIFTY Realty", "index", "NSE", "INR", "^CNXREALTY", None, None, "NSE", "AT", "Sector index", None),
+    ("NIFTYPSUBANK", "NIFTY PSU Bank", "index", "NSE", "INR", "^CNXPSUBANK", None, None, "NSE", "AT", "Sector index", None),
+    ("NIFTYINFRA", "NIFTY Infrastructure", "index", "NSE", "INR", "^CNXINFRA", None, None, "NSE", "AT", "Sector index", None),
+    ("NIFTYMEDIA", "NIFTY Media", "index", "NSE", "INR", "^CNXMEDIA", None, None, "NSE", "AT", "Sector index", None),
     ("INDIAVIX",   "India VIX",            "index",  "NSE",   "INR", "^INDIAVIX", None,       "INDIAVIX",   "NSE",  "AT",  "Volatility", None),
     ("SENSEX",     "S&P BSE Sensex",       "index",  "BSE",   "INR", "^BSESN",    None,       None,         "NSE",  "AT",  "Index", None),
     ("NIFTYBEES",  "Nippon Nifty 50 ETF",  "etf",    "NSE",   "INR", "NIFTYBEES.NS","NIFTYBEES:NSE", "NIFTYBEES-EQ", "NSE", "ATP", "ETF", 1),
@@ -66,6 +76,13 @@ CORE = [
     ("JPM",   "JPMorgan",    "stock", "NYSE",   "USD", "JPM",   "JPM",   None, "US", "ATP", "Financials", 1),
     ("XOM",   "ExxonMobil",  "stock", "NYSE",   "USD", "XOM",   "XOM",   None, "US", "ATP", "Energy", 1),
 ]
+# US large-cap universe for the US auto paper account (S&P 100-style list; membership not point-in-time - survivorship bias noted).
+US_UNIVERSE = ["AAPL","MSFT","NVDA","AMZN","GOOGL","META","TSLA","BRK-B","JPM","V","MA","UNH","XOM","JNJ","PG","HD","COST","ABBV","MRK","AVGO",
+    "PEP","KO","LLY","WMT","BAC","CVX","ADBE","CRM","NFLX","AMD","ORCL","CSCO","TMO","ACN","MCD","ABT","DHR","WFC","LIN","TXN","INTC","QCOM",
+    "PM","NEE","UNP","IBM","AMGN","HON","LOW","CAT","GS","MS","SPGI","BLK","INTU","ISRG","AMAT","NOW","GE","RTX","BKNG","DE","PLD","SBUX",
+    "MDT","GILD","ADI","LMT","SYK","MMC","C","CB","TJX","VRTX","MO","SO","DUK","ZTS","PGR","BA","UPS","PYPL","COP","T","VZ","CMCSA","DIS",
+    "NKE","MU","PANW","UBER","ABNB","SCHW","AXP","ELV","CI","REGN","BMY","USB","F","GM"]
+
 COLS = ["id", "name", "kind", "exchange", "currency", "yahoo", "twelvedata", "angel", "calendar", "can", "sector", "lot"]
 
 # Existing 25-Sep-2026 engine run traded these NSE stocks; keep sectors for the ones we know.
@@ -83,6 +100,14 @@ SECTOR_HINTS = {
     "TITAN": "Consumer", "ASIANPAINT": "Consumer", "TRENT": "Retail",
     "BEL": "Defence", "COCHINSHIP": "Defence", "ENGINERSIN": "Engineering", "CASTROLIND": "Energy", "AEGISLOG": "Logistics",
 }
+
+
+def us_equity_rows(symbols=None):
+    rows = []
+    for s in (symbols or US_UNIVERSE):
+        rows.append({"id": s, "name": s, "kind": "stock", "exchange": "US", "currency": "USD", "yahoo": s, "twelvedata": s,
+                     "angel": None, "calendar": "US", "can": "ATP", "sector": "Unknown", "lot": 1, "source": "us_universe"})
+    return pd.DataFrame(rows, columns=COLS + ["source"])
 
 
 def _core_df():

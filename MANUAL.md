@@ -2,7 +2,13 @@
 
 Open **https://16vitaws.github.io/market-scanner/** on your phone or laptop. Add it to the home screen. Everything updates by itself; tap **Refresh** any time.
 
-## The 17 screens
+## Get alerts on your phone and PC (one-time, 1 minute)
+Install the free **ntfy** app (Android / iPhone), tap **+**, type `vision-ai-16vitaws-k7q2m9x4`, Subscribe. On a PC open https://ntfy.sh/vision-ai-16vitaws-k7q2m9x4 and allow notifications. You'll get new buy/exit signals (India + US), options entries/exits, paper fills, stop/target touches and big market moves automatically.
+
+## Install the portal as an app
+On the portal tap **⬇ Install app** (Chrome/Edge on PC or Android), or on iPhone Safari: Share → Add to Home Screen.
+
+## The screens (21 in v2.3; new ones described at the end)
 1. **Command Center** — the verdict (BULL / BEAR / SIDEWAYS), today's buy / sell / blocked list with every reason, the automatic paper account, world heat-map, latest automated observation, system status.
 2. **Global Markets** — India, US, Europe, Asia, currencies, commodities; market hours; correlation matrix. Each tile shows its date and status.
 3. **Charts** — pick any symbol that has a candle file; SMA/EMA/Bollinger, RSI, support/resistance, engine fills and signals drawn on the chart; place a paper order from the chart.
@@ -35,3 +41,13 @@ Open **https://16vitaws.github.io/market-scanner/** on your phone or laptop. Add
 
 ## What it will never do
 Place a real order; show a static number as live; fill a gap with invented candles; promise a return.
+
+
+## New in 2.3 (plain words)
+- **Intelligence → Market regime:** says whether NIFTY behaves like an uptrend, a range or a downtrend right now, how sure the model is, and how long such phases usually last. It describes the recent past; the out-of-sample box says whether it has helped predict anything.
+- **Intelligence → Global events → Indian sectors:** when oil, the dollar, US stocks or US yields make an unusually big move, you get a push and a table: which Indian sector indices usually move the next day, by how much, and the headlines that may explain it. Statistics, not certainty.
+- **Big-Money Flows:** bulk and block deals (who bought/sold big, as disclosed by NSE) and stocks where heavy volume came with high delivery (possible accumulation) — end-of-day only.
+- **Mutual Funds:** every direct-growth fund in the main categories, ranked against its own category. Tick 2–4 funds and press Compare. Allocation ideas explain their reason. Check expense ratio and holdings on the AMC site before investing.
+- **AI p on the scanner:** the machine-learning model's probability that the stock gains 1%+ in 10 sessions. AGREES / DISAGREES tells you if it supports the rule signal. It never trades by itself.
+- **Your own alerts on the phone (Alerts screen):** build a rule line such as `RELIANCE>3000; NIFTY%<-1.5`, copy it, open GitHub variables, create `ALERT_RULES` and paste. Done once; change it any time.
+- **Telegram (optional):** add repository secrets `TELEGRAM_TOKEN` and `TELEGRAM_CHAT_ID`; every push is also sent there.

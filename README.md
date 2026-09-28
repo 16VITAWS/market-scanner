@@ -1,4 +1,19 @@
-# VISION AI v2 — paper-trading & market-intelligence workspace
+# VISION AI v2.3 — paper-trading, market-intelligence & live-trading workspace
+
+**New in 2.3:** market-regime model (3-state HMM: BULL / SIDEWAYS / BEAR with probabilities, expected duration and an out-of-sample check) ·
+global-event → Indian-sector impact map (lag-aware betas of 10 NSE sector indices to US stocks, US yields, VIX, dollar, Brent, gold, copper, Asia;
+2-sd shock alerts with expected move and band; headlines keyword-linked to drivers) · next-session probability-range chart · macro panel (FRED, World Bank) ·
+**Big-Money Flows** (NSE bulk/block deals, delivery-% accumulation/distribution flags) · **Mutual Fund Scanner** (AMFI NAVs, direct-growth schemes ranked
+inside their category on 3y return/Sharpe/drawdown; sector-tilt and regime-based allocation ideas; side-by-side compare) · AI confidence (shadow ML probability)
+shown next to every scanner signal · your own server-side alert rules (repo variable `ALERT_RULES`) pushed to the phone · sector indices added.
+
+**New in 2.2:** Intelligence screen (next-session NIFTY forecast with out-of-sample hit rate and calibration, pre-market run at 08:15 IST;
+cross-market linkage monitor with rolling correlations, lead-lag and Granger tests; unusual-activity detector; machine-learning shadow model
+compared walk-forward against the rule scanner) · execution-quality report (TWAP / VWAP / POV vs decision price) · SPAN-like margin estimates ·
+event filters (results blackout, ex-dividend, F&O ban) · **Live Desk**: live trading without API (tickets + "I placed it" tracking) and with API
+(Groww, approve-each-order via GitHub, gated auto mode, kill switch; orders placed only by the runner on your static-IP machine — see LIVE_SETUP.md).
+
+**New in 2.1:** automatic index-options paper trading (NIFTY debit spreads, defined risk, Black-Scholes MODELED prices until a quote feed exists) · US large-cap auto paper account (S&P 500 regime) · push notifications to phone/PC via ntfy (signals, fills, options, stop/target touches, big market moves, detected every ~15 min intraday and at EOD) · installable app (PWA) for any phone or PC · VaR/CVaR, two-sided stress tests, Kelly (info) · square-root market-impact slippage. Live real-money execution remains locked and not implemented.
 
 **Live portal:** https://16vitaws.github.io/market-scanner/ (GitHub Pages, branch `gh-pages`)
 **Mode:** PAPER only. No broker is connected; live execution is not implemented and is locked by design.
@@ -38,6 +53,8 @@ GitHub Actions (free)                       GitHub Pages (gh-pages branch, singl
 | `pipeline.py` | regime → scan → risk → paper orders → mark-to-market. |
 | `backtest.py` | Event-driven backtester, metrics (CAGR, DD, Sharpe, Sortino, Calmar, PF, expectancy…), walk-forward, seasonality with Holm correction. |
 | `analytics.py` | Equity/drawdown/monthly stats, rolling win-rate, rule-based diagnosis, bootstrap outcome range (labelled, not a forecast). |
+| `options.py` | Black-Scholes pricing/greeks, expiry calendar, modeled chains, defined-risk debit-spread strategy, options paper account. |
+| `notify.py` | ntfy.sh push (+ Telegram if configured), dedupe, notification feed. |
 | `news.py` | Google News RSS, dedupe, keyword sentiment (low confidence, labelled). |
 | `knowledge.py` | Seed event-impact graph (documented mechanisms) + computed correlations/betas. |
 | `reports.py` | Pre-market / post-market / weekend automated observations. |
@@ -46,7 +63,7 @@ GitHub Actions (free)                       GitHub Pages (gh-pages branch, singl
 ## Run locally
 ```
 pip install -r requirements.txt
-python -m pytest -q tests                    # 23 tests
+python -m pytest -q tests                    # 29 tests
 python -m engine.run eod --site /tmp/site --offline   # uses the preserved NIFTY CSV, no network
 python -m engine.run eod --site /tmp/site             # real run (needs internet to Yahoo)
 ```
