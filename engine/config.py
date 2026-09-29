@@ -4,7 +4,7 @@ Secrets (broker keys, Telegram token) come ONLY from environment variables / Git
 """
 import os
 
-ENGINE_VERSION = "2.6.1"
+ENGINE_VERSION = "2.7.0"
 
 # ---- MODE (one word, never mixed) --------------------------------------------
 # Paper trading and live trading are SEPARATE and both stay available:
@@ -24,6 +24,8 @@ DEFAULT_ACCOUNTS = [
     {"id": "US-MANUAL", "name": "US manual practice", "currency": "USD", "cash": "10000", "strategies": []},
     {"id": "US-SWING", "name": "US swing (auto)", "currency": "USD", "cash": "10000", "strategies": ["trend_breakout_swing_us"]},
     {"id": "IN-OPTIONS", "name": "India index options (auto, modeled prices)", "currency": "INR", "cash": "200000", "strategies": ["index_options_regime"]},
+    {"id": "IN-VALUE", "name": "India long-term value (auto, monthly)", "currency": "INR", "cash": "500000", "strategies": ["value_longterm"]},
+    {"id": "US-VALUE", "name": "US long-term value (auto, monthly)", "currency": "USD", "cash": "20000", "strategies": ["value_longterm"]},
 ]
 
 # ---- risk limits (the risk engine enforces these; strategies cannot override) ---

@@ -22,7 +22,7 @@ from .strategies import get as get_strategy, catalogue
 from .strategies.ma_cross import MACross
 from . import options as OPT, notify as NOTIFY, forecast as FC, contagion as CG, anomaly as AM, ml as ML, execalgo as EX, margin as MG, events as EV
 from .live import control as LCTL, proposals as LPROP
-from . import nse_eod as NSEEOD, livefeed as LF, simulator
+from . import nse_eod as NSEEOD, livefeed as LF, simulator, value as VAL
 from . import regime_hmm as HMM, impact as IM, flows as FL, mf as MF, macro as MAC, rules as RULES
 
 IST = dt.timezone(dt.timedelta(hours=5, minutes=30))
@@ -254,7 +254,7 @@ def job_eod(site, offline=False, universe_limit=None, fetch_news=True, weekend=F
     else:
         why = "offline" if not stocks else (f"data {data_status}" if data_status != "OK" else f"mode {C.MODE}")
         for aid, a in L.state["accounts"].items():
-            if a["strategies"] and a["strategies"][0] in ("trend_breakout_swing_us", "index_options_regime"):
+            if a["strategies"] and a["strategies"][0] in ("trend_breakout_swing_us", "index_options_regime", "value_longterm"):
                 continue
             prices = {s: float(frames[s]["Close"].iloc[-1]) for s in L.account(aid)["positions"] if s in frames}
             L.mark(aid, prices, bar_date)
@@ -338,6 +338,42 @@ def job_eod(site, offline=False, universe_limit=None, fetch_news=True, weekend=F
                 api.write(site.path, "mf.json", {"available": False, "reason": str(e)})
     elif not mf_old:
         api.write(site.path, "mf.json", {"available": False, "reason": "offline - AMFI / mfapi not reachable from this environment"})
+    # ---- long-term value scanner + value paper accounts
+    try:
+        vc_path = os.path.join(site.data, "value_cache.json")
+        vcache = json.load(open(vc_path)) if os.path.exists(vc_path) else {}
+        vrep = {"fetched_this_run": 0, "errors": 0}
+        if not offline:
+            univ = [(k, master.loc[k, "yahoo"], "IN" if master.loc[k, "currency"] == "INR" else "US", master.loc[k, "name"])
+                    for k in master.index if master.loc[k, "kind"] == "stock" and isinstance(master.loc[k, "yahoo"], str) and master.loc[k, "currency"] in ("INR", "USD")]
+            vcache, vrep = VAL.refresh(univ, vcache, max_fetch=400 if weekend else 150)
+            json.dump(vcache, open(vc_path, "w"), default=str)
+        prices = {k: float(v["Close"].iloc[-1]) for k, v in clean.items()}
+        vscored, vrecs = VAL.build(vcache, prices)
+        vacts = {}
+        if C.PAPER_ON and data_status == "OK":
+            mk = L.state.setdefault("value_rebalanced", {})
+            for aid, mkt in (("IN-VALUE", "IN"), ("US-VALUE", "US")):
+                if aid not in L.state["accounts"] or not [r for r in vscored if r.get("market") == mkt]:
+                    continue
+                acc_ = L.account(aid)
+                ym = str(bar_date)[:7]
+                reb = mk.get(aid) != ym
+                vacts[aid] = VAL.paper_step(L, aid, vscored, clean, bar_date, simulator, mkt, reb)
+                if reb:
+                    mk[aid] = ym
+                actions[aid] = vacts[aid]
+            L.save()
+        n_cov = {m_: sum(1 for r in vscored if r.get("market") == m_) for m_ in ("IN", "US")}
+        api.write(site.path, "value.json", {"as_of": str(bar_date), "coverage": n_cov, "universe_cached": len(vcache), "refresh": vrep,
+                                            "recommendations": vrecs, "stocks": vscored, "actions": vacts,
+                                            "method": VAL.__doc__.strip(), "status": "DELAYED fundamentals (annual statements) + today's close",
+                                            "honesty": "Point-in-time fundamentals are not available free, so this scanner has NOT been backtested. "
+                                                       "Its live record starts with the IN-VALUE / US-VALUE paper accounts. Conviction is a model score, not a probability."})
+    except Exception as e:  # noqa
+        log("value scanner failed:", e)
+        if not site.load_json("api/value.json"):
+            api.write(site.path, "value.json", {"recommendations": [], "stocks": [], "error": str(e)})
     if not offline:
         try:
             api.write(site.path, "macro.json", MAC.run(frames))
