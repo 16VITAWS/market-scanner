@@ -22,8 +22,11 @@ def px(x):
     return D(str(x)).quantize(D("0.01"), rounding=ROUND_HALF_UP)
 
 
-def apply_bar(ledger, account, symbol, bar, bar_date, slippage=None, max_vol_share=None, sector=None):
-    """Process pending orders and open position exits for `symbol` with one bar. Returns list of action strings."""
+def apply_bar(ledger, account, symbol, bar, bar_date, slippage=None, max_vol_share=None, sector=None, intraday=False):
+    """Process pending orders and open position exits for `symbol` with one bar. Returns list of action strings.
+    intraday=True: `bar` is TODAY SO FAR (open, high/low so far, last price). Pending orders decided on an earlier bar fill at
+    today's open, stops/targets trigger on the range so far - the same rules the end-of-day run uses, just earlier. Holding-day
+    counters, order expiry and trailing stops are left to the end-of-day run, so nothing is counted twice."""
     slip = D(str(C.FILL["slippage_pct"] if slippage is None else slippage))
     share = D(str(C.RISK["max_volume_share"] if max_vol_share is None else max_vol_share))
     o_, h_, l_, c_, v_ = (D(str(bar[k])) for k in ("Open", "High", "Low", "Close", "Volume"))
@@ -41,7 +44,8 @@ def apply_bar(ledger, account, symbol, bar, bar_date, slippage=None, max_vol_sha
     for o in [o for o in ledger.pending(account) if o["symbol"] == symbol]:
         if o["decided_on_bar"] and str(bar_date) <= o["decided_on_bar"]:
             continue  # never fill on the decision bar (look-ahead guard)
-        o["bars_waited"] += 1
+        if not intraday:
+            o["bars_waited"] += 1
         remaining = D(o["qty"]) - D(o["filled_qty"])
         fill_px = None
         if v_ == 0:
@@ -66,16 +70,21 @@ def apply_bar(ledger, account, symbol, bar, bar_date, slippage=None, max_vol_sha
             note = "" if qty == remaining else f"partial: liquidity cap {liq_cap} of bar volume"
             f = ledger.fill(o, px(fill_px), qty, bar_date, note=note)
             if f:
+                if intraday:
+                    f["note"] = ((f.get("note") or "") + " [filled live during the session]").strip()
                 acts.append(f"{o['side'].upper()} {f['qty']} {symbol} @ {f['price']} ({o['type'].lower()}, fees {f['fees']}) {note}".strip())
-        if o["status"] in ("PENDING", "PARTIAL") and o["bars_waited"] >= o.get("expires_after_bars", 3):
+        if not intraday and o["status"] in ("PENDING", "PARTIAL") and o["bars_waited"] >= o.get("expires_after_bars", 3):
             o["status"] = "EXPIRED"; ledger._audit("order_expired", order=o["id"])
             acts.append(f"{symbol}: order {o['id']} expired unfilled")
 
     # 2. open position management: stop first, then target, then trailing
     a = ledger.account(account)
     pos = a["positions"].get(symbol)
+    if pos and pos.get("spread"):
+        return acts                                            # option spreads are managed by options.py
     if pos:
-        pos["bars_held"] = int(pos.get("bars_held", 0)) + 1
+        if not intraday:
+            pos["bars_held"] = int(pos.get("bars_held", 0)) + 1
         pos["last"] = str(c_)
         pos["high_water"] = str(max(D(pos["high_water"]), h_))
         stop = D(pos["stop"]) if pos.get("stop") else None
@@ -90,8 +99,8 @@ def apply_bar(ledger, account, symbol, bar, bar_date, slippage=None, max_vol_sha
                                  reason=why, dedupe_key=f"{account}|{symbol}|exit|{bar_date}", segment=pos.get("segment", "delivery"))
             f = ledger.fill(o, px(exit_px), D(pos["qty"]), bar_date, note=why)
             if f:
-                acts.append(f"EXIT {f['qty']} {symbol} @ {f['price']} - {why}")
-        else:
+                acts.append(f"EXIT {f['qty']} {symbol} @ {f['price']} - {why}" + (" (live)" if intraday else ""))
+        elif not intraday:
             # trailing stop once up trail_after_pct
             trail_after, trail = D(str(C.SIGNALS["trail_after_pct"])), D(str(C.SIGNALS["trail_pct"]))
             if pos.get("strategy") not in (None, "manual") and c_ > D(pos["avg_price"]) * (1 + trail_after):

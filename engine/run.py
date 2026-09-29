@@ -10,7 +10,7 @@ Entry point.  python -m engine.run <job> --site site [--offline]
 --offline uses the preserved NIFTY CSV and legacy snapshots (used in the sandbox and in tests).
 State lives in <site>/data (ledger.json, runs/, backups/); outputs in <site>/api.
 """
-import os, sys, io, json, glob, shutil, argparse, subprocess, datetime as dt, traceback
+import os, sys, io, json, glob, time, shutil, argparse, subprocess, datetime as dt, traceback
 from decimal import Decimal
 import pandas as pd
 import numpy as np
@@ -22,7 +22,7 @@ from .strategies import get as get_strategy, catalogue
 from .strategies.ma_cross import MACross
 from . import options as OPT, notify as NOTIFY, forecast as FC, contagion as CG, anomaly as AM, ml as ML, execalgo as EX, margin as MG, events as EV
 from .live import control as LCTL, proposals as LPROP
-from . import nse_eod as NSEEOD
+from . import nse_eod as NSEEOD, livefeed as LF, simulator
 from . import regime_hmm as HMM, impact as IM, flows as FL, mf as MF, macro as MAC, rules as RULES
 
 IST = dt.timezone(dt.timedelta(hours=5, minutes=30))
@@ -624,96 +624,140 @@ def run_tests():
         return {"passed": False, "summary": f"could not run: {e}", "ran_at": api.now()}
 
 
-def job_intraday(site, offline=False):
-    """Refresh quotes for core instruments + held/watched symbols with 5-minute bars; mark positions. No decisions."""
+def job_intraday(site, offline=False, minutes=None, every=None):
+    """LIVE session loop: quotes for everything, live paper fills (stocks + options), alerts, and a small publish every cycle.
+    Runs one pass when no market is open. See engine/livefeed.py for the rules."""
     if offline:
         log("intraday: offline, nothing to do"); return
+    minutes = float(os.environ.get("LIVE_MINUTES") or (minutes if minutes is not None else 24))
+    every = float(os.environ.get("LIVE_EVERY_SECONDS") or (every if every is not None else 120))
+    t_end = time.time() + minutes * 60
+    token, repo = os.environ.get("LIVE_PUSH_TOKEN"), os.environ.get("GITHUB_REPOSITORY")
     L = site.ledger()
-    master = INS.master(INS.us_equity_rows())
+    nse = INS.load_nifty500(fallback_file=os.path.join(ROOT, "stocks.txt"))[0]
+    master = INS.master(pd.concat([nse, INS.us_equity_rows()], ignore_index=True))
     y = provider("yahoo")
-    held = set()
-    for a in L.state["accounts"].values():
-        held |= {s for s, p in a["positions"].items() if not p.get("spread")}
-    ids = [i for i in master.index if master.loc[i, "source"] == "core" and isinstance(master.loc[i, "yahoo"], str)] + sorted(held)
-    tick = {i: (master.loc[i, "yahoo"] if i in master.index else i + ".NS") for i in ids}
-    got, bad = y.candles_many(list(tick.values()), "5m", "5d")
-    q = site.load_json("api/quotes.json", {"quotes": {}})
-    now = api.now()
-    for i, t in tick.items():
-        df = got.get(t)
-        if df is None or len(df) < 2:
-            continue
-        day = df.index[-1].date()
-        today = df[df.index.date == day]
-        before = df[df.index.date < day]
-        prev = q["quotes"].get(i, {}).get("pc") or (float(before["Close"].iloc[-1]) if len(before) else None)
-        last = float(df["Close"].iloc[-1])
-        q["quotes"][i] = {**q["quotes"].get(i, {}), "p": round(last, 2), "pc": round(prev, 2) if prev else None, "chg_pct": round((last / prev - 1) * 100, 2) if prev else None,
-                          "t": df.index[-1].isoformat(), "d": str(day), "status": "DELAYED", "intraday": True,
-                          "day_o": round(float(today["Open"].iloc[0]), 2), "day_h": round(float(today["High"].max()), 2), "day_l": round(float(today["Low"].min()), 2)}
-        instr = master.loc[i].to_dict() if i in master.index else {"id": i, "name": i}
-        api.candles_json(site.path, instr, df, {"provider": "yahoo", "ticker": t, "interval": "5m", "delay_minutes": 15, "licence": y.licence, "fetched_at_utc": now}, "5m")
-    q["generated_at"] = now; q["note"] = "Intraday refresh: 5-minute bars, ~15 min delayed, from the free feed."
-    api.write(site.path, "quotes.json", {k: v for k, v in q.items() if k not in ("generated_at", "engine_version", "mode")})
-    for aid in L.state["accounts"]:
-        prices = {s: q["quotes"][s]["p"] for s in L.account(aid)["positions"] if s in q["quotes"]}
-        L.mark(aid, prices, dt.datetime.now(IST).date())
-    L.save()
-    pj = api.paper_json(L); pj["last_actions"] = site.load_json("api/paper.json", {}).get("last_actions", {})
-    api.write(site.path, "paper.json", pj)
-    snap = site.load_json("api/snapshot.json", {})
-    for grp in ("indices", "fx", "commodities", "rates_vol"):
-        for k in snap.get(grp, {}):
-            if k in q["quotes"]:
-                snap[grp][k] = q["quotes"][k]
-    snap["nifty"] = q["quotes"].get("NIFTY", snap.get("nifty")); snap["vix"] = q["quotes"].get("INDIAVIX", snap.get("vix"))
-    api.write(site.path, "snapshot.json", {k: v for k, v in snap.items() if k not in ("generated_at", "engine_version", "mode")})
-    api.write(site.path, "calendar.json", {**{k: v for k, v in site.load_json("api/calendar.json", {}).items() if k not in ("generated_at", "engine_version", "mode")}, "markets": cal.all_status()})
-    # ---- intraday auto-detect + notify (no trading decisions intraday; the engine acts at EOD)
-    try:
-        n = NOTIFY.Notifier(site.path)
-        today = dt.datetime.now(IST).date().isoformat()
-        for k, lim in (("NIFTY", C.ALERTS["index_move_pct"]), ("BANKNIFTY", C.ALERTS["index_move_pct"]), ("SPX", C.ALERTS["index_move_pct"]),
-                       ("INDIAVIX", C.ALERTS["vix_move_pct"]), ("BRENT", 3.0), ("USDINR", 0.5), ("GOLD", 2.0)):
-            x = q["quotes"].get(k)
-            if x and x.get("intraday") and x.get("chg_pct") is not None and abs(x["chg_pct"]) >= lim:
-                band = int(abs(x["chg_pct"]) // lim)
-                n.push(f"{x.get('name', k)} {x['chg_pct']:+.2f}% today", f"{k} {x['p']:,} (prev {x['pc']:,}) · delayed ~15 min · {x['t'][11:16]} UTC",
-                       key=f"move|{k}|{today}|{band}|{'up' if x['chg_pct'] > 0 else 'dn'}", tags=("warning",), priority=4, click=NOTIFY.PORTAL + "#markets")
-        for aid, a in L.state["accounts"].items():
-            for sym, p in a["positions"].items():
-                x = q["quotes"].get(sym)
-                if not x or not x.get("intraday"):
+    cycles = 0
+    while True:
+        cycles += 1
+        t0 = time.time()
+        st = cal.all_status()
+        open_mk = {k for k in ("NSE", "US") if st.get(k, {}).get("state") == "OPEN"}
+        q = site.load_json("api/quotes.json", {"quotes": {}})
+        q.setdefault("quotes", {})
+        held = set()
+        for acc in L.state["accounts"].values():
+            held |= {s_ for s_, p_ in acc["positions"].items() if not p_.get("spread")}
+        for o in L.state["orders"]:
+            if o["status"] in ("PENDING", "PARTIAL") and o.get("segment") != "options":
+                held.add(o["symbol"])
+        core = [i for i in master.index if master.loc[i, "source"] == "core" and isinstance(master.loc[i, "yahoo"], str)]
+        tick5 = {i: master.loc[i, "yahoo"] for i in core}
+        for h_ in held:
+            tick5[h_] = master.loc[h_, "yahoo"] if h_ in master.index else h_ + ".NS"
+        got, bad = y.candles_many(list(tick5.values()), "5m", "5d")
+        for i, t in tick5.items():
+            df = got.get(t)
+            if df is None or len(df) < 2:
+                continue
+            old = q["quotes"].get(i, {})
+            q["quotes"][i] = {**old, **LF.quote_from_5m(df, old)}
+        # every stock in the open market(s): today's running daily bar
+        univ = []
+        if "NSE" in open_mk:
+            univ += [i for i in master.index if master.loc[i, "kind"] == "stock" and master.loc[i, "currency"] == "INR" and i not in tick5]
+        if "US" in open_mk:
+            univ += [i for i in master.index if master.loc[i, "kind"] == "stock" and master.loc[i, "currency"] == "USD" and i not in tick5]
+        n_univ = 0
+        if univ:
+            td = {i: master.loc[i, "yahoo"] for i in univ if isinstance(master.loc[i, "yahoo"], str)}
+            gd, _ = y.candles_many(list(td.values()), "1d", "5d")
+            from zoneinfo import ZoneInfo
+            today_mk = {"INR": dt.datetime.now(IST).date(), "USD": dt.datetime.now(ZoneInfo("America/New_York")).date()}
+            for i, t in td.items():
+                df = gd.get(t)
+                if df is None or len(df) < 2:
                     continue
-                if p.get("stop") and x.get("day_l") is not None and x["day_l"] <= float(p["stop"]):
-                    n.push(f"{sym}: stop-loss level touched", f"{aid}: day low {x['day_l']} <= stop {p['stop']}. Paper exit is booked by the engine using the documented fill rule.",
-                           key=f"stop|{aid}|{sym}|{today}", tags=("rotating_light",), priority=5, click=NOTIFY.PORTAL + "#paper")
-                if p.get("target") and x.get("day_h") is not None and x["day_h"] >= float(p["target"]):
-                    n.push(f"{sym}: target level touched", f"{aid}: day high {x['day_h']} >= target {p['target']}.", key=f"tgt|{aid}|{sym}|{today}", tags=("tada",), priority=4)
-        # your own rules (repo variable ALERT_RULES)
-        check_rules(n, q["quotes"], today)
-        # options: modeled intraday value of open spreads
-        if "IN-OPTIONS" in L.state["accounts"] and q["quotes"].get("NIFTY", {}).get("intraday"):
-            a = L.account("IN-OPTIONS")
-            S = q["quotes"]["NIFTY"]["p"]
-            vix = q["quotes"].get("INDIAVIX", {}).get("p")
-            sigma = (vix / 100) if vix else 0.14
-            for sym, p in a["positions"].items():
-                sp = p.get("spread")
-                if not sp:
-                    continue
-                val, _, _ = OPT.spread_value(sp, S, dt.datetime.now(IST).date(), sigma)
-                p["last"] = str(round(val, 2))
-                debit = float(p["avg_price"]); maxp = sp["width"] - debit
-                if val - debit >= OPT.PARAMS["take_profit"] * maxp:
-                    n.push(f"Options take-profit zone: {sym}", f"Modeled value {val:.2f} vs debit {debit:.2f}. Engine books the exit at EOD.", key=f"otp|{sym}|{today}", tags=("tada",), priority=4)
-                elif val <= debit * (1 - OPT.PARAMS["stop_loss"]):
-                    n.push(f"Options stop zone: {sym}", f"Modeled value {val:.2f} vs debit {debit:.2f}. Engine books the exit at EOD.", key=f"osl|{sym}|{today}", tags=("rotating_light",), priority=5)
-            L.save()
-        n.save()
-    except Exception as e:  # noqa
-        log("intraday alerts failed:", e)
-    log("intraday refresh:", len(got), "series,", len(bad), "failed")
+                if df.index[-1].date() != today_mk[master.loc[i, "currency"]]:
+                    continue                                  # no bar for today yet
+                old = q["quotes"].get(i, {})
+                q["quotes"][i] = {**old, **LF.quote_from_daily(df, old)}
+                n_univ += 1
+        now = api.now()
+        q["note"] = "LIVE session: 5-minute bars for indices/FX/commodities/held symbols and today's running bar for every stock; ~15 min behind the exchange (free feed)."
+        api.write(site.path, "quotes.json", {k: v for k, v in q.items() if k not in ("generated_at", "engine_version", "mode")})
+        # ---- live paper trading
+        today = dt.datetime.now(IST).date()
+        acts = LF.paper_live(L, q["quotes"], open_mk, simulator, today)
+        if "NSE" in open_mk:
+            oa = LF.options_live(L, "IN-OPTIONS", q["quotes"], OPT, today, str(today))
+            if oa:
+                acts.setdefault("IN-OPTIONS", []).extend(oa)
+        for aid in L.state["accounts"]:
+            acc = L.account(aid)
+            if ("US" if acc["currency"] == "USD" else "NSE") not in open_mk:
+                continue                                        # only mark accounts whose market is trading now
+            prices = {s_: q["quotes"][s_]["p"] for s_, p_ in acc["positions"].items() if s_ in q["quotes"] and not p_.get("spread") and q["quotes"][s_].get("d") == str(today)}
+            prices.update({s_: float(p_["last"]) for s_, p_ in acc["positions"].items() if p_.get("spread")})
+            L.mark(aid, prices, str(today))
+        L.save()
+        pj = api.paper_json(L)
+        prev_pj = site.load_json("api/paper.json", {})
+        pj["last_actions"] = prev_pj.get("last_actions", {})
+        prev_acc = {x.get("account"): x for x in prev_pj.get("accounts", [])}
+        for acc_ in pj["accounts"]:                       # keep the evening analytics / risk blocks; values above are live
+            for k_ in ("analytics", "risk"):
+                if k_ in prev_acc.get(acc_["account"], {}):
+                    acc_[k_] = prev_acc[acc_["account"]][k_]
+        for k_ in prev_pj:
+            if k_ not in pj and k_ not in ("generated_at", "engine_version", "mode"):
+                pj[k_] = prev_pj[k_]
+        live_log = (prev_pj.get("live_actions") or [])
+        for aid, al in acts.items():
+            for a_ in al:
+                live_log.append({"time": now, "account": aid, "action": a_})
+        pj["live_actions"] = live_log[-200:]
+        pj["live_updated_at"] = now
+        api.write(site.path, "paper.json", pj)
+        snap = site.load_json("api/snapshot.json", {})
+        for k in ("generated_at", "engine_version", "mode"):
+            snap.pop(k, None)
+        for grp in ("indices", "fx", "commodities", "rates_vol", "sectors"):
+            for k in list(snap.get(grp, {}) or {}):
+                if k in q["quotes"]:
+                    snap[grp][k] = q["quotes"][k]
+        snap["nifty"] = q["quotes"].get("NIFTY", snap.get("nifty")); snap["vix"] = q["quotes"].get("INDIAVIX", snap.get("vix")); snap["usdinr"] = q["quotes"].get("USDINR", snap.get("usdinr"))
+        api.write(site.path, "snapshot.json", snap)
+        api.write(site.path, "calendar.json", {**{k: v for k, v in site.load_json("api/calendar.json", {}).items() if k not in ("generated_at", "engine_version", "mode")}, "markets": st})
+        # ---- alerts
+        try:
+            n = NOTIFY.Notifier(site.path)
+            day = today.isoformat()
+            for aid, al in acts.items():
+                for a_ in al:
+                    if a_.startswith(("BUY", "SELL", "EXIT")):
+                        n.push(f"Paper {aid} (live)", a_, key=f"live|{aid}|{a_}", tags=("memo",), priority=4, click=NOTIFY.PORTAL + "#paper")
+            for k, lim in (("NIFTY", C.ALERTS["index_move_pct"]), ("BANKNIFTY", C.ALERTS["index_move_pct"]), ("SPX", C.ALERTS["index_move_pct"]),
+                           ("INDIAVIX", C.ALERTS["vix_move_pct"]), ("BRENT", 3.0), ("USDINR", 0.5), ("GOLD", 2.0)):
+                x = q["quotes"].get(k)
+                if x and x.get("intraday") and x.get("chg_pct") is not None and abs(x["chg_pct"]) >= lim and x.get("d") == day:
+                    band = int(abs(x["chg_pct"]) // lim)
+                    n.push(f"{x.get('name', k)} {x['chg_pct']:+.2f}% today", f"{k} {x['p']:,} (prev {x['pc']:,}) · delayed ~15 min",
+                           key=f"move|{k}|{day}|{band}|{'up' if x['chg_pct'] > 0 else 'dn'}", tags=("warning",), priority=4, click=NOTIFY.PORTAL + "#markets")
+            check_rules(n, q["quotes"], day)
+            n.save()
+        except Exception as e:  # noqa
+            log("live alerts failed:", e)
+        status = {"cycle": cycles, "updated_at": now, "open_markets": sorted(open_mk), "quotes_5m": len(got), "stocks_live": n_univ,
+                  "paper_actions_this_cycle": sum(len(v) for v in acts.values()), "every_seconds": every,
+                  "note": "Free data is ~15 minutes behind the exchange. Real-time needs a broker data feed (see Live Desk setup)."}
+        api.write(site.path, "live_status.json", status)
+        pub = LF.publish(site.path, token, repo)
+        log(f"live cycle {cycles}: markets {sorted(open_mk) or 'closed'} · 5m {len(got)} · stocks {n_univ} · actions {status['paper_actions_this_cycle']} · {pub}")
+        if not open_mk or time.time() + every > t_end:
+            break
+        time.sleep(max(5, every - (time.time() - t0)))
+    log(f"live session done after {cycles} cycle(s)")
 
 
 def job_premarket(site, offline=False):
