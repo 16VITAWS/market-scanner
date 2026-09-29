@@ -22,6 +22,7 @@ from .strategies import get as get_strategy, catalogue
 from .strategies.ma_cross import MACross
 from . import options as OPT, notify as NOTIFY, forecast as FC, contagion as CG, anomaly as AM, ml as ML, execalgo as EX, margin as MG, events as EV
 from .live import control as LCTL, proposals as LPROP
+from . import nse_eod as NSEEOD
 from . import regime_hmm as HMM, impact as IM, flows as FL, mf as MF, macro as MAC, rules as RULES
 
 IST = dt.timezone(dt.timedelta(hours=5, minutes=30))
@@ -118,6 +119,16 @@ def load_market(site, offline, universe_limit=None):
     except Exception as e:  # noqa
         err = f"{type(e).__name__}: {e}"; log("Yahoo download failed:", err)
     prov_status.append({**y.capabilities(), "last_fetch_ok": ok, "last_error": err, "fetched": len(frames), "failed": len(failed)})
+    # fill sessions Yahoo has not published yet from NSE's official end-of-day files
+    try:
+        nse_ids = [k for k in frames if k in master.index and master.loc[k, "currency"] == "INR" and master.loc[k, "calendar"] == "NSE"]
+        rep = NSEEOD.patch(frames, nse_ids, list(cal.CALENDARS["NSE"]["holidays"].keys()))
+        for d_, n_ in rep["patched"].items():
+            log(f"NSE bhavcopy filled {d_} for {n_} symbols")
+        prov_status.append({"id": "nse-eod", "name": "NSE official EOD files (bhavcopy + index close)", "last_fetch_ok": bool(rep["patched"]) or None,
+                            "last_error": None, "detail": rep, "delay": "after ~18:00 IST", "licence": "NSE public archive"})
+    except Exception as e:  # noqa
+        log("NSE EOD patch failed:", e)
     for pid in ("angelone", "twelvedata", "nseweb", "manual"):
         prov_status.append({**provider(pid).capabilities(), "last_fetch_ok": None})
     return {"master": master, "frames": frames, "metas": metas, "failed": failed, "universe_source": usrc, "providers": prov_status, "sectors": sectors}
@@ -714,6 +725,11 @@ def job_premarket(site, offline=False):
         core = [r for _, r in master.iterrows() if r.source == "core" and isinstance(r.yahoo, str)]
         got, bad = y.candles_many([r.yahoo for r in core], "1d", "5y")
         frames = {r.id: dq.clean(got[r.yahoo]) for r in core if r.yahoo in got}
+        try:
+            NSEEOD.patch(frames, [k for k in frames if k in master.index and master.loc[k, "currency"] == "INR" and master.loc[k, "calendar"] == "NSE"],
+                         list(cal.CALENDARS["NSE"]["holidays"].keys()))
+        except Exception as e:  # noqa
+            log("NSE EOD patch failed:", e)
     else:
         frames = M["frames"]
     if "NIFTY" not in frames:
