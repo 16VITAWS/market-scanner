@@ -1,8 +1,9 @@
-name: Intraday quotes refresh
+name: Live session (quotes + live paper trading)
 
 on:
   schedule:
-    - cron: "*/15 3-10 * * 1-5"   # every 15 min, 08:30-15:59 IST window (03:00-10:59 UTC), weekdays
+    - cron: "*/5 3-10 * * 1-5"    # India session window (08:30-16:29 IST); each run loops ~24 min, refreshing every ~2 min
+    - cron: "*/5 13-20 * * 1-5"   # US session window (19:00-02:29 IST)
   workflow_dispatch:
 
 concurrency: { group: vision-site, cancel-in-progress: false }
@@ -12,7 +13,7 @@ jobs:
   intraday:
     runs-on: ubuntu-latest
     environment: { name: github-pages }
-    timeout-minutes: 15
+    timeout-minutes: 35
     steps:
       - uses: actions/checkout@v4
       - name: Fetch site state
@@ -41,6 +42,9 @@ jobs:
           TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
           VISION_MODE: ${{ vars.VISION_MODE }}
+          LIVE_PUSH_TOKEN: ${{ github.token }}
+          LIVE_MINUTES: "24"
+          LIVE_EVERY_SECONDS: "120"
         run: python -m engine.run intraday --site site
       - name: Publish
         run: |
