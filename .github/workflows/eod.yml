@@ -8,8 +8,11 @@ on:
     - cron: "15 13 * * 1-5"    # 18:45 IST: re-run once NSE's official bhavcopy / index files are out (fills any gap in the free feed)
   workflow_dispatch:
 
-concurrency: { group: vision-site, cancel-in-progress: false }
-permissions: { contents: write, pages: write, id-token: write }
+# Own queue: the 5-minute live-session schedule can no longer knock a waiting end-of-day run out of the queue.
+# The two never write the site at the same time: this run waits for a running live session (which hands over within ~2 min),
+# and live sessions that start while this run is queued/running skip entirely.
+concurrency: { group: vision-eod, cancel-in-progress: false }
+permissions: { contents: write, pages: write, id-token: write, actions: read }
 
 jobs:
   eod:
@@ -17,6 +20,14 @@ jobs:
     environment: { name: github-pages }
     timeout-minutes: 40
     steps:
+      - name: Wait for a running live session to hand over
+        env: { GH_TOKEN: "${{ github.token }}" }
+        run: |
+          for i in $(seq 1 90); do
+            n=$(gh api "repos/${{ github.repository }}/actions/workflows/intraday.yml/runs?status=in_progress&per_page=5" --jq '.total_count' 2>/dev/null || echo 0)
+            [ "$n" = "0" ] && break
+            echo "live session still running ($n) - waiting"; sleep 20
+          done
       - uses: actions/checkout@v4
       - name: Fetch site state (gh-pages)
         run: |
