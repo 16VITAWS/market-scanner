@@ -5,6 +5,7 @@ on:
     branches: [main]
   schedule:
     - cron: "50 10 * * 1-5"    # 16:20 IST, Monday-Friday (Actions cron may be delayed 5-30 min)
+    - cron: "15 13 * * 1-5"    # 18:45 IST: re-run once NSE's official bhavcopy / index files are out (fills any gap in the free feed)
   workflow_dispatch:
 
 concurrency: { group: vision-site, cancel-in-progress: false }
