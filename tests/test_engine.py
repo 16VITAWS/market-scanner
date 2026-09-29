@@ -545,3 +545,59 @@ def test_live_quote_uses_previous_session_close():
     df = pd.DataFrame({"Open": [100, 98, 97], "High": [101, 99, 98], "Low": [99, 96, 95], "Close": [100, 97, 96], "Volume": [1, 2, 3]}, index=idx)
     qq = LF.quote_from_5m(df, {"p": 100, "pc": 150, "d": "2026-09-28"})
     assert qq["pc"] == 100 and qq["chg_pct"] == -4.0 and qq["day_o"] == 98 and qq["day_l"] == 95
+
+
+def _val_statements(scale=1.0, fcf_mult=1.0):
+    cols = pd.to_datetime(["2026-03-31", "2025-03-31", "2024-03-31", "2023-03-31"])
+    mk = lambda d: pd.DataFrame(d, index=cols).T
+    fin = mk({"Total Revenue": [1000 * scale, 900 * scale, 800 * scale, 700 * scale], "EBIT": [200 * scale, 170 * scale, 150 * scale, 120 * scale],
+              "Net Income": [150 * scale, 125 * scale, 110 * scale, 90 * scale], "Gross Profit": [500 * scale, 440 * scale, 380 * scale, 320 * scale],
+              "Pretax Income": [190.0, 160, 140, 110], "Tax Provision": [45.0, 40, 35, 28]})
+    bs = mk({"Total Assets": [2000.0, 1900, 1800, 1700], "Stockholders Equity": [1200.0, 1100, 1000, 900], "Total Debt": [200.0, 250, 300, 300],
+             "Cash And Cash Equivalents": [300.0, 250, 200, 150], "Current Assets": [800.0, 700, 650, 600], "Current Liabilities": [400.0, 380, 370, 360],
+             "Ordinary Shares Number": [100.0, 100, 100, 100]})
+    cf = mk({"Operating Cash Flow": [180 * scale, 150, 130, 110], "Capital Expenditure": [-40.0, -35, -30, -30],
+             "Free Cash Flow": [140 * scale * fcf_mult, 115 * fcf_mult, 100 * fcf_mult, 80 * fcf_mult]})
+    return fin, bs, cf
+
+
+def test_value_metrics_dcf_and_ratings():
+    from engine import value as V
+    fin, bs, cf = _val_statements()
+    m = V.compute({"currentPrice": 25, "sharesOutstanding": 100, "marketCap": 2500, "sector": "Technology"}, fin, bs, cf, "IN")
+    assert m["fscore"] == 9 and 0.13 < m["roic"] < 0.15 and m["fcf_positive_years"] == 4
+    assert m["dcf"]["iv_bear"] < m["dcf"]["iv_base"] < m["dcf"]["iv_bull"]
+    assert m["exp_return"]["bear"] < m["exp_return"]["base"] < m["exp_return"]["bull"]
+    rows = []
+    for i in range(20):
+        f, b, c = _val_statements(0.6 + i * 0.05, 0.5 + i * 0.08)
+        x = V.compute({"currentPrice": 25, "sharesOutstanding": 100, "marketCap": 2500, "sector": ["IT", "Pharma", "Auto"][i % 3]}, f, b, c, "IN")
+        x.update(id=f"S{i}", market="IN", name=f"S{i}")
+        rows.append(x)
+    scored, recs = V.build({r["id"]: r for r in rows})
+    buys = [r for r in scored if r["rating"] == "BUY"]
+    assert buys and all(r["margin_of_safety"] >= 0.2 and r["fscore"] >= 6 for r in buys)
+    assert all(0 < r["suggested_weight"] <= 0.05 for r in buys) and recs[0]["action"] in ("BUY", "WATCH")
+    capped = V.sector_capped(buys, cap=0.03)
+    by_sec = {}
+    for r in capped:
+        by_sec[r["sector"]] = by_sec.get(r["sector"], 0) + r["suggested_weight"]
+    assert all(v <= 0.0300001 for v in by_sec.values())
+
+
+def test_value_paper_account_buys_on_rebalance(tmp_path):
+    from engine import value as V, simulator as SIM
+    L = Ledger(str(tmp_path / "v.json")).load([{"id": "IN-VALUE", "name": "v", "currency": "INR", "cash": "500000", "strategies": ["value_longterm"]}])
+    idx = pd.DatetimeIndex(pd.to_datetime(["2026-09-28", "2026-09-29"])).tz_localize("Asia/Kolkata")
+    frames = {f"S{i}": pd.DataFrame({"Open": [25.0, 25], "High": [26.0, 26], "Low": [24.0, 24], "Close": [25.0, 25], "Volume": [1e6, 1e6]}, index=idx) for i in range(20)}
+    rows = []
+    for i in range(20):
+        f, b, c = _val_statements(0.6 + i * 0.05, 0.5 + i * 0.08)
+        x = V.compute({"currentPrice": 25, "sharesOutstanding": 100, "marketCap": 2500, "sector": "IT"}, f, b, c, "IN")
+        x.update(id=f"S{i}", market="IN", name=f"S{i}")
+        rows.append(x)
+    scored, _ = V.build({r["id"]: r for r in rows})
+    acts = V.paper_step(L, "IN-VALUE", scored, frames, "2026-09-29", SIM, "IN", rebalance=True)
+    assert any(a.startswith("Queued BUY") for a in acts)
+    acts2 = V.paper_step(L, "IN-VALUE", scored, frames, "2026-09-29", SIM, "IN", rebalance=True)
+    assert not any(a.startswith("Queued BUY") for a in acts2)          # no duplicates while orders are pending
