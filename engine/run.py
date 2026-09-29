@@ -792,6 +792,9 @@ def job_intraday(site, offline=False, minutes=None, every=None):
         log(f"live cycle {cycles}: markets {sorted(open_mk) or 'closed'} · 5m {len(got)} · stocks {n_univ} · actions {status['paper_actions_this_cycle']} · {pub}")
         if not open_mk or time.time() + every > t_end:
             break
+        if LF.eod_waiting(repo, token):
+            log("end-of-day run is waiting - ending the live session early so it can publish")
+            break
         time.sleep(max(5, every - (time.time() - t0)))
     log(f"live session done after {cycles} cycle(s)")
 

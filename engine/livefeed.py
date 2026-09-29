@@ -105,6 +105,19 @@ def options_live(ledger, account_id, quotes, options_mod, today, bar_date):
     return acts
 
 
+def eod_waiting(repo, token):
+    """True when an end-of-day run is queued or running (it waits for this live session, so the session hands over)."""
+    if not repo or not token:
+        return False
+    try:
+        import requests
+        r = requests.get(f"https://api.github.com/repos/{repo}/actions/workflows/eod.yml/runs?per_page=5",
+                         headers={"Authorization": f"Bearer {token}", "Accept": "application/vnd.github+json"}, timeout=10)
+        return any(x.get("status") != "completed" for x in r.json().get("workflow_runs", []))
+    except Exception:  # noqa
+        return False
+
+
 def publish(site_path, token, repo, branch="live-data"):
     """Push the small live files to an orphan branch (history never grows)."""
     if not token or not repo:
