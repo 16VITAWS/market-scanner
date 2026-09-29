@@ -35,7 +35,7 @@ nav.side{border-right:1px solid var(--line);padding:12px 8px;position:sticky;top
 nav.side button{display:flex;align-items:center;gap:10px;width:100%;text-align:left;border:0;background:none;color:var(--muted);padding:10px 12px;border-radius:10px;font-weight:700;font-size:14px}
 nav.side button .n{width:22px;height:22px;border-radius:6px;background:var(--card2);display:grid;place-items:center;font-size:11px;color:var(--cy)}
 nav.side button[aria-selected="true"]{background:linear-gradient(90deg,#1B3A6B,#132239);color:#fff}
-main{padding:16px;max-width:1400px;width:100%;min-width:0}.grid>*,.card,section{min-width:0}.card table{max-width:100%}.card>table,.card>details>table{display:block;overflow-x:auto}.tbl,.card .mono{overflow-x:auto}
+main{padding:16px;max-width:1400px;width:100%;min-width:0}.termgrid{grid-template-columns:minmax(0,3fr) minmax(0,1.2fr);gap:12px}@media(max-width:900px){.termgrid{grid-template-columns:1fr}#tvChart{height:420px!important}}.grid>*,.card,section{min-width:0}.card table{max-width:100%}.card>table,.card>details>table{display:block;overflow-x:auto}.tbl,.card .mono{overflow-x:auto}
 section[hidden]{display:none}
 @media(max-width:900px){.wrap{grid-template-columns:1fr}nav.side{position:fixed;left:0;right:0;bottom:0;top:auto;height:auto;display:flex;overflow-x:auto;padding:6px 8px calc(6px + env(safe-area-inset-bottom,0));border-right:0;border-top:1px solid var(--line);gap:4px;z-index:20}
 nav.side button{width:auto;flex:none;flex-direction:column;gap:2px;font-size:11px;padding:6px 8px}nav.side button .n{display:none}main{padding:12px 12px 90px}.top{flex-wrap:nowrap}.badges{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none}.brand{font-size:15px}#refreshBtn{padding:6px 8px}}
@@ -113,19 +113,28 @@ const ago=iso=>{if(!iso)return '—';const s=(Date.now()-new Date(iso))/1000;ret
 const toast=m=>{const t=document.createElement('div');t.className='toast';t.textContent=m;document.body.appendChild(t);setTimeout(()=>t.remove(),2600)};
 const store={get:(k,d)=>{try{const v=localStorage.getItem('vision2:'+k);return v?JSON.parse(v):d}catch(e){return d}},set:(k,v)=>{try{localStorage.setItem('vision2:'+k,JSON.stringify(v))}catch(e){}}};
 const API={}; let LOADED=false;
-const FILES=['meta','snapshot','quotes','signals','signals_us','paper','health','calendar','strategies','backtests','correlations','graph','news','flows','options','options_model','notifications','intel','live_control','live_proposals','live_results','ipos','brokers','instruments','reports','runs','candles_index','inst_flows','mf','macro'];
+const FILES=['meta','snapshot','quotes','signals','signals_us','paper','health','calendar','strategies','backtests','correlations','graph','news','flows','options','options_model','notifications','intel','live_control','live_proposals','live_results','ipos','brokers','instruments','reports','runs','candles_index','inst_flows','mf','macro','live_status'];
 
 async function loadAll(){
   const res=await Promise.allSettled(FILES.map(f=>fetch(`api/${f}.json?v=${Date.now()}`).then(r=>{if(!r.ok)throw new Error(r.status);return r.json()})));
-  let fails=0;res.forEach((r,i)=>{if(r.status==='fulfilled')API[FILES[i]]=r.value;else{fails++;API[FILES[i]]=API[FILES[i]]||null}});
+  let fails=0;res.forEach((r,i)=>{if(r.status==='fulfilled'){const v=r.value,c=API[FILES[i]];if(!c||!c.generated_at||!v||!v.generated_at||v.generated_at>=c.generated_at)API[FILES[i]]=v}else{fails++;API[FILES[i]]=API[FILES[i]]||null}});
   $('#offline').hidden=fails<FILES.length; LOADED=fails<FILES.length;
   if(fails&&fails<FILES.length)console.warn('missing api files',fails);
 }
+/* ---------- LIVE overlay: small files the engine pushes every ~2 min during market hours (branch live-data) ---------- */
+const LIVE_BASE='https://raw.githubusercontent.com/16VITAWS/market-scanner/live-data/api/';
+const LIVE_FILES=['quotes','paper','snapshot','notifications','live_status'];
+async function loadLive(){const res=await Promise.allSettled(LIVE_FILES.map(f=>fetch(LIVE_BASE+f+'.json?t='+Date.now(),{cache:'no-store'}).then(r=>{if(!r.ok)throw new Error(r.status);return r.json()})));
+  let changed=false;res.forEach((r,i)=>{if(r.status!=='fulfilled')return;const f=LIVE_FILES[i],v=r.value,c=API[f];if(v&&v.generated_at&&(!c||!c.generated_at||v.generated_at>c.generated_at)){API[f]=v;changed=true}});return changed}
+function liveBadge(){const L=API.live_status;if(!L)return '';const age=(Date.now()-new Date(L.updated_at))/60000;const on=(L.open_markets||[]).length&&age<12;
+  return on?`<span class="bd open" title="Engine refreshes every ~2 min; free data is ~15 min behind the exchange">● LIVE ${esc((L.open_markets||[]).join('+'))} · ${new Date(L.updated_at).toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'})}</span>`:`<span class="bd closed" title="Live refresh runs while NSE or US markets are open">LIVE: ${age<12?'markets closed':'last '+ago(L.updated_at)}</span>`}
+const SAFE_RERENDER=['home','markets','paper','portfolio','options','live','intel','flows','funds'];
+function softRender(){const a=document.activeElement;if(a&&/INPUT|SELECT|TEXTAREA/.test(a.tagName))return;const id=(location.hash||'#home').slice(1);if(!SAFE_RERENDER.includes(id)||!R[id])return;const y=window.scrollY;try{R[id]()}catch(e){console.error(e)}window.scrollTo(0,y)}
 async function candles(id,interval='1d'){const sub=interval==='1d'?'candles':'candles_'+interval;const r=await fetch(`api/${sub}/${encodeURIComponent(id)}.json?v=${Date.now()}`);if(!r.ok)throw new Error('no candle file for '+id);return r.json()}
 
 /* ---------- sections registry ---------- */
 const SECTIONS=[
- ['home','Command Center','⌂'],['markets','Global Markets','🌐'],['charts','Charts','📈'],['scanner','AI Scanner','🔍'],['intel','Intelligence','🧠'],['flows','Big-Money Flows','🐋'],['funds','Mutual Funds','🏦'],['lab','Strategy Lab','🧪'],
+ ['home','Command Center','⌂'],['terminal','Live Terminal','📡'],['markets','Global Markets','🌐'],['charts','Charts','📈'],['scanner','AI Scanner','🔍'],['intel','Intelligence','🧠'],['flows','Big-Money Flows','🐋'],['funds','Mutual Funds','🏦'],['lab','Strategy Lab','🧪'],
  ['paper','Paper Trading','📝'],['live','Live Desk','⚡'],['portfolio','Portfolio & Growth','💹'],['plan','Small-Budget Plan','💰'],['options','Options','⛓'],['news','News & Events','📰'],
  ['research','Research & Backtests','📚'],['ipos','IPOs','🆕'],['brokers','Broker Desk','🏦'],['alerts','Alerts','🔔'],['data','Data Center','🗄'],['engine','Engine & Health','⚙'],['settings','Settings · Other devices','🔐']];
 const R={};  // renderers
@@ -141,7 +150,7 @@ function badges(){
   const m=API.meta,c=API.calendar,h=API.health;const b=[];
   const nse=c?.markets?.NSE;if(nse)b.push(`<span class="bd ${nse.state==='OPEN'?'open':'closed'}">NSE ${nse.state}${nse.reason?' · '+esc(nse.reason):''}</span>`);
   const us=c?.markets?.US;if(us)b.push(`<span class="bd ${us.state==='OPEN'?'open':'closed'}">US ${us.state}</span>`);
-  b.push(`<span class="bd paper">PAPER: ON</span>`);
+  b.push(`<span class="bd paper">PAPER: ON</span>`);b.push(liveBadge());
   const lm=API.live_control?.mode||'OFF';b.push(lm==='OFF'?`<span class="bd off">LIVE API: OFF · assisted live ready</span>`:`<span class="bd warn">API LIVE: ${esc(lm)}${API.live_control?.kill?' · KILLED':''}</span>`);
   if(m)b.push(`<span class="bd ${m.data_status==='OK'?'ok':'bad'}">DATA ${esc(m.data_status)} · ${esc(m.data_date)}</span>`);
   if(h)b.push(`<span class="bd ${h.tests?.passed?'ok':'bad'}">TESTS ${h.tests?.passed?'PASS':'FAIL'}</span>`);
@@ -457,6 +466,10 @@ let RP=null;
 R.paper=function(){const P=API.paper,el=$('#s-paper');const b=book();markBook();
   const autoAcc=(P?.accounts||[]).filter(a=>a.strategies?.length);
   el.innerHTML=`<h1>Paper Trading ${tag('PAPER')}</h1><p class="sub">Two kinds of practice: the <b>automatic</b> account traded by the engine every evening, and your <b>manual</b> accounts in this browser (work any time — nights, weekends, holidays — at the last available price). Plus <b>Replay</b> to practise on any past day.</p>
+  ${(()=>{const la=(P?.live_actions||[]).filter(x=>x.time&&x.time.slice(0,10)===new Date().toISOString().slice(0,10));const L=API.live_status;return `<div class="card" style="border-color:#1F6A4A"><h3>● Live paper session ${L?`<small class="mut">updated ${esc(new Date(L.updated_at).toLocaleTimeString('en-IN'))} · markets open: ${esc((L.open_markets||[]).join(', ')||'none')}</small>`:''}</h3>
+   <p class="help">During market hours the engine trades the automatic paper accounts live: yesterday's queued orders fill at today's open, stop-losses and targets trigger as soon as they are touched, and option spreads exit when their modeled value hits take-profit or stop. Prices are ~15 min behind the exchange (free feed).</p>
+   ${la.length?`<ul class="log">${la.slice().reverse().map(x=>`<li>${esc(new Date(x.time).toLocaleTimeString('en-IN'))} · <b>${esc(x.account)}</b> · ${esc(x.action)}</li>`).join('')}</ul>`:'<div class="empty">No live paper fills yet today.</div>'}
+   <div class="grid g4" style="margin-top:8px">${(P?.accounts||[]).filter(a=>a.strategies?.length).map(a=>`<div class="kpi"><b class="${cls(+a.equity-+a.start_cash)}">${cur(a.currency,a.equity,0)}</b><span>${esc(a.account)} · ${a.positions?.length||0} open</span></div>`).join('')}</div></div>`})()}
   <div class="tabs" id="ppTabs"><button class="on" data-p="manual">Manual trading</button><button data-p="auto">Automatic (engine)</button><button data-p="replay">Replay / practice on past days</button></div>
   <div id="pp-manual">
    <div class="grid g2"><div class="card"><h3>Place a paper order</h3>${orderForm('RELIANCE',Q('RELIANCE')?.p||0,'INR')}</div>
@@ -770,6 +783,52 @@ function mfCompare(){const ids=$$('.mfc:checked').map(x=>+x.value).slice(0,4);co
  const best={ret_1y:1,cagr_3y:1,cagr_5y:1,vol_3y:-1,max_dd_3y:1,sharpe_3y:1,positive_1y_windows_pct:1,score:1};
  $('#mfCmp').innerHTML=`<div class="card"><h3>Side-by-side</h3><div class="tbl"><table><tr><th></th>${F.map(f=>`<th>${esc(f.name)}</th>`).join('')}</tr>${rows.map(([l,k])=>{const vals=F.map(f=>f[k]);const nums=vals.filter(v=>typeof v==='number');const b=best[k]?(best[k]>0?Math.max(...nums):Math.min(...nums)):null;return `<tr><td>${l}</td>${vals.map(v=>`<td class="num" style="${b!=null&&v===b?'color:#2FE39A;font-weight:700':''}">${v??'—'}</td>`).join('')}</tr>`}).join('')}</table></div><p class="help">Green = best on that row. Growth of ₹10,000 at each 3y CAGR: ${F.map(f=>f.cagr_3y!=null?`${esc(f.name.split(' ').slice(0,3).join(' '))} ₹${fmt0(10000*Math.pow(1+f.cagr_3y/100,3))}`:'').filter(Boolean).join(' · ')} (historical, not a projection).</p></div>`}
 
+/* ===================== LIVE TERMINAL (TradingView widgets: streaming prices, charts, news, screeners in your browser) ===================== */
+function tvWidget(el,name,cfg){if(!el)return;el.innerHTML='<div class="tradingview-widget-container" style="height:100%;width:100%"><div class="tradingview-widget-container__widget" style="height:100%;width:100%"></div></div>';const sc=document.createElement('script');sc.src=`https://s3.tradingview.com/external-embedding/embed-widget-${name}.js`;sc.async=true;sc.type='text/javascript';sc.text=JSON.stringify({colorTheme:'dark',isTransparent:true,locale:'en',...cfg});el.firstChild.appendChild(sc)}
+let TERM={sym:store.get('termSym','NSE:NIFTY'),iv:store.get('termIv','5')};
+R.terminal=function(){const el=$('#s-terminal');const S=API.signals||{};const held=[...new Set((API.paper?.accounts||[]).flatMap(a=>(a.positions||[]).map(p=>p.symbol)).filter(s=>!/ SPREAD/.test(s)))];
+ const buys=(S.buys||[]).map(b=>b.symbol);const wl=store.get('watchlist',[]);
+ const tvs=s=>/[:]/.test(s)?s:(/^[A-Z&-]+$/.test(s)?'NSE:'+s.replace('&','_').replace('-','_'):s);
+ const quick=[['NSE:NIFTY','NIFTY 50'],['NSE:BANKNIFTY','Bank Nifty'],['BSE:SENSEX','Sensex'],['NSE:CNXIT','Nifty IT'],['NSE:INDIAVIX','India VIX'],['FX_IDC:USDINR','USD/INR'],['TVC:UKOIL','Brent'],['TVC:GOLD','Gold'],['SP:SPX','S&P 500'],['NASDAQ:NDX','Nasdaq 100']];
+ el.innerHTML=`<h1>Live Terminal <span class="tag OK">STREAMING</span></h1><p class="sub">Streaming prices, charts, market news, economic calendar and live screeners, in your browser. Prices and news here come from TradingView's public widgets (their own delay rules apply per exchange — shown on each widget). Trade from here: paper order in one tap, or open your broker for a real order.</p>
+ <div id="tvTape" style="height:46px;margin-bottom:10px"></div>
+ <div class="grid termgrid">
+  <div class="card" style="padding:8px"><div class="row" style="flex-wrap:wrap;gap:6px;margin-bottom:6px">${quick.map(([s,n])=>`<button class="btn sm ${TERM.sym===s?'':'grey'}" onclick="termSet('${s}')">${esc(n)}</button>`).join('')}
+    <input id="termIn" placeholder="any symbol e.g. TCS, NSE:RELIANCE, NASDAQ:AAPL" style="width:260px" onkeydown="if(event.key==='Enter')termSet(this.value.trim().toUpperCase())">
+    <select id="termIv" onchange="TERM.iv=this.value;store.set('termIv',this.value);R.terminal()">${[['1','1m'],['5','5m'],['15','15m'],['60','1h'],['D','1D'],['W','1W']].map(([v,l])=>`<option value="${v}" ${TERM.iv===v?'selected':''}>${l}</option>`).join('')}</select></div>
+   <div id="tvChart" style="height:560px"></div></div>
+  <div class="grid" style="gap:12px;align-content:start">
+   <div class="card" style="padding:8px"><h3 style="margin:4px 6px">Signal gauge · ${esc(TERM.sym)}</h3><div id="tvTA" style="height:400px"></div></div>
+   <div class="card"><h3>Trade ${esc(TERM.sym.split(':').pop())}</h3>
+    <div class="row" style="gap:6px;flex-wrap:wrap"><button class="btn sm buy" onclick="termPaper('buy')">Paper BUY</button><button class="btn sm sell" onclick="termPaper('sell')">Paper SELL</button>
+     <a class="btn sm" target="_blank" rel="noopener" href="https://groww.in/search?q=${encodeURIComponent(TERM.sym.split(':').pop())}">Real order: Groww ↗</a><a class="btn sm grey" target="_blank" rel="noopener" href="https://kite.zerodha.com/">Zerodha ↗</a><a class="btn sm grey" target="_blank" rel="noopener" href="https://trade.angelone.in/">Angel ↗</a></div>
+    <p class="help">Paper orders fill at the latest engine price (stated on the fill). Real orders are placed by you in your broker app; log them on the Live Desk with "I placed it".</p></div>
+  </div></div>
+ <div class="grid g2">
+  <div class="card" style="padding:8px"><h3 style="margin:4px 6px">Live market news</h3><div id="tvNews" style="height:520px"></div></div>
+  <div class="card" style="padding:8px"><h3 style="margin:4px 6px">Top movers — NSE (live)</h3><div id="tvHot" style="height:520px"></div></div>
+ </div>
+ <div class="grid g2">
+  <div class="card" style="padding:8px"><h3 style="margin:4px 6px">India stock screener (live)</h3><div id="tvScreen" style="height:520px"></div></div>
+  <div class="card" style="padding:8px"><h3 style="margin:4px 6px">Economic calendar (India + US)</h3><div id="tvCal" style="height:520px"></div></div>
+ </div>
+ <div class="card" style="padding:8px"><h3 style="margin:4px 6px">My symbols — held, today's signals, watchlist</h3><div id="tvMine" style="height:${Math.max(220,Math.min(12,held.length+buys.length+wl.length+3)*44)}px"></div></div>
+ <p class="help">Widgets © TradingView (tradingview.com), shown under their free embed terms. The engine's own signals, paper accounts and alerts use the engine data (badge at the top shows its update time).</p>`;
+ tvWidget($('#tvTape'),'ticker-tape',{symbols:quick.map(([s,n])=>({proName:s,title:n})),showSymbolLogo:true,displayMode:'adaptive'});
+ const box=$('#tvChart');
+ const sc=document.createElement('script');sc.src='https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js';sc.async=true;sc.text=JSON.stringify({autosize:true,symbol:TERM.sym,interval:TERM.iv,timezone:'Asia/Kolkata',theme:'dark',style:'1',locale:'en',allow_symbol_change:true,hide_side_toolbar:false,studies:['STD;RSI','STD;MACD'],support_host:'https://www.tradingview.com'});
+ box.innerHTML='<div class="tradingview-widget-container" style="height:100%;width:100%"><div class="tradingview-widget-container__widget" style="height:100%;width:100%"></div></div>';box.firstChild.appendChild(sc);
+ tvWidget($('#tvTA'),'technical-analysis',{interval:({'1':'1m','5':'5m','15':'15m','60':'1h','D':'1D','W':'1W'})[TERM.iv]||'5m',width:'100%',height:'100%',symbol:TERM.sym,showIntervalTabs:true});
+ tvWidget($('#tvNews'),'timeline',{feedMode:'market',market:'stock',displayMode:'regular',width:'100%',height:'100%'});
+ tvWidget($('#tvHot'),'hotlists',{exchange:'NSE',showChart:true,width:'100%',height:'100%',showSymbolLogo:true});
+ tvWidget($('#tvScreen'),'screener',{market:'india',defaultColumn:'overview',defaultScreen:'top_gainers',showToolbar:true,width:'100%',height:'100%'});
+ tvWidget($('#tvCal'),'events',{countryFilter:'in,us',importanceFilter:'0,1',width:'100%',height:'100%'});
+ const mine=[...new Set([...held,...buys,...wl])].slice(0,12).map(s=>({s:tvs(s),d:s}));
+ tvWidget($('#tvMine'),'market-quotes',{width:'100%',height:'100%',symbolsGroups:[{name:'Mine',symbols:mine.length?mine:[{s:'NSE:NIFTY',d:'NIFTY 50'}]}],showSymbolLogo:true});
+};
+function termSet(s){if(!s)return;TERM.sym=s.includes(':')?s:'NSE:'+s;store.set('termSym',TERM.sym);R.terminal()}
+function termPaper(side){const sym=TERM.sym.split(':').pop();const q=Q(sym);show('paper');setTimeout(()=>{const inputs=[...document.querySelectorAll('#s-paper input')];if(inputs[0]){inputs[0].value=sym;inputs[0].dispatchEvent(new Event('input',{bubbles:true}))}toast(`${side.toUpperCase()} ${sym}: set quantity and confirm${q?' · engine price '+q.p:''}`)},200)}
+
 /* ===================== LIVE DESK ===================== */
 R.live=async function(){const C=API.live_control||{},PR=API.live_proposals||{},LR=API.live_results||{},S=API.signals,el=$('#s-live');
   let appr={items:[]};try{appr=await fetch('data/approvals.json?v='+Date.now()).then(r=>r.ok?r.json():{items:[]})}catch(e){}
@@ -906,9 +965,10 @@ let deferredInstall=null;
 window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();deferredInstall=e;const b=$('#installBtn');if(b)b.hidden=false});
 function pwa(){if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js').catch(e=>console.warn('sw',e));
   const b=$('#installBtn');if(b)b.onclick=async()=>{if(!deferredInstall){toast('Use the browser menu: Add to Home screen / Install app');return}deferredInstall.prompt();await deferredInstall.userChoice;deferredInstall=null;b.hidden=true}}
-async function boot(){pwa();buildNav();await Promise.all([loadAll(),loadLwc()]);badges();markBook();evalAlerts();const h=(location.hash||'#home').slice(1);show(SECTIONS.some(s=>s[0]===h)?h:'home');
-  $('#refreshBtn').onclick=async()=>{await loadAll();badges();markBook();evalAlerts();show((location.hash||'#home').slice(1));toast('Refreshed')};
-  setInterval(async()=>{const before=API.meta?.generated_at;await loadAll();if(API.meta?.generated_at!==before){badges();markBook();evalAlerts();toast('New engine data loaded')}},120000);
+async function boot(){pwa();buildNav();await Promise.all([loadAll(),loadLwc()]);await loadLive().catch(()=>{});badges();markBook();evalAlerts();const h=(location.hash||'#home').slice(1);show(SECTIONS.some(s=>s[0]===h)?h:'home');
+  $('#refreshBtn').onclick=async()=>{await loadAll();await loadLive().catch(()=>{});badges();markBook();evalAlerts();show((location.hash||'#home').slice(1));toast('Refreshed')};
+  setInterval(async()=>{const before=API.meta?.generated_at;await loadAll();if(API.meta?.generated_at!==before){badges();markBook();evalAlerts();softRender();toast('New engine data loaded')}},120000);
+  setInterval(async()=>{let ch=false;try{ch=await loadLive()}catch(e){}badges();if(ch){markBook();evalAlerts();softRender()}},60000);
   window.addEventListener('hashchange',()=>{const id=location.hash.slice(1);if(SECTIONS.some(s=>s[0]===id)&&$('#s-'+id)?.hidden)show(id)});}
 boot();
 </script>
