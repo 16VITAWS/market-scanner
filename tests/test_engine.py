@@ -505,3 +505,20 @@ def test_alert_rules_parse_and_fire():
 def test_macro_fred_parser_yoy():
     s = MAC.parse_fred("observation_date,CPIAUCSL\n" + "\n".join(f"20{20 + i // 12}-{i % 12 + 1:02d}-01,{100 * 1.03 ** (i / 12)}" for i in range(30)), "yoy")
     assert abs(s.iloc[-1] - 3.0) < 0.01
+
+
+def test_nse_eod_patch_fills_missing_session_only():
+    from engine import nse_eod as NE
+    idx = pd.DatetimeIndex(pd.to_datetime(["2026-09-24", "2026-09-25"])).tz_localize("Asia/Kolkata")
+    fr = {"NIFTY": pd.DataFrame({"Open": [1.0, 2], "High": [1.0, 2], "Low": [1.0, 2], "Close": [1.0, 2], "Volume": [0.0, 0]}, index=idx)}
+    ind = ("Index Name,Index Date,Open Index Value,High Index Value,Low Index Value,Closing Index Value,Points Change,Change(%),Volume,Turnover (Rs. Cr.),P/E,P/B,Div Yield\n"
+           "Nifty 50,28-09-2026,23064.9,23080.25,22762.2,22780.25,-360.25,-1.56,261457054,20620.36,19.26,2.75,1.24\n")
+    def fetch(path):
+        if "28092026" not in path or "sec_bhav" in path:
+            raise RuntimeError("404")
+        return ind, path
+    rep = NE.patch(fr, ["NIFTY"], [], fetch, dt.datetime(2026, 9, 29, 6, 0, tzinfo=NE.IST))
+    assert rep["patched"] == {"2026-09-28": 1} and float(fr["NIFTY"]["Close"].iloc[-1]) == 22780.25
+    rep2 = NE.patch(fr, ["NIFTY"], [], fetch, dt.datetime(2026, 9, 29, 6, 0, tzinfo=NE.IST))
+    assert rep2["patched"] == {} and len(fr["NIFTY"]) == 3                       # never duplicates / overwrites
+    assert NE.sessions_to_fill([dt.date(2026, 9, 28)], set(), dt.datetime(2026, 9, 29, 12, 0, tzinfo=NE.IST)) == []   # today only after 18:30
