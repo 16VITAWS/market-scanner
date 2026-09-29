@@ -522,3 +522,26 @@ def test_nse_eod_patch_fills_missing_session_only():
     rep2 = NE.patch(fr, ["NIFTY"], [], fetch, dt.datetime(2026, 9, 29, 6, 0, tzinfo=NE.IST))
     assert rep2["patched"] == {} and len(fr["NIFTY"]) == 3                       # never duplicates / overwrites
     assert NE.sessions_to_fill([dt.date(2026, 9, 28)], set(), dt.datetime(2026, 9, 29, 12, 0, tzinfo=NE.IST)) == []   # today only after 18:30
+
+
+def test_live_paper_fills_pending_at_open_and_stops_intraday(tmp_path):
+    from engine import livefeed as LF, simulator as SIM
+    L = Ledger(str(tmp_path / "l.json")).load([{"id": "A", "name": "a", "currency": "INR", "cash": "100000", "strategies": ["s"]}])
+    o, _ = L.submit("A", "AAA", "buy", 10, "MARKET", bar_date="2026-09-28", strategy="s", stop=95, target=120)
+    today = dt.date(2026, 9, 29)
+    q = {"AAA": {"p": 101.0, "day_o": 100.0, "day_h": 102.0, "day_l": 99.0, "day_v": 100000, "d": str(today), "intraday": True}}
+    acts = LF.paper_live(L, q, {"NSE"}, SIM, today)
+    pos = L.account("A")["positions"]["AAA"]
+    assert "AAA" in L.account("A")["positions"] and any("BUY" in a for a in acts["A"]) and int(pos.get("bars_held", 0)) == 0
+    q["AAA"].update(p=94.0, day_l=94.0)                          # later in the session the stop is hit
+    acts2 = LF.paper_live(L, q, {"NSE"}, SIM, today)
+    assert "AAA" not in L.account("A")["positions"] and any("EXIT" in a and "live" in a for a in acts2["A"])
+    assert LF.paper_live(L, q, set(), SIM, today) == {}          # market closed -> nothing happens
+
+
+def test_live_quote_uses_previous_session_close():
+    from engine import livefeed as LF
+    idx = pd.DatetimeIndex(["2026-09-28 15:25", "2026-09-29 09:15", "2026-09-29 09:20"]).tz_localize("Asia/Kolkata")
+    df = pd.DataFrame({"Open": [100, 98, 97], "High": [101, 99, 98], "Low": [99, 96, 95], "Close": [100, 97, 96], "Volume": [1, 2, 3]}, index=idx)
+    qq = LF.quote_from_5m(df, {"p": 100, "pc": 150, "d": "2026-09-28"})
+    assert qq["pc"] == 100 and qq["chg_pct"] == -4.0 and qq["day_o"] == 98 and qq["day_l"] == 95
