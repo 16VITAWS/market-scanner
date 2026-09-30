@@ -601,3 +601,109 @@ def test_value_paper_account_buys_on_rebalance(tmp_path):
     assert any(a.startswith("Queued BUY") for a in acts)
     acts2 = V.paper_step(L, "IN-VALUE", scored, frames, "2026-09-29", SIM, "IN", rebalance=True)
     assert not any(a.startswith("Queued BUY") for a in acts2)          # no duplicates while orders are pending
+
+
+# ---------------- v2.8 data-quality / freshness / telemetry / Angel adapter ----------------
+def _q(p=100.0, pc=99.0, t=None, **k):
+    import datetime as _dt
+    t = t or _dt.datetime.now(_dt.timezone.utc).isoformat()
+    return {"p": p, "pc": pc, "t": t, "day_o": 99.5, "day_h": 101.0, "day_l": 98.0, "day_v": 1000.0, **k}
+
+
+def test_quality_rejects_bad_records_and_keeps_previous():
+    from engine import quality as QA
+    import datetime as _dt
+    now = _dt.datetime.now(_dt.timezone.utc)
+    quotes, log = {}, []
+    assert QA.accept(quotes, "X", _q(t=(now - _dt.timedelta(minutes=1)).isoformat()), "stock_nse", log)
+    good = dict(quotes["X"])
+    assert not QA.accept(quotes, "X", _q(p=150.0, day_h=151.0), "stock_nse", log)            # +51% vs prev close on NSE equity
+    assert not QA.accept(quotes, "X", _q(day_h=97.0), "stock_nse", log)                      # high below low
+    assert not QA.accept(quotes, "X", _q(day_v=-5.0), "stock_nse", log)                      # negative volume
+    assert not QA.accept(quotes, "X", _q(t=(now - _dt.timedelta(hours=1)).isoformat()), "stock_nse", log)  # out of order
+    assert not QA.accept(quotes, "X", {"t": now.isoformat()}, "stock_nse", log)               # missing price
+    assert not QA.accept(quotes, "X", _q(p=float("nan")), "stock_nse", log)                  # non-numeric
+    assert not QA.accept(quotes, "X", _q(t=(now + _dt.timedelta(hours=2)).isoformat()), "stock_nse", log)  # future
+    assert quotes["X"]["p"] == good["p"] and len(log) == 7 and quotes["X"]["last_rejected"]["reason"]
+    ok, flags = QA.validate(dict(quotes["X"]), quotes["X"])
+    assert ok and "duplicate tick" in flags
+
+
+def test_freshness_states():
+    from engine import quality as QA
+    import datetime as _dt
+    now = _dt.datetime.now(_dt.timezone.utc)
+    ago = lambda s: (now - _dt.timedelta(seconds=s)).isoformat()
+    assert QA.freshness(_q(t=ago(20), delay_min=0), True, now)[0] == "LIVE"
+    assert QA.freshness(_q(t=ago(120), delay_min=0), True, now)[0] == "DELAYED"
+    assert QA.freshness(_q(t=ago(16 * 60), delay_min=15), True, now)[0] == "DELAYED"      # never LIVE for a delayed feed
+    assert QA.freshness(_q(t=ago(40 * 60), delay_min=15), True, now)[0] == "STALE"
+    assert QA.freshness(_q(t=ago(3 * 3600), delay_min=15), False, now)[0] == "CLOSED"
+    assert QA.freshness(None, True, now)[0] == "OFFLINE" and QA.freshness({"p": 1}, True, now)[0] == "OFFLINE"
+
+
+def test_telemetry_jobs_providers_and_secret_scrub(tmp_path, monkeypatch):
+    from engine import telemetry as TEL
+    monkeypatch.setenv("ANGEL_API_KEY", "supersecretkey123")
+    t = TEL.Telemetry(str(tmp_path))
+    with t.job("intraday") as j:
+        j.processed, j.failed = 100, 3
+        t.call("yahoo", True, 0.25)
+        t.call("angelone", False, error="login failed for key supersecretkey123 Bearer abc.def.ghi")
+    try:
+        with t.job("eod"):
+            raise RuntimeError("boom x-access-token:ghp_12345@github.com")
+    except RuntimeError:
+        pass
+    import json as _j
+    d = _j.load(open(tmp_path / "api" / "pipeline.json"))
+    assert [x["status"] for x in d["jobs"]] == ["OK", "FAILED"] and d["jobs"][0]["processed"] == 100
+    assert "intraday" in d["last_ok"] and "eod" not in d["last_ok"]
+    assert d["providers"]["yahoo"]["latency_ms_last"] == 250 and d["providers"]["angelone"]["errors"] == 1
+    txt = open(tmp_path / "api" / "pipeline.json").read()
+    assert "supersecretkey123" not in txt and "abc.def.ghi" not in txt and "ghp_12345" not in txt
+
+
+def test_angel_totp_and_quote_parsing_with_mocked_api(monkeypatch):
+    from engine.providers import angel as A
+    assert A.totp("GEZDGNBVGY3TQOJQGEZDGNBVGY3TQOJQ", t=59) == "287082"      # RFC 6238 test vector (SHA-1, 6 digits)
+    for k in ("ANGEL_API_KEY", "ANGEL_CLIENT_ID", "ANGEL_PASSWORD", "ANGEL_TOTP_SECRET"):
+        monkeypatch.setenv(k, "GEZDGNBVGY3TQOJQ" if k == "ANGEL_TOTP_SECRET" else "test")
+
+    class R:
+        def __init__(self, code, j):
+            self.status_code, self._j, self.content = code, j, b"x"
+        def json(self):
+            return self._j
+        def raise_for_status(self):
+            pass
+
+    class S:   # test double for requests.Session - development only, never used in production code paths
+        def post(self, url, **k):
+            if "loginByPassword" in url:
+                return R(200, {"status": True, "data": {"jwtToken": "jwt"}})
+            return R(200, {"status": True, "data": {"fetched": [
+                {"symbolToken": "2885", "ltp": 1400.5, "close": 1390.0, "open": 1392, "high": 1405, "low": 1388, "tradeVolume": 12345,
+                 "avgPrice": 1398.2, "exchFeedTime": "30-Sep-2026 11:15:02", "depth": {"buy": [{"price": 1400.4, "quantity": 50}], "sell": [{"price": 1400.6, "quantity": 20}]}},
+                {"symbolToken": "99926000", "ltp": 0, "exchFeedTime": "garbage"}], "unfetched": []}})
+        def get(self, url, **k):
+            return R(200, [{"token": "2885", "symbol": "RELIANCE-EQ", "name": "RELIANCE", "exch_seg": "NSE", "instrumenttype": ""},
+                           {"token": "99926000", "symbol": "Nifty 50", "name": "NIFTY", "exch_seg": "NSE", "instrumenttype": "AMXIDX"}])
+    a = A.AngelOne(session=S())
+    a._throttle = lambda: None
+    assert a.load_tokens({"RELIANCE": "RELIANCE-EQ", "NIFTY": "NIFTY"}) == {"RELIANCE": "2885", "NIFTY": "99926000"}
+    q, errs = a.quotes(["RELIANCE", "NIFTY"])
+    assert list(q) == ["RELIANCE"] and not errs                                           # unparsable record dropped, not invented
+    r = q["RELIANCE"]
+    assert r["p"] == 1400.5 and r["bid"] == 1400.4 and r["ask"] == 1400.6 and r["vwap"] == 1398.2
+    assert r["t"].startswith("2026-09-30T05:45:02")                                        # 11:15:02 IST -> 05:45:02 UTC
+
+
+def test_api_write_never_emits_nan(tmp_path):
+    import numpy as _np, json as _j
+    from engine import api as A
+    A.write(str(tmp_path), "x.json", {"a": float("nan"), "b": [1.5, float("inf"), _np.float64("nan")], "c": {"d": -float("inf")}, "s": "NaN"})
+    txt = open(tmp_path / "api" / "x.json").read()
+    assert "NaN" not in txt.replace('"NaN"', "") and "Infinity" not in txt
+    d = _j.loads(txt)
+    assert d["a"] is None and d["b"] == [1.5, None, None] and d["c"]["d"] is None and d["s"] == "NaN"
