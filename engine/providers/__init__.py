@@ -1,6 +1,7 @@
 from .base import Provider, ProviderError, standardise, meta
 from .yahoo import Yahoo
-from .stubs import AngelOne, TwelveData, NSEWeb, ManualCSV
+from .stubs import TwelveData, NSEWeb, ManualCSV
+from .angel import AngelOne
 
 REGISTRY = {p.id: p for p in [Yahoo, AngelOne, TwelveData, NSEWeb, ManualCSV]}
 
