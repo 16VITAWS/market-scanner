@@ -42,3 +42,35 @@ Option spreads are never auto-placed; you get a two-leg ticket to place manually
 - The runner is written against Groww's published SDK but has **not been tested on a live account**: start with the dry run.
 - Signals have **no proven edge yet**; the paper record and the out-of-sample tests on the portal are the evidence to watch.
 - Rules change: confirm current requirements with Groww/SEBI before going live. Not investment advice.
+
+## VISION LIVE (realtime, every tick) - `runner/vision_live.py`
+
+**Default broker: Shoonya (Finvasia), free API.**
+
+1. **Get your API details.** On Shoonya's API key page, note your user id, API client id and secret code. Set the redirect URL to `http://127.0.0.1:8765/shoonya/callback`.
+2. **Enter them once.** Put `SHOONYA_UID`, `SHOONYA_CLIENT_ID` and `SHOONYA_SECRET` in `%USERPROFILE%\vision_live\settings.env` (`BROKER=SHOONYA`).
+3. **Log in each trading day.** Click **Login to Shoonya** on the live screen and log in on Shoonya's own page with your password and authenticator code. Shoonya returns a one-day token (there's no token renewal in Shoonya's API).
+   - Your password is never stored by VISION LIVE.
+   - If the redirect doesn't come back to the screen, paste the address from that tab into the box on the screen.
+4. **Compatibility is tested.** The token exchange (`GenAcsTok`, sha256(client_id + secret + code)) and order payloads (`PlaceOrder`) are compared in the tests against the official NorenRestApiOAuth SDK.
+
+Angel One remains available with `BROKER=ANGEL`, using the steps below.
+
+The portal itself can only refresh about every 2 minutes. That's a GitHub limit, and its free data is also ~15 minutes delayed. For live trading run **VISION LIVE** on your laptop during market hours:
+
+1. **Get an Angel One account and API app.** Open a free Angel One account, create a SmartAPI app at smartapi.angelone.in and enable TOTP at smartapi.angelone.in/enable-totp. SmartAPI and its live WebSocket feed are free.
+2. **Start it.** Download `VISION-LIVE.bat` from the portal's Live Desk and double-click it. The first run installs Python and the official `smartapi-python` SDK, then opens `%USERPROFILE%\vision_live\settings.env` in Notepad. Fill in `ANGEL_API_KEY`, `ANGEL_CLIENT_ID`, `ANGEL_PASSWORD` (login PIN) and `ANGEL_TOTP_SECRET`, then save.
+3. **Watch the live screen.** It opens at http://127.0.0.1:8765 and is only reachable from your own computer. Prices update on every exchange trade. Stop-loss and target are checked on every tick. Entries follow the portal's BUY signals, and only when the live price is within 0.5% of the signal's entry.
+4. **Choose a mode:**
+   - PAPER (default): simulated fills at the live price.
+   - ALERT: PAPER plus a phone notification so you place the order yourself.
+   - REAL: Angel One LIMIT orders, delivery product. Refused unless:
+     - `CONSENT=I ACCEPT REAL MONEY RISK`
+     - `STATIC_IP_REGISTERED=yes`. SEBI: from 1 Apr 2026, API orders are accepted only from your registered static IP. Market data doesn't need one.
+     - The live-paper record has 30 or more closed trades, profit factor ≥ 1.2 and positive expectancy.
+     - The kill switch is off.
+
+   Order limits in REAL: orders per day, value per order, open positions and daily loss.
+5. **Stop it.** The kill switch is the red button on the screen; the portal's kill switch also stops it. Resuming requires typing RESUME.
+
+Everything is logged to `%USERPROFILE%\vision_live\audit.jsonl`. Secrets never leave the laptop except to Angel One, and are scrubbed from logs. Status: built on the official SDK and covered by tests (binary tick parsing with the SDK's own parser, validation, stop/target on live ticks, limits, locks). It has **not yet been run against a live Angel One account**.
