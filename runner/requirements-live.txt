@@ -1,0 +1,5 @@
+smartapi-python>=1.5
+websocket-client>=1.6
+logzero
+requests
+pyotp
