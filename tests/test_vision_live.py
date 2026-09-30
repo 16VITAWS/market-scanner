@@ -167,7 +167,7 @@ def test_shoonya_ticks_and_websocket_flow(VL, monkeypatch, tmp_path):
     assert VL.sh_code_from("https://x/cb?code=ABC123&state=1") == "ABC123" and VL.sh_code_from(" ABC123 ") == "ABC123"
 
     sent, book = [], VL.Book()
-    import websocket as W
+    W = pytest.importorskip("websocket")
 
     class FakeWS:                                                    # test double for websocket.WebSocketApp
         def __init__(self, url, on_open=None, on_message=None, on_error=None, **k): self.on_open, self.on_message, self.url = on_open, on_message, url
