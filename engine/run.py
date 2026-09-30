@@ -23,6 +23,7 @@ from .strategies.ma_cross import MACross
 from . import options as OPT, notify as NOTIFY, forecast as FC, contagion as CG, anomaly as AM, ml as ML, execalgo as EX, margin as MG, events as EV
 from .live import control as LCTL, proposals as LPROP
 from . import nse_eod as NSEEOD, livefeed as LF, simulator, value as VAL
+from . import quality as QA, telemetry as TEL
 from . import regime_hmm as HMM, impact as IM, flows as FL, mf as MF, macro as MAC, rules as RULES
 
 IST = dt.timezone(dt.timedelta(hours=5, minutes=30))
@@ -116,6 +117,8 @@ def load_market(site, offline, universe_limit=None):
                 frames[r.id] = dq.clean(got[r.yahoo]); metas[r.id] = {"provider": "yahoo", "ticker": r.yahoo, "interval": "1d", "delay_minutes": 15, "licence": y.licence, "fetched_at_utc": dt.datetime.now(dt.timezone.utc).isoformat(timespec="seconds"), "status": "OK"}
         failed += bad
         err = None
+        if TEL.get(site.path).active:
+            TEL.get(site.path).active.processed = len(frames); TEL.get(site.path).active.failed = len(failed)
     except Exception as e:  # noqa
         err = f"{type(e).__name__}: {e}"; log("Yahoo download failed:", err)
     prov_status.append({**y.capabilities(), "last_fetch_ok": ok, "last_error": err, "fetched": len(frames), "failed": len(failed)})
@@ -436,7 +439,7 @@ def job_eod(site, offline=False, universe_limit=None, fetch_news=True, weekend=F
                "rejected_dq": rejected, "failed_download": M["failed"][:50], "skipped": dict(list(scan.get("skipped", {}).items())[:200])}
     if data_status != "BEHIND":                       # never overwrite the record of a session with a stale re-run
         with open(os.path.join(site.data, "runs", f"{bar_date}.json"), "w") as f:
-            json.dump(run_rec, f, indent=1, default=api._enc)
+            f.write(json.dumps(api.clean(json.loads(json.dumps(run_rec, default=api._enc))), indent=1, allow_nan=False))
     # ---- outputs
     write_common(site, M, clean, rejected, dqrep, reg, scan, L, actions, data_status, offline, scan_us=scan_us, opt_sig=opt_sig, intel=intel)
     log("EOD done:", reg["state"], len(scan["buys"]), "buys", len(scan["sells"]), "sells", scan["scanned"], "scanned")
@@ -647,7 +650,7 @@ def backtests(site, nifty, frames):
     out["seasonality"] = {"name": "Seasonality (monthly / weekday)", "summary": B.seasonality(df)}
     out["_note"] = "Independent reproduction. Differences from v1 figures come from cost model, slippage and next-open fills. No figure here is a forecast."
     with open(cache, "w") as f:
-        json.dump(out, f, default=api._enc)
+        f.write(json.dumps(api.clean(json.loads(json.dumps(out, default=api._enc))), allow_nan=False))
     return out
 
 
@@ -673,6 +676,23 @@ def job_intraday(site, offline=False, minutes=None, every=None):
     nse = INS.load_nifty500(fallback_file=os.path.join(ROOT, "stocks.txt"))[0]
     master = INS.master(pd.concat([nse, INS.us_equity_rows()], ignore_index=True))
     y = provider("yahoo")
+    tel = TEL.get(site.path)
+    ex_of = lambda i: master.loc[i, "calendar"] if i in master.index else "NSE"
+    kind_of = lambda i: ("stock_nse" if master.loc[i, "currency"] == "INR" else "stock") if i in master.index and master.loc[i, "kind"] in ("stock", "etf") else "index"
+    angel = provider("angelone")
+    angel_on = angel.configured()
+    if angel_on:
+        try:
+            t_ = time.time(); angel.login(); tel.call("angelone", True, time.time() - t_)
+            wanted = {i: master.loc[i, "angel"] for i in master.index if master.loc[i, "calendar"] == "NSE" and isinstance(master.loc[i, "angel"], str)}
+            angel.load_tokens(wanted)
+            tel.provider_status("angelone", tokens_mapped=len(angel.tokens or {}), status="CONNECTED")
+        except Exception as e:  # noqa
+            angel_on = False
+            tel.call("angelone", False, error=e); tel.provider_status("angelone", status="LOGIN FAILED - using delayed feed")
+            log("Angel One unavailable, continuing on the delayed feed:", TEL.scrub(e))
+    else:
+        tel.provider_status("angelone", status="AWAITING SECRETS", configured=False)
     cycles = 0
     while True:
         cycles += 1
@@ -691,13 +711,25 @@ def job_intraday(site, offline=False, minutes=None, every=None):
         tick5 = {i: master.loc[i, "yahoo"] for i in core}
         for h_ in held:
             tick5[h_] = master.loc[h_, "yahoo"] if h_ in master.index else h_ + ".NS"
+        rejected, n_ok = [], 0
+        t_ = time.time()
         got, bad = y.candles_many(list(tick5.values()), "5m", "5d")
+        tel.call("yahoo", len(got) > 0, time.time() - t_, error=f"{len(bad)} of {len(tick5)} tickers returned nothing" if bad else None)
         for i, t in tick5.items():
             df = got.get(t)
             if df is None or len(df) < 2:
                 continue
             old = q["quotes"].get(i, {})
-            q["quotes"][i] = {**old, **LF.quote_from_5m(df, old)}
+            n_ok += QA.accept(q["quotes"], i, QA.normalise(LF.quote_from_5m(df, old), i, ex_of(i), "yahoo", 15), kind_of(i), rejected)
+        if angel_on and "NSE" in open_mk:
+            try:
+                t_ = time.time()
+                aq, aerr = angel.quotes([i for i in (angel.tokens or {}) if i in tick5 or i in held])
+                tel.call("angelone", bool(aq), time.time() - t_, error="; ".join(aerr[:3]) if aerr else None, rate_limited="rate limited" in aerr)
+                for i, a_ in aq.items():
+                    n_ok += QA.accept(q["quotes"], i, QA.normalise(a_, i, "NSE", "angelone", 0), kind_of(i), rejected)
+            except Exception as e:  # noqa
+                tel.call("angelone", False, error=e)
         # every stock in the open market(s): today's running daily bar
         univ = []
         if "NSE" in open_mk:
@@ -707,7 +739,9 @@ def job_intraday(site, offline=False, minutes=None, every=None):
         n_univ = 0
         if univ:
             td = {i: master.loc[i, "yahoo"] for i in univ if isinstance(master.loc[i, "yahoo"], str)}
-            gd, _ = y.candles_many(list(td.values()), "1d", "5d")
+            t_ = time.time()
+            gd, bad_d = y.candles_many(list(td.values()), "1d", "5d")
+            tel.call("yahoo", len(gd) > 0, time.time() - t_, error=f"{len(bad_d)} of {len(td)} tickers returned nothing" if bad_d else None)
             from zoneinfo import ZoneInfo
             today_mk = {"INR": dt.datetime.now(IST).date(), "USD": dt.datetime.now(ZoneInfo("America/New_York")).date()}
             for i, t in td.items():
@@ -717,10 +751,12 @@ def job_intraday(site, offline=False, minutes=None, every=None):
                 if df.index[-1].date() != today_mk[master.loc[i, "currency"]]:
                     continue                                  # no bar for today yet
                 old = q["quotes"].get(i, {})
-                q["quotes"][i] = {**old, **LF.quote_from_daily(df, old)}
-                n_univ += 1
+                if QA.accept(q["quotes"], i, QA.normalise(LF.quote_from_daily(df, old), i, ex_of(i), "yahoo", 15), kind_of(i), rejected):
+                    n_univ += 1; n_ok += 1
         now = api.now()
-        q["note"] = "LIVE session: 5-minute bars for indices/FX/commodities/held symbols and today's running bar for every stock; ~15 min behind the exchange (free feed)."
+        q["note"] = ("Session refresh every ~2 min. Yahoo (free) quotes are ~15 min behind the exchange and labelled DELAYED; "
+                     + ("Angel One realtime quotes (src=angelone) override them for NSE symbols." if angel_on else
+                        "no realtime feed is configured (add the ANGEL_* secrets for realtime NSE quotes)."))
         api.write(site.path, "quotes.json", {k: v for k, v in q.items() if k not in ("generated_at", "engine_version", "mode")})
         # ---- live paper trading
         today = dt.datetime.now(IST).date()
@@ -784,10 +820,17 @@ def job_intraday(site, offline=False, minutes=None, every=None):
             n.save()
         except Exception as e:  # noqa
             log("live alerts failed:", e)
-        status = {"cycle": cycles, "updated_at": now, "open_markets": sorted(open_mk), "quotes_5m": len(got), "stocks_live": n_univ,
+        open_cals = {k for k, v in st.items() if v.get("state") == "OPEN"}
+        status = {"validation": {"accepted": n_ok, "rejected": len(rejected), "rejected_sample": rejected[:10]},
+                  "freshness": QA.summary(q["quotes"], open_cals), "realtime_provider": "angelone" if angel_on else None,
+                  "cycle": cycles, "updated_at": now, "open_markets": sorted(open_mk), "quotes_5m": len(got), "stocks_live": n_univ,
                   "paper_actions_this_cycle": sum(len(v) for v in acts.values()), "every_seconds": every,
                   "note": "Free data is ~15 minutes behind the exchange. Real-time needs a broker data feed (see Live Desk setup)."}
         api.write(site.path, "live_status.json", status)
+        job_ = tel.active
+        if job_:
+            job_.processed += n_ok; job_.failed += len(rejected) + len(bad)
+        tel.save()
         pub = LF.publish(site.path, token, repo)
         log(f"live cycle {cycles}: markets {sorted(open_mk) or 'closed'} · 5m {len(got)} · stocks {n_univ} · actions {status['paper_actions_this_cycle']} · {pub}")
         if not open_mk or time.time() + every > t_end:
@@ -896,6 +939,12 @@ def main(argv=None):
     ap.add_argument("--no-news", action="store_true")
     a = ap.parse_args(argv)
     site = Site(a.site)
+    tel = TEL.get(site.path)
+    with tel.job(a.job, provider="yahoo" + ("+angelone" if a.job == "intraday" and provider("angelone").configured() else "")):
+        _dispatch(a, site)
+
+
+def _dispatch(a, site):
     if a.job in ("eod", "weekend"):
         job_eod(site, a.offline, a.limit, fetch_news=not a.no_news, weekend=a.job == "weekend")
     elif a.job == "premarket":

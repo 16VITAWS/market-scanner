@@ -22,6 +22,23 @@ def _enc(o):
     return str(o)
 
 
+def clean(o):
+    """Strict JSON for browsers: NaN / +-Infinity (pandas gaps) become null - never a fake number."""
+    import math
+    if isinstance(o, float):
+        return o if math.isfinite(o) else None
+    if isinstance(o, dict):
+        return {k: clean(v) for k, v in o.items()}
+    if isinstance(o, (list, tuple)):
+        return [clean(v) for v in o]
+    if hasattr(o, "item") and not isinstance(o, (str, bytes)):
+        try:
+            return clean(o.item())
+        except Exception:  # noqa
+            return o
+    return o
+
+
 def now():
     return dt.datetime.now(IST).isoformat(timespec="seconds")
 
@@ -32,7 +49,7 @@ def write(site, name, obj):
     obj = {"generated_at": now(), "engine_version": C.ENGINE_VERSION, "mode": C.MODE, **obj} if isinstance(obj, dict) else obj
     tmp = path + ".tmp"
     with open(tmp, "w") as f:
-        json.dump(obj, f, default=_enc, separators=(",", ":"), ensure_ascii=False)
+        f.write(json.dumps(clean(json.loads(json.dumps(obj, default=_enc))), separators=(",", ":"), ensure_ascii=False, allow_nan=False))
     os.replace(tmp, path)
     return path
 
@@ -61,7 +78,9 @@ def quotes_from_frames(frames, master):
         age = dq.age_days(df)
         row = master.loc[k] if k in master.index else {}
         q[k] = {"p": round(float(c.iloc[-1]), 2), "pc": round(float(c.iloc[-2]), 2), "chg_pct": round(float(c.iloc[-1] / c.iloc[-2] - 1) * 100, 2),
-                "d": str(df.index[-1].date()), "t": df.index[-1].isoformat(), "age_days": age,
+                "d": str(df.index[-1].date()), "t": df.index[-1].isoformat(), "age_days": age, "intraday": False,
+                "sym": k, "ex": row.get("calendar") if hasattr(row, "get") else None, "src": "yahoo", "delay_min": 15,
+                "recv": dt.datetime.now(dt.timezone.utc).isoformat(timespec="seconds"),
                 "status": "STALE" if age > 4 else ("HISTORICAL" if age >= 1 else "DELAYED"),
                 "name": row.get("name", k) if hasattr(row, "get") else k, "currency": row.get("currency") if hasattr(row, "get") else None,
                 "kind": row.get("kind") if hasattr(row, "get") else None, "sector": row.get("sector") if hasattr(row, "get") else None,
