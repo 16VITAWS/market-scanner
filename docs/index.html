@@ -113,30 +113,50 @@ const ago=iso=>{if(!iso)return '—';const s=(Date.now()-new Date(iso))/1000;ret
 const toast=m=>{const t=document.createElement('div');t.className='toast';t.textContent=m;document.body.appendChild(t);setTimeout(()=>t.remove(),2600)};
 const store={get:(k,d)=>{try{const v=localStorage.getItem('vision2:'+k);return v?JSON.parse(v):d}catch(e){return d}},set:(k,v)=>{try{localStorage.setItem('vision2:'+k,JSON.stringify(v))}catch(e){}}};
 const API={}; let LOADED=false;
-const FILES=['meta','snapshot','quotes','signals','signals_us','paper','health','calendar','strategies','backtests','correlations','graph','news','flows','options','options_model','notifications','intel','live_control','live_proposals','live_results','ipos','brokers','instruments','reports','runs','candles_index','inst_flows','mf','macro','live_status','value'];
+const FILES=['meta','snapshot','quotes','signals','signals_us','paper','health','calendar','strategies','backtests','correlations','graph','news','flows','options','options_model','notifications','intel','live_control','live_proposals','live_results','ipos','brokers','instruments','reports','runs','candles_index','inst_flows','mf','macro','live_status','value','pipeline'];
 
+/* tolerate NaN/Infinity written by older engine versions: they become null (missing), never a number */
+const jparse=t=>JSON.parse(t.replace(/(?<=[:,\[]\s*)-?(?:NaN|Infinity)(?=\s*[,}\]])/g,'null'));
 async function loadAll(){
-  const res=await Promise.allSettled(FILES.map(f=>fetch(`api/${f}.json?v=${Date.now()}`).then(r=>{if(!r.ok)throw new Error(r.status);return r.json()})));
+  const res=await Promise.allSettled(FILES.map(f=>fetch(`api/${f}.json?v=${Date.now()}`).then(r=>{if(!r.ok)throw new Error(r.status);return r.text()}).then(jparse)));
   let fails=0;res.forEach((r,i)=>{if(r.status==='fulfilled'){const v=r.value,c=API[FILES[i]];if(!c||!c.generated_at||!v||!v.generated_at||v.generated_at>=c.generated_at)API[FILES[i]]=v}else{fails++;API[FILES[i]]=API[FILES[i]]||null}});
   $('#offline').hidden=fails<FILES.length; LOADED=fails<FILES.length;
   if(fails&&fails<FILES.length)console.warn('missing api files',fails);
 }
 /* ---------- LIVE overlay: small files the engine pushes every ~2 min during market hours (branch live-data) ---------- */
 const LIVE_BASE='https://raw.githubusercontent.com/16VITAWS/market-scanner/live-data/api/';
-const LIVE_FILES=['quotes','paper','snapshot','notifications','live_status'];
-async function loadLive(){const res=await Promise.allSettled(LIVE_FILES.map(f=>fetch(LIVE_BASE+f+'.json?t='+Date.now(),{cache:'no-store'}).then(r=>{if(!r.ok)throw new Error(r.status);return r.json()})));
-  let changed=false;res.forEach((r,i)=>{if(r.status!=='fulfilled')return;const f=LIVE_FILES[i],v=r.value,c=API[f];if(v&&v.generated_at&&(!c||!c.generated_at||v.generated_at>c.generated_at)){API[f]=v;changed=true}});return changed}
+const LIVE_FILES=['quotes','paper','snapshot','notifications','live_status','pipeline'];
+async function loadLive(){const res=await Promise.allSettled(LIVE_FILES.map(f=>fetch(LIVE_BASE+f+'.json?t='+Date.now(),{cache:'no-store'}).then(r=>{if(!r.ok)throw new Error(r.status);return r.text()}).then(jparse)));
+  let changed=false;OBS.loads++;OBS.last_try=new Date().toISOString();if(res.every(r=>r.status!=='fulfilled')){OBS.fails++;OBS.fail_streak++}else{if(OBS.fail_streak)OBS.recovered++;OBS.fail_streak=0;OBS.last_ok=OBS.last_try}
+  res.forEach((r,i)=>{if(r.status!=='fulfilled')return;const f=LIVE_FILES[i],v=r.value,c=API[f];if(v&&v.generated_at&&(!c||!c.generated_at||v.generated_at>c.generated_at)){API[f]=v;changed=true;if(f==='live_status')OBS.status_changes++}});
+  const n=Q('NIFTY');if(n?.t)OBS.nifty_t.add(n.t);return changed}
+/* what THIS browser has observed since the page opened - used by the Data Health verification checklist */
+const OBS={opened:new Date().toISOString(),loads:0,fails:0,fail_streak:0,recovered:0,status_changes:0,renders:0,nifty_t:new Set(),last_ok:null,last_try:null};
 function liveBadge(){const L=API.live_status;if(!L)return '';const age=(Date.now()-new Date(L.updated_at))/60000;const on=(L.open_markets||[]).length&&age<12;
-  return on?`<span class="bd open" title="Engine refreshes every ~2 min; free data is ~15 min behind the exchange">● LIVE ${esc((L.open_markets||[]).join('+'))} · ${new Date(L.updated_at).toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'})}</span>`:`<span class="bd closed" title="Live refresh runs while NSE or US markets are open">LIVE: ${age<12?'markets closed':'last '+ago(L.updated_at)}</span>`}
-const SAFE_RERENDER=['home','markets','paper','portfolio','options','live','intel','flows','funds'];
-function softRender(){const a=document.activeElement;if(a&&/INPUT|SELECT|TEXTAREA/.test(a.tagName))return;const id=(location.hash||'#home').slice(1);if(!SAFE_RERENDER.includes(id)||!R[id])return;const y=window.scrollY;try{R[id]()}catch(e){console.error(e)}window.scrollTo(0,y)}
+  return on?`<span class="bd open" title="The engine refreshes quotes every ~2 min while markets are open">⟳ AUTO-REFRESH ${esc((L.open_markets||[]).join('+'))} · ${istT(L.updated_at,true)}</span>`:`<span class="bd closed" title="Session refresh runs while NSE or US markets are open">REFRESH: ${age<12?'markets closed':'last '+ago(L.updated_at)}</span>`}
+/* ---------- freshness: computed from each quote's OWN market timestamp; same rules as engine/quality.py ---------- */
+const istT=(iso,short)=>{if(!iso)return '—';const d=new Date(iso);return isNaN(d)?'—':d.toLocaleTimeString('en-IN',{timeZone:'Asia/Kolkata',hour12:false,...(short?{hour:'2-digit',minute:'2-digit'}:{})})+' IST'};
+const ageTxt=s=>s==null?'':s<90?Math.round(s)+' s ago':s<5400?Math.round(s/60)+' min ago':s<172800?Math.round(s/3600)+' h ago':Math.round(s/86400)+' d ago';
+function mktOpen(ex){const m=API.calendar?.markets?.[ex];return !!m&&m.state==='OPEN'}
+function fresh(q){if(!q||q.p==null||!q.t)return{st:'OFFLINE',age:null};const age=(Date.now()-new Date(q.t))/1000;if(isNaN(age))return{st:'OFFLINE',age:null};
+  if(q.ex&&!mktOpen(q.ex))return{st:'CLOSED',age};if(!q.ex&&!q.intraday)return{st:'CLOSED',age};const d=q.delay_min??15;
+  if(d===0&&age<=60)return{st:'LIVE',age};if(age<=d*60+600)return{st:'DELAYED',age};return{st:'STALE',age}}
+const FCLS={LIVE:'LIVE',DELAYED:'DELAYED',STALE:'STALE',CLOSED:'HISTORICAL',OFFLINE:'STALE'};
+function fchip(q,label){const f=fresh(q);if(f.st==='OFFLINE')return '<span class="tag STALE">DATA TEMPORARILY UNAVAILABLE</span>';
+  const when=q.intraday?istT(q.t):esc(q.d||'');const tip=`Source: ${q.src||'yahoo'} · market time: ${q.intraday?istT(q.t):(q.d||'')} · received: ${istT(q.recv)} · provider delay: ${q.delay_min??15} min · status: ${f.st}${(q.flags||[]).length?' · flags: '+q.flags.join(', '):''}`;
+  return `<span class="tag ${FCLS[f.st]}" title="${esc(tip)}">${f.st}${label===false?'':' · '+(f.st==='CLOSED'?'last '+when:ageTxt(f.age))}</span>`}
+function dataBadge(){const q=Q('NIFTY')||Q('SPX');if(!q)return '<span class="bd bad" id="dbadge" onclick="show(\'diag\')">DATA TEMPORARILY UNAVAILABLE</span>';const f=fresh(q);
+  const c={LIVE:'open',DELAYED:'ok',CLOSED:'closed',STALE:'bad',OFFLINE:'bad'}[f.st];
+  return `<span class="bd ${c}" id="dbadge" style="cursor:pointer" onclick="show('diag')" title="Source ${esc(q.src||'yahoo')} · market time ${esc(q.intraday?istT(q.t):q.d)} · click for Data Health">● ${f.st} · ${esc(q.sym||'NIFTY')} ${q.intraday?istT(q.t):esc(q.d||'')} · ${f.st==='CLOSED'?'market closed':ageTxt(f.age)} · ${esc(q.src||'yahoo')}</span>`}
+const SAFE_RERENDER=['diag','overview','home','markets','paper','portfolio','options','live','intel','flows','funds'];
+function softRender(){const a=document.activeElement;if(a&&/INPUT|SELECT|TEXTAREA/.test(a.tagName))return;const id=(location.hash||'#home').slice(1);if(id==='home'&&Date.now()<(window.HOME_BUSY||0))return;if(!SAFE_RERENDER.includes(id)||!R[id])return;const y=window.scrollY;try{R[id]()}catch(e){console.error(e)}window.scrollTo(0,y)}
 async function candles(id,interval='1d'){const sub=interval==='1d'?'candles':'candles_'+interval;const r=await fetch(`api/${sub}/${encodeURIComponent(id)}.json?v=${Date.now()}`);if(!r.ok)throw new Error('no candle file for '+id);return r.json()}
 
 /* ---------- sections registry ---------- */
 const SECTIONS=[
- ['home','Command Center','⌂'],['terminal','Live Terminal','📡'],['markets','Global Markets','🌐'],['charts','Charts','📈'],['scanner','AI Scanner','🔍'],['intel','Intelligence','🧠'],['flows','Big-Money Flows','🐋'],['funds','Mutual Funds','🏦'],['value','Long-Term Value','💎'],['lab','Strategy Lab','🧪'],
+ ['home','Today','⌂'],['overview','Full Dashboard','🗂'],['terminal','Live Terminal','📡'],['markets','Global Markets','🌐'],['charts','Charts','📈'],['scanner','AI Scanner','🔍'],['intel','Intelligence','🧠'],['flows','Big-Money Flows','🐋'],['funds','Mutual Funds','🏦'],['value','Long-Term Value','💎'],['lab','Strategy Lab','🧪'],
  ['paper','Paper Trading','📝'],['live','Live Desk','⚡'],['portfolio','Portfolio & Growth','💹'],['plan','Small-Budget Plan','💰'],['options','Options','⛓'],['news','News & Events','📰'],
- ['research','Research & Backtests','📚'],['ipos','IPOs','🆕'],['brokers','Broker Desk','🏦'],['alerts','Alerts','🔔'],['data','Data Center','🗄'],['engine','Engine & Health','⚙'],['settings','Settings · Other devices','🔐']];
+ ['research','Research & Backtests','📚'],['ipos','IPOs','🆕'],['brokers','Broker Desk','🏦'],['alerts','Alerts','🔔'],['data','Data Center','🗄'],['diag','Data Health','🩺'],['engine','Engine & Health','⚙'],['settings','Settings · Other devices','🔐']];
 const R={};  // renderers
 function buildNav(){
   $('#nav').innerHTML=SECTIONS.map(([id,n,ic],i)=>`<button role="tab" data-t="${id}" aria-selected="${i===0}"><span class="n">${i+1}</span><span>${ic} ${n}</span></button>`).join('');
@@ -147,7 +167,7 @@ function show(id){$$('#nav button').forEach(b=>b.setAttribute('aria-selected',b.
 
 /* ---------- status badges ---------- */
 function badges(){
-  const m=API.meta,c=API.calendar,h=API.health;const b=[];
+  const m=API.meta,c=API.calendar,h=API.health;const b=[dataBadge()];
   const nse=c?.markets?.NSE;if(nse)b.push(`<span class="bd ${nse.state==='OPEN'?'open':'closed'}">NSE ${nse.state}${nse.reason?' · '+esc(nse.reason):''}</span>`);
   const us=c?.markets?.US;if(us)b.push(`<span class="bd ${us.state==='OPEN'?'open':'closed'}">US ${us.state}</span>`);
   b.push(`<span class="bd paper">PAPER: ON</span>`);b.push(liveBadge());
@@ -210,16 +230,96 @@ const Q=id=>API.quotes?.quotes?.[id];
 const qname=id=>Q(id)?.name||API.instruments?.instruments?.find(i=>i.id===id)?.name||id;
 function quoteTile(id,label){const q=Q(id);if(!q)return `<div class="kpi"><b class="mut">—</b><span>${esc(label||id)}</span><small>no data</small></div>`;
   return `<div class="kpi"><b>${fmt(q.p,q.p>1000?0:2)} <span class="${cls(q.chg_pct)}" style="font-size:14px">${pct(q.chg_pct)}</span></b><span>${esc(label||q.name||id)}</span><small>${tag(q.status)} ${esc(q.d)}${q.intraday?' · '+new Date(q.t).toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'}):''}</small></div>`}
-function heat(ids){return `<div class="heat">${ids.filter(Q).map(id=>{const q=Q(id),v=q.chg_pct||0,a=Math.min(1,Math.abs(v)/2.5);const bg=v>=0?`rgba(47,227,154,${.15+a*.6})`:`rgba(255,92,122,${.15+a*.6})`;return `<div style="background:${bg}"><span>${esc(q.name||id)}</span><b>${pct(v)}</b><small style="font-size:10px;opacity:.85">${fmt(q.p,q.p>1000?0:2)} · ${esc(q.status)}</small></div>`}).join('')||'<div class="empty">no quotes</div>'}</div>`}
+function heat(ids){return `<div class="heat">${ids.filter(Q).map(id=>{const q=Q(id),v=q.chg_pct||0,a=Math.min(1,Math.abs(v)/2.5);const bg=v>=0?`rgba(47,227,154,${.15+a*.6})`:`rgba(255,92,122,${.15+a*.6})`;return `<div style="background:${bg}"><span>${esc(q.name||id)}</span><b>${pct(v)}</b><small style="font-size:10px;opacity:.85" title="source ${esc(q.src||'yahoo')} · ${esc(q.intraday?istT(q.t):q.d||'')}">${fmt(q.p,q.p>1000?0:2)} · ${fresh(q).st}</small></div>`}).join('')||'<div class="empty">no quotes</div>'}</div>`}
 
 /* ===================== 1. COMMAND CENTER ===================== */
-R.home=function(){
-  const S=API.signals,P=API.paper,snap=API.snapshot,rep=API.reports,H=API.health;const el=$('#s-home');
+/* ===================== TODAY (front page): direction, what to buy/sell, options & futures, search, paper + live trade ===================== */
+R.home=function(){const el=$('#s-home'),mkt=store.get('homeMkt','IN'),IN=mkt==='IN';
+ const S=IN?API.signals:API.signals_us,r=S?.regime||{},F=API.intel?.forecast,idx=Q(IN?'NIFTY':'SPX'),cur0=IN?'INR':'USD';
+ const trend=r.state==='BULL'?'UP':r.state==='BEAR'?'DOWN':r.state?'SIDEWAYS':null;
+ const lean=IN&&F?.available?F.lean:null;const now=idx?.chg_pct;
+ let verdict,vcls,advice;
+ if(!trend){verdict='NO DATA';vcls='';advice='Signals appear after the next engine run.'}
+ else if(trend==='DOWN'&&lean!=='UP'){verdict='DOWN';vcls='neg';advice="Market is weak. Don't buy new stocks today — protect your money. Existing positions: follow the SELL list and your stop-losses."}
+ else if(trend==='UP'&&lean!=='DOWN'){verdict='UP';vcls='pos';advice='Market is strong. Buying is allowed — only the stocks in the BUY list, with a stop-loss on every trade.'}
+ else {verdict='SIDEWAYS';vcls='';advice='Signals are mixed. Only the strongest setups, smaller size, tight stop-losses.'}
+ const buys=(S?.buys||[]),sells=(S?.sells||[]),vrec=(API.value?.recommendations||[]).filter(x=>x.market===mkt&&x.action==='BUY').slice(0,5),opt=API.options_model?.signal;
+ const heldAuto=(API.paper?.accounts||[]).filter(a=>IN?a.currency!=='USD':a.currency==='USD'),bk=book(),manual=bk.positions.filter(p=>IN?p.currency!=='USD':p.currency==='USD');
+ const row=(s,side)=>`<div class="sig ${side}"><div class="h"><span style="font-size:17px"><b>${esc(s.symbol)}</b></span><span>${side==='buy'?'BUY':'SELL'} · score ${s.score>0?'+':''}${s.score}</span></div>
+   <div class="row" style="font-size:14px;margin-top:4px"><span>near ${cur(cur0,s.entry)}</span>${s.stop?`<span class="neg">stop ${cur(cur0,s.stop)}</span>`:''}${s.target?`<span class="pos">target ${cur(cur0,s.target)}</span>`:''}${Q(s.symbol)?fchip(Q(s.symbol)):''}</div>
+   <div class="help" style="margin:4px 0">${esc((s.why||[]).slice(0,2).join(' · '))}</div>
+   <div class="row"><button class="btn sm ${side}" onclick="homeTicket('${esc(s.symbol)}','${side}',${s.entry||0},${s.stop||0},${s.target||0},'${cur0}')">📝 Paper ${side==='buy'?'BUY':'SELL'}</button><button class="btn sm line" onclick="liveTrade('${esc(s.symbol)}','${side}',${s.entry||0},'${mkt}')">⚡ Live</button><button class="btn sm grey" onclick="openChart('${esc(s.symbol)}')">📈 Chart</button></div></div>`;
+ el.innerHTML=`<div class="tabs"><button class="${IN?'on':''}" onclick="store.set('homeMkt','IN');R.home()">🇮🇳 India (NSE)</button><button class="${!IN?'on':''}" onclick="store.set('homeMkt','US');R.home()">🇺🇸 US / Global</button></div>
+ <div class="card" style="border-width:2px;${vcls==='pos'?'border-color:#1F6A4A':vcls==='neg'?'border-color:#8B1E2E':''}">
+  <h1 style="margin:0 0 4px">Market today: <span class="${vcls}" style="font-size:40px">${verdict==='UP'?'▲ UP':verdict==='DOWN'?'▼ DOWN':verdict==='SIDEWAYS'?'◆ SIDEWAYS':verdict}</span></h1>
+  <p style="font-size:18px;margin:6px 0 10px">${esc(advice)}</p>
+  <div class="grid g3">
+   <div class="kpi"><b class="${trend==='UP'?'pos':trend==='DOWN'?'neg':''}">${trend||'—'}</b><span>Trend (${IN?'NIFTY':'S&P 500'} vs 50/200-day averages) ${tag('RULE')}</span><small>${esc(r.date||'')}</small></div>
+   <div class="kpi"><b class="${lean==='UP'?'pos':lean==='DOWN'?'neg':''}">${lean?`${esc(lean)} · ${Math.round(F.p_up*100)}% up`:'—'}</b><span>Next-session lean ${tag('MODEL OUTPUT')}</span><small>${IN&&F?.available?`hit rate ${F.oos?.hit_rate!=null?Math.round(F.oos.hit_rate*100)+'%':'—'} out-of-sample vs ${F.oos?.baseline_hit!=null?Math.round(F.oos.baseline_hit*100)+'%':'—'} always-up · ${F.oos?.has_skill?'small edge':'NO PROVEN EDGE'}`:'India only'}</small></div>
+   <div class="kpi"><b class="${cls(now)}">${idx?pct(now):'—'}</b><span>${IN?'NIFTY':'S&P 500'} right now ${idx?fchip(idx):''}</span><small>${idx?fmt(idx.p):''}</small></div></div>
+  <p class="help">Direction = rules + a statistical model, not a promise. Up to 1 in 2 days goes the other way. Not investment advice.</p></div>
+
+ ${autoCard(IN)}
+ <div class="card"><h3>🔍 Search any stock</h3><input id="hsQ" placeholder="Type a name or symbol: TCS, Reliance, AAPL, NVDA…" style="font-size:18px;padding:12px" autocomplete="off"><div id="hsR"></div></div>
+
+ <div class="grid g2">
+  <div class="card"><h3>🟢 BUY today <span class="pill">${buys.length}</span></h3>${buys.slice(0,8).map(s=>row(s,'buy')).join('')||`<div class="empty" style="font-size:16px">No BUY today.${trend==='DOWN'?' The market trend is down, so the rules block new buys.':''} Waiting is also a decision.</div>`}</div>
+  <div class="card"><h3>🔴 SELL / EXIT today <span class="pill">${sells.length}</span></h3>${sells.slice(0,8).map(s=>row(s,'sell')).join('')||'<div class="empty" style="font-size:16px">Nothing to sell today.</div>'}</div></div>
+
+ <div class="grid g2">
+  ${IN?`<div class="card"><h3>🎯 Options today ${tag('MODELED')}</h3>${opt&&opt.action==='BUY'?`<div class="sig ${opt.kind==='P'?'sell':'buy'}"><div class="h"><span style="font-size:16px"><b>${esc(opt.name)}</b></span><span>${opt.kind==='P'?'bearish':'bullish'} · ${opt.dte} days</span></div>
+     <div class="row" style="font-size:14px"><span>cost ${fmt(opt.debit)}/unit</span><span class="pos">max profit ${fmt(opt.max_profit)}</span><span class="neg">max loss ${fmt(opt.max_loss)}</span><span>lot ${opt.lot}</span><span>breakeven ${fmt0(opt.breakeven)}</span></div>
+     <div class="help">${esc((opt.why||[]).join(' · '))}. Defined risk: you can never lose more than the cost. Prices are MODELED (Black-Scholes on India VIX) — check the live option chain before trading.</div>
+     <div class="row"><button class="btn sm line" onclick="show('options')">Details →</button><button class="btn sm line" onclick="liveTrade('NIFTY','buy',0,'IN')">⚡ Live</button></div></div>`:'<div class="empty" style="font-size:16px">No options trade today (conditions not met).</div>'}
+    <h3 style="margin-top:12px">📊 Futures today</h3><p style="font-size:15px">NIFTY / BANKNIFTY futures follow the market verdict above: <b class="${vcls}">${verdict}</b>. VISION AI has <b>no separately tested futures model</b>, so there's no futures signal of its own — futures are leveraged, so practice in paper first.</p>
+    <div class="row"><button class="btn sm buy" onclick="homeTicket('NIFTY','buy',${Q('NIFTY')?.p||0},0,0,'INR','futures')">📝 Paper NIFTY futures</button></div></div>`:`<div class="card"><h3>🎯 Options & futures (US)</h3><div class="empty">No US options/futures model yet. US stocks: see the BUY / SELL lists.</div></div>`}
+  <div class="card"><h3>💎 Long-term buys (5-year view) ${tag('MODEL OUTPUT')}</h3>${vrec.map(v=>`<div class="row" style="justify-content:space-between;border-bottom:1px solid var(--line);padding:6px 0"><span><b>${esc(v.ticker)}</b> <small class="mut">${v.target_return!=null?`return ${pct(v.target_return*100)}/yr (${pct((v.return_range?.[0]??0)*100)}…${pct((v.return_range?.[1]??0)*100)})`:'financial: rated on P/B, ROE, F-score (no DCF return)'}</small></span><span><button class="btn sm buy" onclick="homeTicket('${esc(v.ticker)}','buy',${Q(v.ticker)?.p||0},0,0,'${cur0}')">📝 Paper</button></span></div>`).join('')||'<div class="empty">No long-term BUY rating in this market right now.</div>'}<a class="btn sm line" href="#value" onclick="show('value');return false">All ratings →</a></div></div>
+
+ <div class="card" id="homeTrade"><h3>Trade</h3>
+  <div class="grid g2"><div><h3 style="margin:0">📝 Paper trade (practice money)</h3><p class="help">Works any time — during market hours at the refreshed price, after the market closes or on holidays at the last price (or leave a Limit/Stop order for the next session). India ₹2,00,000 and US $10,000 practice accounts.</p><div id="homeTicket">${orderForm(IN?'NIFTYBEES':'SPY',Q(IN?'NIFTYBEES':'SPY')?.p,cur0)}</div></div>
+   <div><h3 style="margin:0">⚡ Live trade (real money)</h3><p style="font-size:15px">Real orders go through <b>your broker</b>. For prices every second and the algorithm acting on them, run <b>VISION LIVE</b> on your laptop (Shoonya, free API).</p>
+    <div class="row"><a class="btn buy" href="http://127.0.0.1:8765" target="_blank" rel="noopener">Open VISION LIVE</a><a class="btn line" href="#live" onclick="show('live');return false">Set up / Live Desk</a><a class="btn grey" href="https://trade.shoonya.com" target="_blank" rel="noopener">Shoonya web</a></div>
+    <p class="help">VISION LIVE starts in PAPER mode on live prices. Automatic real orders stay locked until the safety conditions are met (Live Desk explains). US live trading: through your US broker's app.</p></div></div></div>
+
+ <div class="grid g2">
+  <div class="card"><h3>My positions</h3>${[...heldAuto.map(a=>`<div class="row" style="justify-content:space-between"><span><b>${esc(a.account)}</b> (auto) · ${(a.positions||[]).length} open</span><span class="${cls(+a.return_pct)}">${cur(a.currency,a.equity)} (${pct(+a.return_pct)})</span></div>`),...manual.map(p=>`<div class="row" style="justify-content:space-between"><span><b>${esc(p.sym)}</b> ×${p.qty} (manual)</span><span class="${cls((p.last-p.avg))}">${cur(p.currency,(p.last-p.avg)*p.qty)}</span></div>`)].join('')||'<div class="empty">No positions.</div>'}<a class="btn sm line" href="#paper" onclick="show('paper');return false">Paper trading →</a></div>
+  <div class="card"><h3>World markets</h3>${heat(IN?['NIFTY','BANKNIFTY','SENSEX','INDIAVIX','USDINR','BRENT','GOLD','SPX']:['SPX','NDX','DJI','VIX','US10Y','NIKKEI','FTSE','DAX'])}<a class="btn sm line" href="#overview" onclick="show('overview');return false">Full dashboard →</a></div></div>`;
+ $('#hsQ').oninput=homeSearch;
+};
+/* auto-trading panel: what the algorithm did by itself (engine accounts) + the real-money lock status */
+function autoCard(IN){const P=API.paper||{},C=API.live_control||{},accs=(P.accounts||[]).filter(a=>(a.strategies||[]).length&&(IN?a.currency!=='USD':a.currency==='USD'));
+ const kind={trend_breakout_swing:'Stocks · swing (days–weeks)',trend_breakout_swing_us:'US stocks · swing',index_options_regime:'NIFTY options · defined risk',value_longterm:'Long-term value (monthly)'};
+ const live=(P.live_actions||[]).filter(x=>accs.some(a=>a.account===x.account)).slice(-6).reverse();
+ const g=C.gate||{checks:[]},n=(g.checks||[])[0]?.value??0;
+ return `<div class="card" style="border-color:#1F3A6B"><h3>🤖 Auto-trading — the algorithm buys and sells by itself ${tag('PAPER')}</h3>
+  <p class="help" style="font-size:14px">Every signal on this page is traded automatically in these accounts: stocks at the next open (and live in market hours), stop-losses and targets checked every ~2 minutes, options spreads opened and closed by rule. No button needed.</p>
+  <div class="tbl"><table><tr><th>Account</th><th>What it trades</th><th class="num">Value</th><th class="num">Return</th><th class="num">Open</th><th>Today it did</th></tr>
+  ${accs.map(a=>`<tr><td><b>${esc(a.account)}</b></td><td style="font-size:13px">${esc(kind[a.strategies[0]]||a.strategies[0])}</td><td class="num">${cur(a.currency,a.equity)}</td><td class="num ${cls(+a.return_pct)}">${pct(+a.return_pct)}</td><td class="num">${(a.positions||[]).length}</td>
+   <td style="font-size:12px">${(P.last_actions?.[a.account]||[]).slice(0,3).map(esc).join('<br>')||'—'}</td></tr>`).join('')||'<tr><td colspan=6 class="mut">Auto accounts appear after the next engine run.</td></tr>'}</table></div>
+  ${live.length?`<h3 style="margin-top:8px">During today's session</h3><ul class="log">${live.map(x=>`<li><small class="mut">${istT(x.time,true)}</small> <b>${esc(x.account)}</b> ${esc(x.action)}</li>`).join('')}</ul>`:''}
+  <div class="row" style="margin-top:8px;align-items:flex-start"><span class="tag ${C.auto_allowed?'BEAR':'STALE'}" style="font-size:13px">REAL-MONEY AUTO: ${C.auto_allowed?'ON':'LOCKED'}</span>
+   <span style="font-size:14px">Unlocks after <b>30 closed paper trades</b> with profit factor ≥ 1.2 and positive expectancy (now <b>${n}</b>/30), your consent phrase, and a static IP registered with your broker (SEBI). Real orders are placed by <b>VISION LIVE</b> on your laptop on live prices.</span></div></div>`}
+function homeTicket(sym,side,px,stop,tgt,currency,seg){window.HOME_BUSY=Date.now()+300000;const r=$('#s-home');$('#homeTicket',r).innerHTML=orderForm(sym,px||Q(sym)?.p,currency||'INR');
+  if(stop)$('#ofStop',r).value=stop;if(tgt)$('#ofTgt',r).value=tgt;if(seg)$('#ofSeg',r).value=seg;$('#homeTrade').scrollIntoView({behavior:'smooth'});$('#ofQty',r).focus();
+  toast(`${side==='buy'?'BUY':'SELL'} ${sym}: set quantity, tick the box, press ${side==='buy'?'BUY':'SELL'} (paper)`)}
+function liveTrade(sym,side,px,mkt){if(mkt==='US'){toast('US live trades: place them in your US broker app');return}
+  window.open('http://127.0.0.1:8765','_blank','noopener');toast(`VISION LIVE opened. ${side.toUpperCase()} ${sym}${px?' near '+fmt(px):''} - if VISION LIVE is not running, start VISION-LIVE.bat or place it in the Shoonya app.`)}
+function homeSearch(){window.HOME_BUSY=Date.now()+300000;const q=$('#hsQ').value.trim().toUpperCase(),box=$('#hsR');if(q.length<2){box.innerHTML='';return}
+  const ins=(API.instruments?.instruments||[]),tabs=[...(API.signals?.table||[]),...(API.signals_us?.table||[])],val=API.value?.stocks||[];
+  const hits=ins.filter(i=>i.id.includes(q)||String(i.name||'').toUpperCase().includes(q)).slice(0,8);
+  box.innerHTML=hits.map(i=>{const qt=Q(i.id),sg=tabs.find(t=>t.symbol===i.id),v=val.find(x=>x.id===i.id),c=i.currency||'INR';
+   return `<div class="sig ${sg?.action==='BUY'?'buy':sg?.action==='SELL'?'sell':''}" style="margin-top:8px"><div class="h"><span style="font-size:17px"><b>${esc(i.id)}</b> <small class="mut">${esc(i.name||'')} · ${esc(i.exchange||'')} · ${esc(i.sector||i.kind||'')}</small></span><span>${qt?`<b>${cur(c,qt.p)}</b> <span class="${cls(qt.chg_pct)}">${pct(qt.chg_pct)}</span> ${fchip(qt)}`:'<span class="tag STALE">DATA TEMPORARILY UNAVAILABLE</span>'}</span></div>
+    <div class="row" style="font-size:14px;margin:4px 0">${sg?`<span>Today's signal: <b class="${sg.action==='BUY'?'pos':sg.action==='SELL'?'neg':''}">${esc(sg.action||'HOLD')}</b> (score ${sg.score>0?'+':''}${sg.score})</span>`:'<span class="mut">No swing signal today</span>'}${v?`<span>Long-term: <b>${esc(v.rating)}</b>${v.exp_return?.base!=null?' · '+pct(v.exp_return.base*100)+'/yr':''}</span>`:''}${qt?.hi52?`<span class="mut">52-wk ${fmt(qt.lo52)} – ${fmt(qt.hi52)}</span>`:''}</div>
+    ${sg?.why?`<div class="help">${esc(sg.why.slice(0,3).join(' · '))}</div>`:''}
+    <div class="row"><button class="btn sm buy" onclick="homeTicket('${esc(i.id)}','buy',${qt?.p||0},${sg?.stop||0},${sg?.target||0},'${c}')">📝 Paper BUY</button><button class="btn sm sell" onclick="homeTicket('${esc(i.id)}','sell',${qt?.p||0},0,0,'${c}')">📝 Paper SELL</button><button class="btn sm line" onclick="liveTrade('${esc(i.id)}','buy',${qt?.p||0},'${c==='USD'?'US':'IN'}')">⚡ Live</button><button class="btn sm grey" onclick="openChart('${esc(i.id)}')">📈 Chart</button></div></div>`}).join('')||'<div class="empty">No match in the 650+ symbols VISION AI tracks.</div>'}
+
+R.overview=function(){
+  const S=API.signals,P=API.paper,snap=API.snapshot,rep=API.reports,H=API.health;const el=$('#s-overview');
   if(!S){el.innerHTML='<div class="empty">No signals file yet. Run the engine once (Engine tab).</div>';return}
   const r=S.regime;const acc=(P?.accounts||[]);const swing=acc.find(a=>a.account==='IN-SWING');
   const fn=[[S.scanned,'scored'],[S.buys.length+S.sells.length+S.blocked.length,'candidates'],[S.blocked.length,'blocked by rules'],[S.sells.length,'sell / exit'],[S.buys.length,'buys']];
   el.innerHTML=`
-  <h1>Command Center <span class="tag ${r.state}">${r.state}</span> ${tag(S.data_status||'?')} ${S.historical?tag('HISTORICAL'):''}</h1>
+  <h1>Full Dashboard <span class="tag ${r.state}">${r.state}</span> ${tag(S.data_status||'?')} ${S.historical?tag('HISTORICAL'):''}</h1>
   <p class="sub">Data to ${esc(r.date)} · computed ${esc(r.computed_at)} · ${esc(S.universe_source||'')}${S.note?' · '+esc(S.note):''}</p>
   <div class="grid g2">
    <div class="card"><h3>Verdict (rule-based)</h3>
@@ -709,7 +809,7 @@ R.intel=function(){const I=API.intel||{},el=$('#s-intel');const f=I.forecast||{}
    ${(im.news_tagged||[]).length?`<details><summary>Headlines linked to global drivers (${im.news_tagged.length})</summary><ul class="log">${im.news_tagged.slice(0,20).map(n=>`<li>${n.drivers.map(d=>`<span class="pill">${esc(d)}</span>`).join(' ')} <a href="${esc(n.link)}" target="_blank" rel="noopener">${esc(n.title)}</a></li>`).join('')}</ul></details>`:''}
    <p class="help">How to read: "Brent +3% → NIFTY ENERGY −0.4%" means that over the last ~2 years, on the Indian session after such a Brent move, that index moved that much on average. Statistics, not proof of cause; R² shows how much of the index's daily move the driver explains. ${esc(im.made_at?'Updated pre-market.':'')}</p></div>
   <div class="grid g2">
-   <div class="card"><h3>Next NIFTY session ${f.available?(f.oos?.has_skill?tag('OK'):'<span class="tag STALE">NO PROVEN EDGE</span>'):''}</h3>${f.available?`
+   <div class="card"><h3>Next NIFTY session ${tag('MODEL OUTPUT')} ${f.available?(f.oos?.has_skill?tag('OK'):'<span class="tag STALE">NO PROVEN EDGE</span>'):''}</h3>${f.available&&API.meta?.data_status!=='OK'?`<div class="danger">Analysis unavailable because current market data is stale (data status ${esc(API.meta?.data_status)} · last bar ${esc(API.meta?.data_date||'?')}).</div>`:''}${f.available&&API.meta?.data_status==='OK'?`
     <div class="row"><div class="gauge" style="width:130px">${gauge(f.p_up*100,0,100,f.p_up>=.5?'#2FE39A':'#FF5C7A')}</div><div><div class="big" style="font-size:30px">${Math.round(f.p_up*100)}% up</div><div class="mut">${esc(f.lean)} · after ${esc(f.for_session_after)} · ${f.made_at==='pre-market'?(f.us_close_included?'pre-market (US close included)':'pre-market (latest US close not yet in feed)'):'evening estimate (US session not closed yet)'}</div></div></div>
     <div class="grid g3" style="margin-top:8px"><div class="kpi"><b>${fmt0(f.range_1sd[0])}–${fmt0(f.range_1sd[1])}</b><span>1-sd range (~68%)</span></div><div class="kpi"><b>${f.oos.hit_rate!=null?Math.round(f.oos.hit_rate*100)+'%':'—'}</b><span>Out-of-sample hit rate (${f.oos.n} days)</span></div><div class="kpi"><b>${f.oos.baseline_hit!=null?Math.round(f.oos.baseline_hit*100)+'%':'—'}</b><span>"Always same way" baseline</span></div></div>
     <details><summary>Why (today's biggest pushes)</summary><table><tr><th>Input</th><th class="num">Today (z)</th><th class="num">Push</th></tr>${(f.contributions||[]).map(k=>`<tr><td>${esc(k.feature)}</td><td class="num">${k.today_z}</td><td class="num ${cls(k.push)}">${k.push}</td></tr>`).join('')}</table></details>
@@ -872,6 +972,12 @@ R.live=async function(){const C=API.live_control||{},PR=API.live_proposals||{},L
   const tickets=(S?.buys||[]).map(s=>{const lim=Math.floor(s.entry*1.005*20)/20;const q=Math.max(0,Math.min(Math.floor(cap*0.01/Math.max(lim-s.stop,0.01)),Math.floor(cap*0.25/lim)));return {...s,lim,q}});
   const exits=(b.holdings||[]).map(h=>{const q=Q(h.sym);const last=q?q.p:null;const sig=(S?.sells||[]).find(x=>x.symbol===h.sym);let why=null;if(h.stop&&last!=null&&last<=h.stop)why='stop-loss level reached';else if(h.target&&last!=null&&last>=h.target)why='target reached';else if(sig)why='engine EXIT signal (score '+sig.score+')';else if(S?.regime?.state==='BEAR'&&h.source==='live-assisted')why='index regime BEAR (engine would exit)';return {...h,last,why}});
   el.innerHTML=`<h1>Live Desk ${mode==='OFF'?'<span class="tag STALE">API LIVE: OFF</span>':mode==='AUTO'?'<span class="tag BEAR">API LIVE: AUTO</span>':'<span class="tag HISTORICAL">API LIVE: APPROVAL</span>'} ${C.kill?'<span class="tag BEAR">KILL SWITCH ON</span>':''}</h1>
+  <div class="card" style="border-color:#1F6A4A"><h3>⚡ VISION LIVE - realtime prices every second + the algorithm on your laptop ${tag('PAPER')}</h3>
+   <p>This portal refreshes about every 2 minutes on free, ~15-minute-delayed data, so it's for research and paper trading. For live trading, run <b>VISION LIVE</b> on your laptop while you trade (free broker API - no monthly fee):</p>
+   <ul class="steps"><li><span class="ic ok">1</span><div>In your <b>Shoonya (Finvasia)</b> account, open the API key page: note your <b>user id</b>, <b>client id</b> and <b>secret code</b>, and set the redirect URL to <code>http://127.0.0.1:8765/shoonya/callback</code>.</div></li>
+   <li><span class="ic ok">2</span><div><a class="btn sm" href="VISION-LIVE.bat" download>⬇ Download VISION-LIVE.bat</a> and double-click it. First time it installs Python and opens a settings file: paste those 3 details (they stay on your laptop only).</div></li>
+   <li><span class="ic ok">3</span><div>Each morning click <b>🔑 Login to Shoonya</b> on the live screen (<b>http://127.0.0.1:8765</b>) and log in on Shoonya's own page. Then prices stream on every trade; stop-loss and target are checked on every tick.</div></li></ul>
+   <p class="help">Modes: <b>PAPER</b> (default, no money moves, builds the track record) · <b>ALERT</b> (phone alert "BUY 7 TCS at 3,405" - you tap it in your app) · <b>REAL</b> (LIMIT orders to your broker) - locked until: consent phrase, a static IP registered with your broker (SEBI rule from 1 Apr 2026), 30+ closed live-paper trades with profit factor ≥ 1.2, and the kill switch off. Angel One also supported (BROKER=ANGEL). Not yet tested against a live account - start in PAPER. Not investment advice.</p></div>
   <div class="danger"><b>Real money.</b> These screens deal with real orders. Losses are real, including gaps through stop-losses and full loss of option premium. Nothing here is advice; the signals have no guaranteed edge (see the paper record and the out-of-sample tests).</div>
   <div class="tabs" id="lvTabs"><button class="on" data-p="assist">1 · Without API (you place it)</button><button data-p="api">2 · With API (approve / auto)</button><button data-p="setup">3 · Setup & safety</button></div>
   <div id="lv-assist">
@@ -969,6 +1075,50 @@ function importData(inp){const f=inp.files[0];if(!f)return;const r=new FileReade
 function wipeData(){if(!confirm('Delete all local portal data on this device? Export first if unsure.'))return;Object.keys(localStorage).filter(k=>k.startsWith('vision2:')).forEach(k=>localStorage.removeItem(k));location.reload()}
 
 /* ===================== 16. ENGINE & HEALTH ===================== */
+/* ===================== DATA HEALTH (diagnostics) - every value is telemetry or an observation made by this browser ===================== */
+R.diag=function(){const el=$('#s-diag'),PL=API.pipeline||{},LS=API.live_status||{},PV=PL.providers||{},QS=API.quotes?.quotes||{};
+ const fc={LIVE:0,DELAYED:0,STALE:0,CLOSED:0,OFFLINE:0};let flagged=0,src={};Object.values(QS).forEach(q=>{fc[fresh(q).st]++;if((q.flags||[]).length)flagged++;src[q.src||'yahoo']=(src[q.src||'yahoo']||0)+1});
+ const n=Q('NIFTY'),nf=fresh(n),y=PV.yahoo||{},a=PV.angelone||{};const ok=b=>b===true?'<span class="pos">✓</span>':b===false?'<span class="neg">✗</span>':'<span class="mut">–</span>';
+ const lastJob=(PL.jobs||[]).slice(-1)[0];const liveAge=LS.updated_at?(Date.now()-new Date(LS.updated_at))/1000:null;
+ const rows=[
+  ['Realtime provider (Angel One)',a.status||'AWAITING SECRETS',a.last_ok?'last OK '+istT(a.last_ok)+' · '+ago(a.last_ok):(a.last_error_msg||'not configured')],
+  ['Delayed provider (Yahoo, ~15 min)',y.last_ok?'RESPONDING':'NO DATA',`${y.requests??0} requests · ${y.errors??0} with gaps · latency ${y.latency_ms_avg??'—'} ms avg · last OK ${y.last_ok?ago(y.last_ok):'—'}`],
+  ['Streaming (WebSocket)','NOT AVAILABLE','static site: quotes are pushed as files every ~2 min in market hours (see below)'],
+  ['Session refresh loop',liveAge!=null&&liveAge<400&&(LS.open_markets||[]).length?'RUNNING':(LS.open_markets||[]).length?'LATE':'IDLE (markets closed)',`cycle ${LS.cycle??'—'} · ${istT(LS.updated_at)} · ${ago(LS.updated_at)}`],
+  ['Site store (gh-pages)',API.meta?'HEALTHY':'UNREACHABLE',`engine ${esc(API.meta?.engine_version||'?')} · built ${ago(API.meta?.generated_at)}`],
+  ['Last NIFTY quote',nf.st,n?`${fmt(n.p)} · market time ${n.intraday?istT(n.t):esc(n.d)} · received ${istT(n.recv)} · src ${esc(n.src||'yahoo')}`:'DATA TEMPORARILY UNAVAILABLE'],
+  ['Data age (NIFTY)',nf.age==null?'—':ageTxt(nf.age),nf.st==='CLOSED'?'market closed - last traded price shown':''],
+  ['Quotes by freshness',Object.values(QS).length+' symbols',Object.entries(fc).map(([k,v])=>`${k} ${v}`).join(' · ')+` · flagged ${flagged}`],
+  ['Validation (last cycle)',LS.validation?`${LS.validation.accepted} accepted`:'—',LS.validation?`${LS.validation.rejected} rejected (previous valid quote kept)`:'appears after the next session refresh'],
+  ['This browser',OBS.fail_streak?'RECONNECTING':OBS.last_ok?'CONNECTED':'CONNECTING',`${OBS.loads} checks · ${OBS.fails} failed · ${OBS.recovered} recoveries · last OK ${OBS.last_ok?istT(OBS.last_ok):'—'} · polling ${document.hidden?'paused (background)':'every 60 s'}`]];
+ const chk=[
+  ['Server can connect to a provider',y.last_ok?Date.now()-new Date(y.last_ok)<3*864e5:false,y.last_ok?'Yahoo last OK '+ago(y.last_ok):'no successful call recorded yet'],
+  ['Authentication succeeds',a.status==='CONNECTED'?true:a.configured===false?null:a.last_error?false:null,a.status==='CONNECTED'?'Angel One login OK':'Yahoo needs no login; Angel One: '+(a.status||'awaiting secrets')],
+  ['A real symbol is retrieved',!!(n&&n.p),n?`NIFTY ${fmt(n.p)} from ${n.src||'yahoo'}`:'no NIFTY quote'],
+  ['Market timestamp changes',OBS.nifty_t.size>1?true:null,`${OBS.nifty_t.size} distinct NIFTY timestamps seen since this page opened ${istT(OBS.opened,true)}${(LS.open_markets||[]).length?'':' (markets closed - no change expected)'}`],
+  ['Browser receives updates',OBS.status_changes>0?true:null,`${OBS.status_changes} new refresh files received this session`],
+  ['Data is stored',!!(PL.generated_at&&API.meta?.generated_at),`pipeline log saved ${ago(PL.generated_at)} · site data ${ago(API.meta?.generated_at)} (gh-pages branch)`],
+  ['UI updates without reload',OBS.renders>0?true:null,`${OBS.renders} automatic re-renders this session (no F5)`],
+  ['Stale detection works',true,'computed live from each quote\'s own timestamp; engine tests cover LIVE/DELAYED/STALE/CLOSED/OFFLINE'],
+  ['Reconnect works',OBS.recovered>0?true:null,OBS.recovered?`recovered ${OBS.recovered}× after failed fetches`:'no connection drop observed yet (it retries every 60 s)'],
+  ['Recovers after restart',lastJob?lastJob.status!=='FAILED':null,lastJob?`every run is a cold start that reloads state from the site store; last job ${esc(lastJob.job)} ${esc(lastJob.status)} ${ago(lastJob.finished)}`:'no job log yet']];
+ el.innerHTML=`<h1>Data Health ${tag(nf.st==='OFFLINE'?'STALE':FCLS[nf.st])}</h1><p class="sub">Every number below is measured: provider telemetry written by the engine (api/pipeline.json), the session-refresh status file, and what this browser itself has observed since you opened it. Nothing is estimated.</p>
+ <div class="card tbl"><h3>Live market data health</h3><table>${rows.map(r=>`<tr><td><b>${esc(r[0])}</b></td><td>${esc(r[1])}</td><td style="font-size:12px">${r[2]}</td></tr>`).join('')}</table></div>
+ <div class="grid g2">
+  <div class="card tbl"><h3>Verification (only ✓ counts as verified)</h3><table>${chk.map(c=>`<tr><td>${ok(c[1])}</td><td><b>${esc(c[0])}</b><br><small class="mut">${c[2]}</small></td></tr>`).join('')}</table><p class="help">– means "not observed yet", not "failed". Items 4, 5, 7 and 9 need this page open while a market is trading.</p></div>
+  <div class="card"><h3>What "LIVE" means here</h3><ul class="steps">
+   <li><span class="tag LIVE">LIVE</span><div>realtime exchange feed (Angel One) and the market timestamp is at most 60 s old. Only possible after you add the ANGEL_* secrets.</div></li>
+   <li><span class="tag DELAYED">DELAYED</span><div>the free Yahoo feed (~15 min behind the exchange) with a timestamp inside that window. This is what the portal shows today.</div></li>
+   <li><span class="tag STALE">STALE</span><div>market is open but the newest timestamp is older than the provider's delay + 10 min. Analysis and new paper orders stop.</div></li>
+   <li><span class="tag HISTORICAL">CLOSED</span><div>market closed: last traded price with its own date/time.</div></li>
+   <li><span class="tag STALE">DATA TEMPORARILY UNAVAILABLE</span><div>no valid quote - nothing is invented.</div></li></ul>
+   <p class="help">Hover any status chip to see source, market time, received time and validation flags.</p></div></div>
+ <div class="grid g2">
+  <div class="card tbl"><h3>Providers</h3><table><tr><th>Provider</th><th>Status</th><th class="num">Requests</th><th class="num">Errors</th><th class="num">Latency</th><th>Last OK</th><th>Last error</th></tr>${Object.entries(PV).map(([k,p])=>`<tr><td><b>${esc(k)}</b></td><td>${esc(p.status||(p.last_ok?'responding':'—'))}</td><td class="num">${p.requests??0}</td><td class="num">${p.errors??0}</td><td class="num">${p.latency_ms_avg!=null?p.latency_ms_avg+' ms':'—'}</td><td>${p.last_ok?istT(p.last_ok,true)+' · '+ago(p.last_ok):'—'}</td><td style="font-size:12px">${p.last_error?ago(p.last_error)+': '+esc(p.last_error_msg||''):'—'}${p.rate_limited_at?'<br><span class="neg">rate-limited '+ago(p.rate_limited_at)+'</span>':''}</td></tr>`).join('')||'<tr><td colspan=7 class="mut">Appears after the next engine run.</td></tr>'}</table><p class="help">Quote sources right now: ${Object.entries(src).map(([k,v])=>`${esc(k)} ${v}`).join(' · ')||'—'}</p></div>
+  <div class="card tbl"><h3>Last successful run per job</h3><table>${Object.entries(PL.last_ok||{}).map(([k,v])=>`<tr><td><b>${esc(k)}</b></td><td>${istT(v)} · ${ago(v)}</td></tr>`).join('')||'<tr><td class="mut">Appears after the next engine run.</td></tr>'}</table>
+   ${(LS.validation?.rejected_sample||[]).length?`<h3 style="margin-top:10px">Rejected records (last cycle)</h3><ul class="log">${LS.validation.rejected_sample.map(r=>`<li><b>${esc(r.sym)}</b> ${esc(r.reason)} <small class="mut">${esc(r.src||'')} ${esc(r.t||'')}</small></li>`).join('')}</ul>`:''}</div></div>
+ <div class="card tbl"><h3>Data pipeline status (latest ${Math.min(20,(PL.jobs||[]).length)} jobs)</h3><table><tr><th>Job</th><th>Started (IST)</th><th class="num">Seconds</th><th>Status</th><th class="num">Processed</th><th class="num">Failed</th><th>Provider</th><th>Error</th></tr>${(PL.jobs||[]).slice(-20).reverse().map(j=>`<tr><td><b>${esc(j.job)}</b></td><td>${esc(new Date(j.started).toLocaleString('en-IN',{timeZone:'Asia/Kolkata',hour12:false}))}</td><td class="num">${j.seconds}</td><td>${tag(j.status==='OK'?'OK':j.status==='PARTIAL'?'HISTORICAL':'STALE')} ${esc(j.status)}</td><td class="num">${j.processed}</td><td class="num">${j.failed}</td><td>${esc(j.provider)}</td><td style="font-size:12px">${esc(j.error||'')}</td></tr>`).join('')||'<tr><td colspan=8 class="mut">The job log starts with the next engine run.</td></tr>'}</table><p class="help">PARTIAL = at least 20% of requested symbols failed or were rejected. Errors are scrubbed of secrets before they are written.</p></div>
+ <div class="card"><h3>Getting true realtime NSE data</h3><p>This portal has no server of its own (it runs free on GitHub), so it can't hold a WebSocket open. The realtime path is the <b>Angel One SmartAPI</b> adapter, polled every ~2-minute cycle: add these four <b>GitHub Secrets</b> (repo → Settings → Secrets and variables → Actions) and the next session refresh logs in, maps symbols and marks those quotes LIVE: <code>ANGEL_API_KEY</code> · <code>ANGEL_CLIENT_ID</code> · <code>ANGEL_PASSWORD</code> (your login PIN) · <code>ANGEL_TOTP_SECRET</code>. The adapter is unverified until the first successful call appears in the Providers table above. Tick-by-tick streaming needs an always-on machine (the VPS runner) - GitHub Actions cannot stream.</p></div>`};
 R.engine=function(){const H=API.health,RU=API.runs,el=$('#s-engine');
   el.innerHTML=`<h1>Engine & System Health</h1><p class="sub">The engine is Python running free on GitHub Actions in repo <a href="https://github.com/16VITAWS/market-scanner" target="_blank" rel="noopener">16VITAWS/market-scanner</a>. Schedule: ${esc(H?.workflow?.eod||'')} · ${esc(H?.workflow?.intraday||'')} · ${esc(H?.workflow?.weekend||'')}.</p>
   <div class="grid g4"><div class="kpi"><b>${H?.tests?.passed?'<span class="pos">PASS</span>':'<span class="neg">FAIL</span>'}</b><span>Automated tests</span><small>${esc(H?.tests?.summary||'')} · ${ago(H?.tests?.ran_at)}</small></div><div class="kpi"><b>${esc(H?.data_status||'?')}</b><span>Data status</span></div><div class="kpi"><b>${esc(H?.mode||'?')}</b><span>Mode</span><small>live execution implemented: ${H?.live_execution?.implemented?'yes':'NO'}</small></div><div class="kpi"><b>${esc(API.meta?.engine_version||'?')}</b><span>Engine version</span><small>${esc(API.meta?.generated_at||'')}</small></div></div>
@@ -1003,7 +1153,10 @@ function pwa(){if('serviceWorker' in navigator)navigator.serviceWorker.register(
 async function boot(){pwa();buildNav();await Promise.all([loadAll(),loadLwc()]);await loadLive().catch(()=>{});badges();markBook();evalAlerts();const h=(location.hash||'#home').slice(1);show(SECTIONS.some(s=>s[0]===h)?h:'home');
   $('#refreshBtn').onclick=async()=>{await loadAll();await loadLive().catch(()=>{});badges();markBook();evalAlerts();show((location.hash||'#home').slice(1));toast('Refreshed')};
   setInterval(async()=>{const before=API.meta?.generated_at;await loadAll();if(API.meta?.generated_at!==before){badges();markBook();evalAlerts();softRender();toast('New engine data loaded')}},120000);
-  setInterval(async()=>{let ch=false;try{ch=await loadLive()}catch(e){}badges();if(ch){markBook();evalAlerts();softRender()}},60000);
+  const liveTick=async()=>{let ch=false;try{ch=await loadLive()}catch(e){OBS.fails++}badges();if(ch){OBS.renders++;markBook();evalAlerts();softRender()}};
+  setInterval(()=>{if(!document.hidden)liveTick()},60000);                       // no network while the app is in the background
+  document.addEventListener('visibilitychange',()=>{if(!document.hidden)liveTick()}); // catch up immediately on return
+  setInterval(()=>{const e=$('#dbadge');if(e&&!document.hidden)e.outerHTML=dataBadge();if(!document.hidden&&(location.hash||'').slice(1)==='diag'&&!document.activeElement?.matches('input,select'))R.diag()},5000);
   window.addEventListener('hashchange',()=>{const id=location.hash.slice(1);if(SECTIONS.some(s=>s[0]===id)&&$('#s-'+id)?.hidden)show(id)});}
 boot();
 </script>
