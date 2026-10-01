@@ -350,7 +350,7 @@ def test_options_real_locked_then_orders_both_legs_safely(VL, tmp_path):
 
 
 def test_shoonya_feed_streams_option_legs(VL, monkeypatch, tmp_path):
-    import websocket as W
+    W = pytest.importorskip("websocket")
     sent, book = [], VL.Book()
 
     class FakeWS:
