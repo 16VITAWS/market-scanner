@@ -216,3 +216,36 @@ def test_live_paper_record_survives_restart(VL):
     p.sell("TCS", 3500.0, "target")
     again = VL.Paper(100000)                                              # a new program start reads the same file
     assert len(again.s["trades"]) == 1 and again.s["trades"][0]["sym"] == "TCS" and again.s["cash"] == p.s["cash"]
+
+
+def test_portal_can_only_stop_resume_and_read_state(VL, tmp_path):
+    import threading, urllib.request, urllib.error
+    from http.server import ThreadingHTTPServer
+
+    class A:   # minimal app double
+        pass
+    app = A(); app.trader = type("T", (), {"log": lambda *a, **k: None})(); app.sh_auth = None
+    srv = ThreadingHTTPServer(("127.0.0.1", 0), VL.make_handler(app)); port = srv.server_address[1]
+    threading.Thread(target=srv.serve_forever, daemon=True).start()
+
+    def req(path, method="GET", origin=None, xv=True):
+        h = {"X-Vision": "1"} if xv else {}
+        if origin: h["Origin"] = origin
+        r = urllib.request.Request(f"http://127.0.0.1:{port}{path}", method=method, headers=h, data=b"" if method == "POST" else None)
+        try:
+            with urllib.request.urlopen(r) as resp:
+                return resp.status, dict(resp.headers)
+        except urllib.error.HTTPError as e:
+            return e.code, dict(e.headers)
+    P = VL.PORTAL_ORIGIN
+    st, h = req("/kill", "OPTIONS", P)
+    assert st == 204 and h["Access-Control-Allow-Origin"] == P and h["Access-Control-Allow-Private-Network"] == "true"
+    assert req("/kill", "OPTIONS", "https://evil.example")[0] == 403
+    assert req("/shoonya/code", "OPTIONS", P)[0] == 403
+    st, h = req("/kill", "POST", P)
+    assert st == 204 and os.path.exists(VL.KILL_FILE) and h["Access-Control-Allow-Origin"] == P
+    assert req("/resume", "POST", P)[0] == 204 and not os.path.exists(VL.KILL_FILE)
+    assert req("/kill", "POST", "https://evil.example")[0] == 403 and not os.path.exists(VL.KILL_FILE)
+    assert req("/shoonya/code", "POST", P)[0] == 403
+    assert req("/kill", "POST", P, xv=False)[0] == 403
+    srv.shutdown()
