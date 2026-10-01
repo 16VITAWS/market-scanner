@@ -725,7 +725,7 @@ class Trader:
 
 # ------------------------------------------------------------------ local live screen
 PAGE = r"""<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>VISION LIVE</title><style>
+<title>16VITAWS LIVE</title><style>
 :root{--bg:#0B1220;--card:#121B2E;--ink:#E8EEF8;--mut:#8FA3BF;--up:#2FE39A;--dn:#FF5C7A;--line:#22304A;--warn:#FFC857}
 body{margin:0;background:var(--bg);color:var(--ink);font:15px system-ui,Segoe UI,Roboto,sans-serif}
 header{display:flex;gap:10px;align-items:center;flex-wrap:wrap;padding:12px 16px;border-bottom:1px solid var(--line);position:sticky;top:0;background:var(--bg)}
@@ -737,7 +737,7 @@ table{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums}td,t
 th{color:var(--mut);font-weight:500}.num{text-align:right}.up{color:var(--up)}.dn{color:var(--dn)}.mut{color:var(--mut)}
 button{background:#8B1E2E;color:#fff;border:0;border-radius:8px;padding:8px 14px;font-weight:600;cursor:pointer}button.g{background:#1F3A6B}
 .flash{animation:f .6s}@keyframes f{from{background:#23406b}to{background:transparent}}ul{margin:0;padding-left:18px}li{margin:3px 0;font-size:13px}
-</style></head><body><header><b class="brand">VISION LIVE</b><span id="feed" class="chip">…</span><span id="mode" class="chip">…</span><span id="mkt" class="chip">…</span>
+</style></head><body><header><b class="brand">16VITAWS LIVE</b><span id="feed" class="chip">…</span><span id="mode" class="chip">…</span><span id="mkt" class="chip">…</span>
 <span id="clock" class="chip mut"></span><span style="flex:1"></span><a id="login" class="chip" href="/shoonya/login" target="_blank" style="display:none;background:#1F6A4A;color:#fff;text-decoration:none;font-weight:600">🔑 Login to Shoonya</a><button id="kill">■ KILL SWITCH</button></header>
 <div id="codebox" style="display:none;padding:10px 16px;background:#1B2842"><b>After logging in:</b> if Shoonya's page did not come back here by itself, copy the full address from that tab and paste it: <input id="code" style="width:50%;padding:6px" placeholder="https://...?code=..."> <button class="g" id="codebtn">Use this login</button> <span id="codemsg" class="mut"></span></div>
 <main><div class="card" style="grid-column:1/-1"><table id="q"></table><p class="mut" style="font-size:12px">Prices: your broker's exchange feed, updated on every trade (tick). "Age" = seconds since that symbol's last exchange tick. Nothing is estimated: a symbol without a tick shows "—".</p></div>
@@ -786,10 +786,30 @@ def state_json(app):
             "events": app.trader.events[-60:], "rejected": app.book.rejected}
 
 
+PORTAL_ORIGIN = "https://16vitaws.github.io"
+LOCAL_ORIGINS = ("http://127.0.0.1:8765", "http://localhost:8765")
+
+
 def make_handler(app):
     class H(BaseHTTPRequestHandler):
         def log_message(self, *a):
             pass
+
+        def _cors(self):
+            # only the 16VITAWS portal may read the state or press STOP/RESUME from the browser
+            if self.headers.get("Origin") == PORTAL_ORIGIN:
+                self.send_header("Access-Control-Allow-Origin", PORTAL_ORIGIN)
+                self.send_header("Vary", "Origin")
+
+        def do_OPTIONS(self):
+            if not self._local() or self.headers.get("Origin") != PORTAL_ORIGIN or self.path not in ("/api/state", "/kill", "/resume"):
+                self.send_error(403); return
+            self.send_response(204); self._cors()
+            self.send_header("Access-Control-Allow-Methods", "GET, POST")
+            self.send_header("Access-Control-Allow-Headers", "X-Vision")
+            self.send_header("Access-Control-Allow-Private-Network", "true")
+            self.send_header("Access-Control-Max-Age", "600")
+            self.end_headers()
 
         def _local(self):
             return self.client_address[0] in ("127.0.0.1", "::1")
@@ -808,7 +828,7 @@ def make_handler(app):
                      f"<p>{msg}</p><p><a style='color:#9FD0FF' href='/'>Back to VISION LIVE</a></p></body></html>").encode()
                 self.send_response(200); self.send_header("Content-Type", "text/html; charset=utf-8"); self.end_headers(); self.wfile.write(b)
             elif self.path == "/api/state":
-                b = json.dumps(state_json(app), default=str).encode(); self.send_response(200); self.send_header("Content-Type", "application/json")
+                b = json.dumps(state_json(app), default=str).encode(); self.send_response(200); self.send_header("Content-Type", "application/json"); self._cors()
                 self.end_headers(); self.wfile.write(b)
             elif self.path == "/stream":
                 self.send_response(200); self.send_header("Content-Type", "text/event-stream"); self.send_header("Cache-Control", "no-cache"); self.end_headers()
@@ -825,6 +845,9 @@ def make_handler(app):
             # local-only + custom header: a web page elsewhere cannot trigger these (CSRF protection)
             if not self._local() or self.headers.get("X-Vision") != "1":
                 self.send_error(403); return
+            origin = self.headers.get("Origin")
+            if origin and origin not in LOCAL_ORIGINS and not (origin == PORTAL_ORIGIN and self.path in ("/kill", "/resume")):
+                self.send_error(403); return                # the portal can only STOP / RESUME, nothing else
             if self.path == "/kill":
                 open(KILL_FILE, "w").write(now().isoformat()); app.trader.log("kill", "KILL SWITCH ON - no new orders")
             elif self.path == "/shoonya/code" and app.sh_auth:
@@ -836,7 +859,7 @@ def make_handler(app):
                 if os.path.exists(KILL_FILE):
                     os.remove(KILL_FILE)
                 app.trader.log("kill", "kill switch off")
-            self.send_response(204); self.end_headers()
+            self.send_response(204); self._cors(); self.end_headers()
     return H
 
 
