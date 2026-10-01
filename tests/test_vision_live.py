@@ -249,3 +249,125 @@ def test_portal_can_only_stop_resume_and_read_state(VL, tmp_path):
     assert req("/shoonya/code", "POST", P)[0] == 403
     assert req("/kill", "POST", P, xv=False)[0] == 403
     srv.shutdown()
+
+
+# ---------------- NIFTY options on live Shoonya prices ----------------
+SIG = {"action": "BUY", "name": "NIFTY 06OCT26 22400/22200 PE DEBIT SPREAD", "underlying": "NIFTY", "kind": "P", "expiry": "2026-10-06",
+       "k_long": 22400, "k_short": 22200, "width": 200, "lot": 65, "why": ["Regime BEAR"]}
+
+
+def _nfo_zip():
+    import io, zipfile
+    buf = io.BytesIO()
+    with zipfile.ZipFile(buf, "w") as z:
+        z.writestr("NFO_symbols.txt", "Exchange,Token,LotSize,Symbol,TradingSymbol,Expiry,Instrument,OptionType,StrikePrice,TickSize,\n"
+                   "NFO,43210,65,NIFTY,NIFTY06OCT26P22400,06-OCT-2026,OPTIDX,PE,22400,0.05,\n"
+                   "NFO,43209,65,NIFTY,NIFTY06OCT26P22200,06-OCT-2026,OPTIDX,PE,22200,0.05,\n"
+                   "NFO,43211,65,NIFTY,NIFTY06OCT26C22400,06-OCT-2026,OPTIDX,CE,22400,0.05,\n"
+                   "NFO,53210,65,NIFTY,NIFTY13OCT26P22400,13-OCT-2026,OPTIDX,PE,22400,0.05,\n"
+                   "NFO,63210,30,BANKNIFTY,BANKNIFTY06OCT26P22400,06-OCT-2026,OPTIDX,PE,22400,0.05,\n")
+    return buf.getvalue()
+
+
+class _Z:
+    def get(self, url, timeout=None):
+        r = _Resp(None); r.content = _nfo_zip(); return r
+
+
+def _opt(VL, tmp_path, cfg=None):
+    cfg = {"OPTIONS_MODE": "PAPER", "MAX_OPTION_RISK": "6000", **(cfg or {})}
+    book, safety, sent = VL.Book(), VL.Safety(cfg), []
+    o = VL.OptionsTrader(cfg, book, safety, lambda a, b: sent.append((a, b)), path=str(tmp_path / "opt.json"))
+    legs = VL.sh_option_legs(_Z(), SIG)
+    o.set_signal(SIG, legs)
+    L = o.leg_syms()
+    def px(lb, sb, t):     # long / short leg last prices (bid=ask=last in this test)
+        book.update(L["long"], {"p": lb, "bid": lb, "ask": lb, "t": t}); book.update(L["short"], {"p": sb, "bid": sb, "ask": sb, "t": t})
+    return o, book, legs, L, px, sent
+
+
+def test_option_legs_found_in_shoonya_master(VL):
+    legs = VL.sh_option_legs(_Z(), SIG)
+    assert legs["long"]["token"] == "43210" and legs["long"]["tsym"] == "NIFTY06OCT26P22400"
+    assert legs["short"]["token"] == "43209" and legs["long"]["lot"] == 65
+    with pytest.raises(RuntimeError):
+        VL.sh_option_legs(_Z(), {**SIG, "k_short": 22100})                       # missing contract -> clear error, no guess
+
+
+def test_options_paper_entry_and_take_profit_on_live_prices(VL, tmp_path):
+    o, book, legs, L, px, sent = _opt(VL, tmp_path)
+    assert L["long"] == "OPT NIFTY 06OCT26 22400 PE"
+    px(130.0, 58.0, 1.0); o.on_tick()
+    op = o.s["open"]
+    assert op and op["debit"] == 72.0 and op["qty"] == 65 and op["legs"]["long"] == "NIFTY06OCT26P22400"
+    px(150.0, 62.0, 2.0); o.on_tick()                                             # 88: not yet +50% of max profit (72+64=136)
+    assert o.s["open"]
+    px(190.0, 50.0, 3.0); o.on_tick()                                             # 140 >= 136 -> take profit
+    t = o.s["trades"][-1]
+    assert not o.s["open"] and "take-profit" in t["why"] and t["pnl"] == round((140 - 72) * 65 - 80, 2)
+    px(130.0, 58.0, 4.0); o.on_tick()
+    assert not o.s["open"]                                                        # once per day per signal
+
+
+def test_options_stop_signal_change_restart_and_limits(VL, tmp_path):
+    o, book, legs, L, px, _ = _opt(VL, tmp_path)
+    px(130.0, 58.0, 1.0); o.on_tick()
+    px(80.0, 45.0, 2.0); o.on_tick()                                              # 35 <= 36 -> stop
+    assert "stop" in o.s["trades"][-1]["why"]
+    o2, book2, legs2, L2, px2, _ = _opt(VL, tmp_path / "b")
+    px2(130.0, 58.0, 1.0); o2.on_tick()
+    again = VL.OptionsTrader(o2.cfg, book2, o2.safety, lambda a, b: None, path=o2.path)   # restart keeps the open spread + its legs
+    assert again.s["open"] and again.legs["long"]["tsym"] == "NIFTY06OCT26P22400"
+    again.set_signal({"action": "NONE", "name": "no trade"})
+    px2(131.0, 58.0, 2.0); again.on_tick()
+    assert not again.s["open"] and "no longer active" in again.s["trades"][-1]["why"]
+    o3, _, _, _, px3, _ = _opt(VL, tmp_path / "c", {"MAX_OPTION_RISK": "1000"})
+    px3(130.0, 58.0, 1.0); o3.on_tick()
+    assert not o3.s["open"] and "MAX_OPTION_RISK" in o3.events[-1]["msg"]
+    o4, _, _, _, px4, _ = _opt(VL, tmp_path / "d")
+    open(VL.KILL_FILE, "w").write("x"); px4(130.0, 58.0, 1.0); o4.on_tick(); os.remove(VL.KILL_FILE)
+    assert not o4.s["open"]
+
+
+def test_options_real_locked_then_orders_both_legs_safely(VL, tmp_path):
+    cfg = {"OPTIONS_MODE": "REAL", "CONSENT": VL.CONSENT_PHRASE, "STATIC_IP_REGISTERED": "yes", "OPTIONS_REAL": "yes", "OPTIONS_MIN_TRADES": "3"}
+    o, book, legs, L, px, sent = _opt(VL, tmp_path, cfg)
+    assert o.mode() == "PAPER" and "options live-paper record not passed yet" in o.real_blockers()
+
+    class FF:
+        def __init__(self): self.orders = []
+        def place_order(self, exch, tsym, side, qty, limit, prd):
+            self.orders.append((exch, tsym, side, qty, limit, prd)); return f"N{len(self.orders)}"
+    o.feed = FF()
+    o.s["trades"] = [{"pnl": 500.0}, {"pnl": 400.0}, {"pnl": -200.0}]
+    assert o.record()["passed"] and o.mode() == "REAL"
+    now_t = time.time()
+    px(130.0, 58.0, now_t); o.on_tick()
+    assert [x[:4] for x in o.feed.orders] == [("NFO", "NIFTY06OCT26P22400", "BUY", 65), ("NFO", "NIFTY06OCT26P22200", "SELL", 65)]
+    assert all(x[5] == "M" for x in o.feed.orders) and o.feed.orders[0][4] == 132.6     # buy limit = ask +2% on the 0.05 tick
+    px(190.0, 50.0, now_t + 1); o.on_tick()
+    assert [x[1:3] for x in o.feed.orders[2:]] == [("NIFTY06OCT26P22200", "BUY"), ("NIFTY06OCT26P22400", "SELL")]   # short bought back first
+
+
+def test_shoonya_feed_streams_option_legs(VL, monkeypatch, tmp_path):
+    import websocket as W
+    sent, book = [], VL.Book()
+
+    class FakeWS:
+        def __init__(self, url, on_open=None, on_message=None, on_error=None, **k): self.on_open, self.on_message = on_open, on_message
+        def send(self, m): sent.append(json.loads(m))
+        def close(self): pass
+        def run_forever(self, **k):
+            self.on_open(self)
+            self.on_message(self, json.dumps({"t": "ak", "s": "OK"}))
+            self.on_message(self, json.dumps({"t": "tk", "e": "NFO", "tk": "43210", "lp": "131.25", "ft": "1790000000", "bp1": "131.20", "sp1": "131.30"}))
+            feed.stop_flag = True
+    monkeypatch.setattr(W, "WebSocketApp", FakeWS)
+    monkeypatch.setattr(VL.time, "sleep", lambda s: None)
+    a = VL.ShoonyaAuth({"SHOONYA_UID": "FA1"}, _Http({"stat": "Not_Ok"}), path=str(tmp_path / "s.json"))
+    a.session = {"access_token": "AT", "uid": "FA1", "actid": "FA1", "day": "2026-10-01"}
+    feed = VL.ShoonyaFeed({}, book, {"26000": "NIFTY", "NFO|43210": "OPT NIFTY 06OCT26 22400 PE"}, a)
+    feed.run()
+    assert sent[1] == {"t": "t", "k": "NSE|26000#NFO|43210"}
+    q = book.get("OPT NIFTY 06OCT26 22400 PE")
+    assert q["p"] == 131.25 and q["bid"] == 131.2 and q["ask"] == 131.3
