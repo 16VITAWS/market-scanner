@@ -236,7 +236,10 @@ function heat(ids){return `<div class="heat">${ids.filter(Q).map(id=>{const q=Q(
 /* ===================== TODAY (front page): direction, what to buy/sell, options & futures, search, paper + live trade ===================== */
 R.home=function(){const el=$('#s-home'),mkt=store.get('homeMkt','IN'),IN=mkt==='IN';
  const S=IN?API.signals:API.signals_us,r=S?.regime||{},F=API.intel?.forecast,idx=Q(IN?'NIFTY':'SPX'),cur0=IN?'INR':'USD';
- const trend=r.state==='BULL'?'UP':r.state==='BEAR'?'DOWN':r.state?'SIDEWAYS':null;
+ /* trend rule re-checked on TODAY's price while the market is open (the 50/200-day averages barely move intraday) */
+ const fi=idx?fresh(idx).st:null,liveT=!!(idx&&idx.intraday&&(fi==='LIVE'||fi==='DELAYED')&&r.sma50&&r.sma200);
+ const ruleT=s=>s==='BULL'?'UP':s==='BEAR'?'DOWN':s?'SIDEWAYS':null;
+ const trend=liveT?(idx.p>r.sma200&&r.sma50>r.sma200?'UP':idx.p<r.sma200&&r.sma50<r.sma200?'DOWN':'SIDEWAYS'):ruleT(r.state);
  const lean=IN&&F?.available?F.lean:null;const now=idx?.chg_pct;
  let verdict,vcls,advice;
  if(!trend){verdict='NO DATA';vcls='';advice='Signals appear after the next engine run.'}
@@ -254,7 +257,7 @@ R.home=function(){const el=$('#s-home'),mkt=store.get('homeMkt','IN'),IN=mkt==='
   <h1 style="margin:0 0 4px">Market today: <span class="${vcls}" style="font-size:40px">${verdict==='UP'?'▲ UP':verdict==='DOWN'?'▼ DOWN':verdict==='SIDEWAYS'?'◆ SIDEWAYS':verdict}</span></h1>
   <p style="font-size:18px;margin:6px 0 10px">${esc(advice)}</p>
   <div class="grid g3">
-   <div class="kpi"><b class="${trend==='UP'?'pos':trend==='DOWN'?'neg':''}">${trend||'—'}</b><span>Trend (${IN?'NIFTY':'S&P 500'} vs 50/200-day averages) ${tag('RULE')}</span><small>${esc(r.date||'')}</small></div>
+   <div class="kpi"><b class="${trend==='UP'?'pos':trend==='DOWN'?'neg':''}">${trend||'—'}</b><span>Trend (${IN?'NIFTY':'S&P 500'} vs 50/200-day averages) ${tag('RULE')}</span><small>${liveT?`today ${istT(idx.t,true)}: ${fmt(idx.p)} vs 200-day ${fmt0(r.sma200)} · 50-day ${fmt0(r.sma50)}`:`on ${esc(r.date||'?')} close · re-checked live while the market is open`}</small></div>
    <div class="kpi"><b class="${lean==='UP'?'pos':lean==='DOWN'?'neg':''}">${lean?`${esc(lean)} · ${Math.round(F.p_up*100)}% up`:'—'}</b><span>Next-session lean ${tag('MODEL OUTPUT')}</span><small>${IN&&F?.available?`hit rate ${F.oos?.hit_rate!=null?Math.round(F.oos.hit_rate*100)+'%':'—'} out-of-sample vs ${F.oos?.baseline_hit!=null?Math.round(F.oos.baseline_hit*100)+'%':'—'} always-up · ${F.oos?.has_skill?'small edge':'NO PROVEN EDGE'}`:'India only'}</small></div>
    <div class="kpi"><b class="${cls(now)}">${idx?pct(now):'—'}</b><span>${IN?'NIFTY':'S&P 500'} right now ${idx?fchip(idx):''}</span><small>${idx?fmt(idx.p):''}</small></div></div>
   <p class="help">Direction = rules + a statistical model, not a promise. Up to 1 in 2 days goes the other way. Not investment advice.</p></div>
