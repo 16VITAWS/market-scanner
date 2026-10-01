@@ -40,6 +40,7 @@ HOME = os.path.join(os.path.expanduser("~"), "vision_live")
 SETTINGS = os.path.join(HOME, "settings.env")
 PAPER_FILE = os.path.join(HOME, "live_paper.json")
 REAL_FILE = os.path.join(HOME, "real_orders.json")
+OPT_FILE = os.path.join(HOME, "options_paper.json")
 AUDIT = os.path.join(HOME, "audit.jsonl")
 KILL_FILE = os.path.join(HOME, "KILL")
 CONSENT_PHRASE = "I ACCEPT REAL MONEY RISK"
@@ -52,6 +53,7 @@ SH_HOST = "https://api.shoonya.com/NorenWClientAPI"
 SH_WS = "wss://api.shoonya.com/NorenWSAPI/"
 SH_OAUTH = "https://api.shoonya.com/OAuthlogin/authorize/oauth"
 SH_SYMBOLS = "https://api.shoonya.com/NSE_symbols.txt.zip"
+SH_NFO = "https://api.shoonya.com/NFO_symbols.txt.zip"
 SH_INDEX_TOKENS = {"NIFTY": "26000", "BANKNIFTY": "26009", "FINNIFTY": "26037", "INDIAVIX": "26017"}
 SH_SESSION = os.path.join(HOME, "shoonya_session.json")
 BACKOFF = [1, 2, 5, 10, 30, 60]
@@ -77,6 +79,12 @@ MAX_ORDERS_PER_DAY=3
 MAX_ORDER_VALUE=25000
 MAX_DAILY_LOSS=2000
 MAX_OPEN_POSITIONS=3
+# NIFTY options (debit spreads on LIVE Shoonya option prices): PAPER | ALERT | REAL
+OPTIONS_MODE=PAPER
+OPTIONS_LOTS=1
+MAX_OPTION_RISK=6000
+# REAL options also need OPTIONS_REAL=yes and 20+ closed options paper trades with profit factor >= 1.2
+OPTIONS_REAL=no
 # Only for MODE=REAL:
 CONSENT=
 STATIC_IP_REGISTERED=no
@@ -175,7 +183,7 @@ class Book:
                 reason = "bad price"
             elif old.get("t") and d.get("t") and d["t"] < old["t"]:
                 reason = "out of order"
-            elif (d.get("pc") or old.get("pc")) and sym not in INDEX_NAMES and abs(p / (d.get("pc") or old.get("pc")) - 1) > 0.205:
+            elif (d.get("pc") or old.get("pc")) and sym not in INDEX_NAMES and not sym.startswith("OPT ") and abs(p / (d.get("pc") or old.get("pc")) - 1) > 0.205:
                 reason = "move beyond NSE price band"
             elif d.get("h") and d.get("l") and not (d["l"] * 0.9999 <= p <= d["h"] * 1.0001):
                 reason = "outside day high/low"
@@ -410,7 +418,8 @@ class ShoonyaFeed(threading.Thread):
     def snapshot_rest(self):
         for tok, sym in list(self.tokens.items()):
             try:
-                j = self.auth.post("GetQuotes", {"uid": self.auth.session["uid"], "exch": "NSE", "token": tok})
+                ex, tk = tok.split("|") if "|" in tok else ("NSE", tok)
+                j = self.auth.post("GetQuotes", {"uid": self.auth.session["uid"], "exch": ex, "token": tk})
                 if isinstance(j, dict) and j.get("stat") == "Ok" and j.get("lp"):
                     d = sh_tick(j); d.pop("t", None); d["src"] = "shoonya-rest"
                     self.book.update(sym, d)
@@ -439,14 +448,14 @@ class ShoonyaFeed(threading.Thread):
                     t = m.get("t")
                     if t in ("ak", "ck"):
                         if m.get("s") == "OK":
-                            ws.send(json.dumps({"t": "t", "k": "#".join(f"NSE|{tok}" for tok in self.tokens)}))
+                            ws.send(json.dumps({"t": "t", "k": "#".join(sh_key(tok) for tok in self.tokens)}))
                             self.state, self.connected_at = "LIVE", time.time()
                             audit("stream_connected", broker="shoonya", symbols=len(self.tokens))
                         else:
                             self.last_error = f"websocket auth refused: {m.get('s')}"
                             self.auth.session = None; ws.close()
                     elif t in ("tk", "tf"):
-                        sym = self.tokens.get(str(m.get("tk")))
+                        sym = self.tokens.get(f"{m.get('e')}|{m.get('tk')}") or self.tokens.get(str(m.get("tk")))
                         if sym:
                             self.last_msg = time.time()
                             d = sh_tick(m); d["src"] = "shoonya-ws"
@@ -470,11 +479,24 @@ class ShoonyaFeed(threading.Thread):
             if self.connected_at and time.time() - self.connected_at > 300:
                 attempt = 0
 
+    def add_tokens(self, more):
+        """Subscribe extra instruments (e.g. today's option legs) without reconnecting."""
+        new = {k: v for k, v in more.items() if k not in self.tokens}
+        self.tokens.update(new)
+        ws = getattr(self, "ws", None)
+        if new and ws is not None and self.state == "LIVE":
+            try:
+                ws.send(json.dumps({"t": "t", "k": "#".join(sh_key(k) for k in new)}))
+            except Exception as e:  # noqa
+                self.last_error = scrub(e, self.cfg)
+
     def place_limit(self, sym, side, qty, limit):
-        tsym = f"{sym}-EQ"
+        return self.place_order("NSE", f"{sym}-EQ", side, qty, limit, "C")
+
+    def place_order(self, exch, tsym, side, qty, limit, prd):
         import urllib.parse as up
         j = self.auth.post("PlaceOrder", {"ordersource": "API", "uid": self.auth.session["uid"], "actid": self.auth.session["actid"],
-                                          "trantype": "B" if side == "BUY" else "S", "prd": "C", "exch": "NSE", "tsym": up.quote_plus(tsym),
+                                          "trantype": "B" if side == "BUY" else "S", "prd": prd, "exch": exch, "tsym": up.quote_plus(tsym),
                                           "qty": str(int(qty)), "dscqty": "0", "prctyp": "LMT", "prc": f"{limit:.2f}", "ret": "DAY",
                                           "remarks": "vision_live"})
         if isinstance(j, dict) and j.get("stat") == "Ok":
@@ -505,6 +527,228 @@ def sh_symbol_tokens(http, watch):
         if ts.endswith("-EQ") and ts[:-3] in want:
             out[ts[:-3]] = (row.get("Token") or "").strip()
     return out
+
+
+def sh_key(tok):
+    return tok if "|" in tok else f"NSE|{tok}"
+
+
+def _expiry_date(txt):
+    txt = (txt or "").strip().upper()
+    for f in ("%d-%b-%Y", "%d%b%Y", "%Y-%m-%d", "%d-%m-%Y", "%d%b%y", "%d-%b-%y"):
+        try:
+            return dt.datetime.strptime(txt, f).date()
+        except ValueError:
+            pass
+    return None
+
+
+def sh_option_legs(http, sig):
+    """Find today's two option contracts in Shoonya's public NFO symbol master.
+    Returns {'long': {token, tsym, lot, strike}, 'short': {...}} or raises with the reason."""
+    import io, zipfile, csv
+    exp = dt.date.fromisoformat(sig["expiry"])
+    ot = "PE" if sig["kind"] == "P" else "CE"
+    want = {int(round(float(sig["k_long"]))): "long", int(round(float(sig["k_short"]))): "short"}
+    r = http.get(SH_NFO, timeout=120)
+    r.raise_for_status()
+    z = zipfile.ZipFile(io.BytesIO(r.content))
+    rows = csv.DictReader(io.TextIOWrapper(z.open(z.namelist()[0]), encoding="utf-8"))
+    out = {}
+    for row in rows:
+        g = {k.strip().lower(): (v or "").strip() for k, v in row.items() if k}
+        if g.get("symbol") != sig.get("underlying", "NIFTY") or g.get("optiontype") != ot or not g.get("instrument", "").startswith("OPTIDX"):
+            continue
+        if _expiry_date(g.get("expiry")) != exp:
+            continue
+        try:
+            k = int(round(float(g.get("strikeprice") or 0)))
+        except ValueError:
+            continue
+        if k in want:
+            out[want[k]] = {"token": g["token"], "tsym": g.get("tradingsymbol"), "lot": int(float(g.get("lotsize") or sig.get("lot") or 0)), "strike": k}
+    if len(out) != 2:
+        raise RuntimeError(f"option contracts not found in Shoonya's list ({sig['name']})")
+    return out
+
+
+class OptionsTrader:
+    """Today's NIFTY debit spread from the portal, priced on LIVE Shoonya option quotes (not modeled).
+    PAPER records it; ALERT also phones you both legs; REAL places both legs as LIMIT orders - only behind its own lock."""
+    P = {"take_profit": 0.5, "stop_loss": 0.5, "exit_dte": 2}
+
+    def __init__(self, cfg, book, safety, notify, path=None):
+        self.cfg, self.book, self.safety, self.notify = cfg, book, safety, notify
+        self.path = path or OPT_FILE
+        self.sig, self.legs, self.active, self.feed, self.events = None, None, None, None, []
+        try:
+            self.s = json.load(open(self.path))
+        except Exception:  # noqa
+            self.s = {"open": None, "trades": [], "entered": {}}
+        o = self.s.get("open")
+        if o and o.get("legs_full"):                       # an open spread survives a restart: keep pricing its own legs
+            self.sig = {k: o[k] for k in ("name", "expiry", "kind", "width")}
+            self.legs = o["legs_full"]
+
+    def save(self):
+        os.makedirs(os.path.dirname(self.path) or ".", exist_ok=True)
+        tmp = self.path + ".tmp"; json.dump(self.s, open(tmp, "w"), indent=1); os.replace(tmp, self.path)
+
+    def log(self, kind, msg):
+        self.events = (self.events + [{"time": now().strftime("%H:%M:%S"), "kind": kind, "msg": msg}])[-100:]
+        audit("opt_" + kind, msg=msg)
+
+    # names used in the Book for the two legs
+    def leg_syms(self, legs=None, sig=None):
+        legs, sig = legs or self.legs, sig or self.sig
+        if not legs or not sig:
+            return {}
+        ot = "PE" if sig["kind"] == "P" else "CE"
+        e = dt.date.fromisoformat(sig["expiry"]).strftime("%d%b%y").upper()
+        return {r: f"OPT NIFTY {e} {legs[r]['strike']} {ot}" for r in ("long", "short")}
+
+    def set_signal(self, sig, legs=None):
+        """sig: the portal's options signal (may be 'no trade'). legs: its contracts when known.
+        While a spread is open we keep pricing THAT spread, whatever the portal says now."""
+        self.active = sig
+        o = self.s.get("open")
+        if legs and not (o and sig and o["name"] != sig.get("name")):
+            self.sig, self.legs = sig, legs
+
+    def mode(self):
+        m = (self.cfg.get("OPTIONS_MODE") or self.cfg.get("MODE") or "PAPER").upper()
+        if m == "REAL" and self.real_blockers():
+            return "PAPER"
+        return m if m in ("PAPER", "ALERT", "REAL") else "PAPER"
+
+    def record(self):
+        tr = self.s["trades"]
+        wins = sum(t["pnl"] for t in tr if t["pnl"] > 0); losses = -sum(t["pnl"] for t in tr if t["pnl"] < 0)
+        pf = (wins / losses) if losses else (None if not wins else float("inf"))
+        n = int(self.cfg.get("OPTIONS_MIN_TRADES") or 20)
+        ok = len(tr) >= n and pf is not None and pf >= GATE["min_pf"] and sum(t["pnl"] for t in tr) > 0
+        return {"passed": ok, "closed": len(tr), "need": n, "pf": None if pf is None else (round(pf, 2) if pf != float("inf") else "no losses")}
+
+    def real_blockers(self):
+        b = list(self.safety.real_blockers_base())
+        if not self.record()["passed"]:
+            b.append("options live-paper record not passed yet")
+        if (self.cfg.get("OPTIONS_REAL") or "no").lower() not in ("yes", "y", "true", "1"):
+            b.append("OPTIONS_REAL is not set to yes")
+        return b
+
+    def _px(self, sym, side):
+        """Executable price: ask to buy, bid to sell; last traded price only if no depth."""
+        q = self.book.get(sym)
+        v = q.get("ask" if side == "BUY" else "bid") or q.get("p")
+        return v if v and v > 0 else None
+
+    def values(self):
+        L = self.leg_syms()
+        if not L:
+            return None
+        lb, ss = self._px(L["long"], "BUY"), self._px(L["short"], "SELL")         # cost to open
+        ls, sb = self._px(L["long"], "SELL"), self._px(L["short"], "BUY")         # value to close
+        if None in (lb, ss, ls, sb):
+            return None
+        return {"open_debit": round(lb - ss, 2), "close_value": round(ls - sb, 2), "long": self.book.get(L["long"]).get("p"), "short": self.book.get(L["short"]).get("p")}
+
+    def on_tick(self, state="OPEN"):
+        if state != "OPEN" or not self.sig:
+            return
+        v = self.values()
+        if not v:
+            return
+        today = now().date()
+        o = self.s["open"]
+        if o:
+            exp = dt.date.fromisoformat(o["expiry"])
+            width, debit, val = o["width"], o["debit"], v["close_value"]
+            why = None
+            if val - debit >= self.P["take_profit"] * (width - debit):
+                why = f"take-profit: spread {val:.2f} >= debit {debit:.2f} + 50% of max profit"
+            elif val <= debit * (1 - self.P["stop_loss"]):
+                why = f"stop: spread {val:.2f} <= 50% of debit {debit:.2f}"
+            elif (exp - today).days <= self.P["exit_dte"] and now().time() >= dt.time(9, 20):
+                why = f"time exit: {(exp - today).days} days to expiry"
+            elif not self.active or self.active.get("action") != "BUY" or self.active.get("name") != o["name"]:
+                why = "portal signal no longer active (trend changed)"
+            if why:
+                self.exit(val, why)
+            return
+        if not self.active or self.active.get("action") != "BUY" or self.active.get("name") != self.sig.get("name"):
+            return
+        if self.s["entered"].get(self.sig["name"]) == today.isoformat():
+            return
+        if not (dt.time(9, 20) <= now().time() <= dt.time(15, 0)):
+            return
+        if (dt.date.fromisoformat(self.sig["expiry"]) - today).days <= self.P["exit_dte"]:
+            return
+        d, width = v["open_debit"], float(self.sig["width"])
+        if not (0 < d < width):
+            return
+        lots = max(1, int(self.cfg.get("OPTIONS_LOTS") or 1))
+        qty = lots * int(self.legs["long"]["lot"] or self.sig["lot"])
+        risk = d * qty
+        if risk > float(self.cfg.get("MAX_OPTION_RISK") or 6000):
+            self.s["entered"][self.sig["name"]] = today.isoformat(); self.save()
+            self.log("skip", f"{self.sig['name']}: max loss Rs {risk:,.0f} above MAX_OPTION_RISK"); return
+        if self.safety.killed():
+            self.log("blocked", "options entry blocked: kill switch ON"); self.s["entered"][self.sig["name"]] = today.isoformat(); self.save(); return
+        self.enter(d, qty)
+
+    def enter(self, debit, qty):
+        sig = self.sig
+        self.s["open"] = {"name": sig["name"], "expiry": sig["expiry"], "kind": sig["kind"], "width": float(sig["width"]), "debit": debit, "qty": qty,
+                          "legs": {r: self.legs[r]["tsym"] for r in ("long", "short")}, "legs_full": self.legs, "at": now().isoformat(timespec="seconds")}
+        self.s["entered"][sig["name"]] = now().date().isoformat(); self.save()
+        L = self.leg_syms()
+        msg = (f"BUY {qty} {L['long']} + SELL {qty} {L['short']} - net debit {debit:.2f} (max loss Rs {debit*qty:,.0f}, "
+               f"max profit Rs {(float(sig['width'])-debit)*qty:,.0f}) - {'; '.join(sig.get('why') or [])}")
+        self.log("paper_entry", "PAPER " + msg)
+        m = self.mode()
+        if m == "ALERT":
+            self.notify("Options: open spread now", msg + ". Place both legs in the Shoonya app (BUY leg first).")
+        elif m == "REAL":
+            self.real_legs([("BUY", "long"), ("SELL", "short")], qty)
+
+    def exit(self, value, why):
+        o = self.s["open"]
+        pnl = round((value - o["debit"]) * o["qty"] - 4 * 20, 2)          # ~Rs 20 per leg per side, both ways
+        self.s["trades"].append({"name": o["name"], "qty": o["qty"], "debit": o["debit"], "exit": value, "pnl": pnl,
+                                 "opened": o["at"], "closed": now().isoformat(timespec="seconds"), "why": why})
+        self.s["open"] = None; self.save()
+        self.log("paper_exit", f"PAPER EXIT {o['name']} at {value:.2f} (debit {o['debit']:.2f}) - P&L Rs {pnl:+,.0f} - {why}")
+        m = self.mode()
+        if m == "ALERT":
+            self.notify("Options: close spread now", f"Close {o['name']}: BUY back the short leg, then SELL the long leg. {why}")
+        elif m == "REAL":
+            self.real_legs([("BUY", "short"), ("SELL", "long")], o["qty"])    # buy back the short first: never left naked short
+
+    def real_legs(self, steps, qty):
+        if self.real_blockers() or not self.feed:
+            self.log("real_blocked", "REAL options orders not sent: " + "; ".join(self.real_blockers() or ["no broker"])); return
+        L = self.leg_syms()
+        for side, role in steps:
+            px = self._px(L[role], side)
+            q = self.book.get(L[role])
+            if not px or not q.get("recv") or time.time() - q["recv"] > 5:
+                self.log("real_blocked", f"REAL {side} {role} leg not sent: live price older than 5 s - check the Shoonya app"); return
+            limit = tick_round(px * (1.02 if side == "BUY" else 0.98), side == "BUY")
+            try:
+                oid = self.feed.place_order("NFO", self.legs[role]["tsym"], side, qty, limit, "M")
+                self.log("real_order", f"REAL {side} {qty} {self.legs[role]['tsym']} LIMIT {limit:.2f} -> order {oid}")
+                self.notify(f"REAL options {side}", f"{side} {qty} {self.legs[role]['tsym']} @ {limit:.2f}, order {oid}")
+            except Exception as e:  # noqa
+                self.log("real_error", f"REAL {side} {role} leg failed: {scrub(e, self.cfg)} - check positions in the Shoonya app now")
+                self.notify("REAL options order FAILED", f"{side} {role} leg failed - open the Shoonya app and check positions")
+                return
+
+    def state(self):
+        L, v, o = self.leg_syms(), self.values(), self.s["open"]
+        return {"signal": self.active, "legs": {r: {"sym": L.get(r), "tsym": (self.legs or {}).get(r, {}).get("tsym"), "ltp": self.book.get(L[r]).get("p") if L else None} for r in ("long", "short")} if L else None,
+                "live": v, "open": o, "open_pnl": round((v["close_value"] - o["debit"]) * o["qty"], 2) if (o and v) else None,
+                "trades": self.s["trades"][-20:], "record": self.record(), "mode": self.mode(), "blockers": self.real_blockers(), "events": self.events[-30:]}
 
 
 # ------------------------------------------------------------------ accounts
@@ -573,14 +817,21 @@ class Safety:
     def killed(self):
         return os.path.exists(KILL_FILE) or self.site_kill
 
-    def real_blockers(self, paper):
+    def real_blockers_base(self):
         b = []
-        if self.cfg.get("MODE", "PAPER").upper() != "REAL":
-            b.append("MODE is not REAL")
         if self.cfg.get("CONSENT") != CONSENT_PHRASE:
             b.append("CONSENT phrase not set")
         if self.cfg.get("STATIC_IP_REGISTERED", "no").lower() not in ("yes", "y", "true", "1"):
             b.append("static IP not registered with your broker (SEBI rule)")
+        if self.killed():
+            b.append("kill switch ON")
+        return b
+
+    def real_blockers(self, paper):
+        b = []
+        if self.cfg.get("MODE", "PAPER").upper() != "REAL":
+            b.append("MODE is not REAL")
+        b += [x for x in self.real_blockers_base() if x != "kill switch ON"]
         if not paper.record()["passed"]:
             b.append("live-paper track record gate not passed")
         if self.killed():
@@ -743,6 +994,7 @@ button{background:#8B1E2E;color:#fff;border:0;border-radius:8px;padding:8px 14px
 <main><div class="card" style="grid-column:1/-1"><table id="q"></table><p class="mut" style="font-size:12px">Prices: your broker's exchange feed, updated on every trade (tick). "Age" = seconds since that symbol's last exchange tick. Nothing is estimated: a symbol without a tick shows "—".</p></div>
 <div class="card"><h3>Positions (live P&amp;L)</h3><table id="pos"></table><p id="acct" class="mut"></p></div>
 <div class="card"><h3>REAL trading lock</h3><div id="gate"></div></div>
+<div class="card" style="grid-column:1/-1;border-color:#3E2A5C"><h3>&#127919; NIFTY options - live Shoonya prices</h3><div id="opt"></div></div>
 <div class="card"><h3>Today's signals from the portal</h3><div id="sig"></div></div>
 <div class="card"><h3>Activity</h3><ul id="ev"></ul></div></main>
 <script>
@@ -761,6 +1013,14 @@ function draw(S){const nl=S.feed.state==='NEEDS LOGIN';$('#login').style.display
 function connect(){const es=new EventSource('/stream');es.onmessage=m=>draw(JSON.parse(m.data));es.onerror=()=>{$('#feed').className='chip DISCONNECTED';$('#feed').textContent='● screen lost connection to VISION LIVE - retrying';}}
 $('#kill').onclick=async()=>{const k=$('#kill').className!=='g';if(!k&&prompt('Type RESUME to switch the kill switch off')!=='RESUME')return;await fetch(k?'/kill':'/resume',{method:'POST',headers:{'X-Vision':'1'}})};
 $('#codebtn').onclick=async()=>{const r=await fetch('/shoonya/code',{method:'POST',headers:{'X-Vision':'1'},body:$('#code').value});const j=await r.json();$('#codemsg').textContent=j.msg};
+function drawOpt(O){if(!O){$('#opt').innerHTML='<p class=mut>Not loaded yet.</p>';return}const s=O.signal||{},L=O.legs,v=O.live,o=O.open;
+ $('#opt').innerHTML=`<p><b>${s.action==='BUY'?e(s.name):'No options trade today'}</b> ${s.action==='BUY'?`<span class=mut>(${e((s.why||[]).join(' · '))})</span>`:''} · mode <b>${e(O.mode)}</b></p>`+
+ (L?`<table><tr><th>Leg</th><th>Contract</th><th class=num>Live price</th></tr><tr><td class=up>BUY</td><td>${e(L.long.tsym)}</td><td class=num>${f2(L.long.ltp)}</td></tr><tr><td class=dn>SELL</td><td>${e(L.short.tsym)}</td><td class=num>${f2(L.short.ltp)}</td></tr></table>
+  <p>Spread cost now: <b>${v?f2(v.open_debit):'—'}</b> · value if closed now: <b>${v?f2(v.close_value):'—'}</b> · width ${e(s.width??'—')}</p>`:'<p class=mut>Waiting for the two contracts / live prices (login to Shoonya first).</p>')+
+ (o?`<p>OPEN: ${e(o.name)} ×${o.qty} · paid ${f2(o.debit)} · P&L now <b class="${O.open_pnl>=0?'up':'dn'}">₹${f2(O.open_pnl)}</b></p>`:'')+
+ `<p class=mut>Closed options trades: ${O.record.closed} (need ${O.record.need} with profit factor ≥ 1.2 before REAL) · ${(O.trades||[]).slice(-3).map(t=>e(t.name)+' ₹'+f2(t.pnl)).join(' · ')}</p>`+
+ (O.events||[]).slice(-4).reverse().map(x=>`<div class=mut style="font-size:12px">${e(x.time)} ${e(x.msg)}</div>`).join('')}
+const _draw=draw;draw=S=>{_draw(S);drawOpt(S.options)};
 connect();
 </script></body></html>"""
 
@@ -783,7 +1043,7 @@ def state_json(app):
             "killed": app.safety.killed(), "quotes": quotes, "positions": pos,
             "account": {"equity": app.paper.equity(app.book), "cash": app.paper.s["cash"], "closed": len(app.paper.s["trades"]), "today": app.paper.realized_today()},
             "real_blockers": app.safety.real_blockers(app.paper), "gate": app.paper.record(), "signals": app.trader.signals,
-            "events": app.trader.events[-60:], "rejected": app.book.rejected}
+            "events": app.trader.events[-60:], "rejected": app.book.rejected, "options": app.opt.state()}
 
 
 PORTAL_ORIGIN = "https://16vitaws.github.io"
@@ -876,6 +1136,8 @@ class App:
         self.watch = []
         self.tokens = {}
         self.trader = Trader(cfg, self.book, self.paper, self.safety, {}, None, self.notify)
+        self.opt = OptionsTrader(cfg, self.book, self.safety, self.notify)
+        self.opt_loaded = None
 
     def shoonya_code(self, text):
         try:
@@ -914,6 +1176,29 @@ class App:
             self.safety.site_kill = bool(self.fetch("live_control").get("kill"))
         except Exception:  # noqa
             pass
+        self.load_options()
+
+    def load_options(self):
+        """Today's options signal -> its two real contracts on Shoonya -> live prices for both legs."""
+        try:
+            sig = (self.fetch("options_model") or {}).get("signal") or {}
+        except Exception as e:  # noqa
+            self.opt.log("warn", f"could not read the portal's options signal: {e}"); return
+        legs = None
+        if self.broker == "SHOONYA" and sig.get("action") == "BUY" and sig.get("name") != self.opt_loaded:
+            try:
+                legs = sh_option_legs(self.req, sig); self.opt_loaded = sig["name"]
+                self.opt.log("signal", f"today's options signal: {sig['name']} - legs {legs['long']['tsym']} / {legs['short']['tsym']}")
+            except Exception as e:  # noqa
+                self.opt.log("warn", f"{scrub(e, self.cfg)}"); self.opt_loaded = sig.get("name")
+        self.opt.set_signal(sig, legs)
+        L = self.opt.leg_syms()
+        if L:
+            more = {f"NFO|{self.opt.legs[r]['token']}": L[r] for r in ("long", "short")}
+            if self.feed and hasattr(self.feed, "add_tokens"):
+                self.feed.add_tokens(more)
+            else:
+                self.tokens.update(more)
 
     def build_watch(self):
         extra = [s.strip().upper() for s in (self.cfg.get("WATCH") or "").split(",") if s.strip()]
@@ -953,13 +1238,14 @@ class App:
                 self.build_watch()
             except Exception as e:  # noqa
                 self.trader.log("error", f"could not load the symbol list: {scrub(e, self.cfg)} - restart to retry")
+            self.load_options()                                            # add today's two option legs to the stream
             if self.broker == "SHOONYA":
                 self.feed = ShoonyaFeed(self.cfg, self.book, self.tokens, self.sh_auth)
                 if not self.sh_auth.session:
                     self.trader.log("login", "Click 'Login to Shoonya' at the top of this screen (once a day).")
             else:
                 self.feed = Feed(self.cfg, self.book, self.tokens)
-            self.trader.feed = self.feed; self.feed.start()
+            self.trader.feed = self.feed; self.opt.feed = self.feed; self.feed.start()
             self.trader.log("start", f"{self.broker}: watching {len(self.tokens)} symbols in {self.trader.mode()} mode")
         seen = {}
         last_portal = time.time()
@@ -970,7 +1256,10 @@ class App:
                 if q.get("recv") != seen.get(s):
                     seen[s] = q.get("recv")
                     try:
-                        self.trader.on_tick(s, self.market)
+                        if s.startswith("OPT "):
+                            self.opt.on_tick(self.market)
+                        else:
+                            self.trader.on_tick(s, self.market)
                     except Exception as e:  # noqa
                         self.trader.log("error", f"{s}: {e}")
             time.sleep(0.25)
