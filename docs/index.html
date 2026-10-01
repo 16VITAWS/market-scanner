@@ -78,7 +78,46 @@ details summary{cursor:pointer;color:var(--cy);font-weight:700;font-size:13px}
 .matrix{display:grid;gap:2px;font-size:10px}.matrix div{aspect-ratio:1;display:grid;place-items:center;border-radius:3px;color:#fff}
 .help{font-size:13px;color:var(--muted)}
 .foot{margin:30px 0 10px;font-size:12px;color:var(--muted)}
-</style></head>
+/* ===== 16VITAWS design layer: depth, glow, motion ===== */
+body{font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;background:
+ radial-gradient(1200px 600px at 10% -10%,rgba(56,225,255,.13),transparent 60%),
+ radial-gradient(900px 500px at 100% 0%,rgba(124,92,255,.16),transparent 60%),
+ radial-gradient(800px 600px at 50% 120%,rgba(47,227,154,.08),transparent 60%),#050A16;background-attachment:fixed}
+h1,h2,.brand,.hero-title,.stat b,.big2{font-family:"Space Grotesk",Inter,system-ui,sans-serif}
+.top{background:rgba(5,10,22,.72);backdrop-filter:blur(14px) saturate(140%);border-bottom:1px solid rgba(120,160,255,.14)}
+.brand{font-size:22px;letter-spacing:.04em;background:linear-gradient(90deg,#38E1FF,#7C5CFF 55%,#2FE39A);-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 0 12px rgba(56,225,255,.35))}
+nav.side{background:rgba(8,15,30,.6);backdrop-filter:blur(10px);border-right:1px solid rgba(120,160,255,.10)}
+nav.side button{transition:background .2s,color .2s,transform .15s}nav.side button:hover{color:#fff;transform:translateX(2px)}
+nav.side button[aria-selected="true"]{background:linear-gradient(90deg,rgba(56,225,255,.22),rgba(124,92,255,.18));color:#fff;box-shadow:inset 3px 0 0 #38E1FF}
+.card{background:linear-gradient(180deg,rgba(18,32,58,.78),rgba(12,22,42,.78));border:1px solid rgba(120,160,255,.13);backdrop-filter:blur(10px);box-shadow:0 10px 30px rgba(0,0,0,.25);transition:transform .2s,box-shadow .2s,border-color .2s}
+.card:hover{border-color:rgba(56,225,255,.28);box-shadow:0 14px 40px rgba(0,0,0,.35)}
+.card.glow{box-shadow:0 0 0 1px rgba(56,225,255,.06),0 16px 50px rgba(56,225,255,.06)}
+.kpi{background:rgba(255,255,255,.035);border:1px solid rgba(120,160,255,.12)}
+.btn{box-shadow:0 6px 20px rgba(56,225,255,.18);transition:transform .15s,box-shadow .15s,filter .15s}.btn:hover{transform:translateY(-1px);filter:brightness(1.08)}
+.btn.sell{box-shadow:0 6px 20px rgba(255,92,122,.25)}.btn.buy{box-shadow:0 6px 20px rgba(47,227,154,.25)}.btn.grey,.btn.line{box-shadow:none}
+h1{font-size:30px;letter-spacing:-.01em}
+section{animation:rise .35s ease both}@keyframes rise{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+/* hero */
+.hero{position:relative;border-radius:22px;padding:1px;margin-bottom:14px;background:linear-gradient(120deg,rgba(56,225,255,.7),rgba(124,92,255,.7),rgba(47,227,154,.6));background-size:200% 200%;animation:flow 8s ease infinite}
+@keyframes flow{0%,100%{background-position:0% 50%}50%{background-position:100% 50%}}
+.hero-in{border-radius:21px;padding:22px;background:radial-gradient(700px 300px at 0% 0%,rgba(56,225,255,.16),transparent 60%),radial-gradient(600px 300px at 100% 100%,rgba(124,92,255,.18),transparent 60%),#081226}
+.hero-title{font-size:40px;margin:6px 0 4px;letter-spacing:-.02em;background:linear-gradient(90deg,#fff,#9FE9FF);-webkit-background-clip:text;background-clip:text;color:transparent}
+.hero-sub{color:#A9BCD6;max-width:640px;margin:0 0 16px;font-size:15px}
+.eyebrow{display:inline-flex;align-items:center;gap:8px;font-size:12px;font-weight:800;letter-spacing:.12em;color:#9FE9FF}
+.dot{width:10px;height:10px;border-radius:50%;background:#2FE39A;box-shadow:0 0 0 0 rgba(47,227,154,.7);animation:ping 1.6s infinite}.dot.off{background:#FF5C7A;animation:none}
+@keyframes ping{0%{box-shadow:0 0 0 0 rgba(47,227,154,.6)}80%,100%{box-shadow:0 0 0 12px rgba(47,227,154,0)}}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px}
+.stat{background:rgba(255,255,255,.04);border:1px solid rgba(160,200,255,.14);border-radius:16px;padding:14px 16px}
+.stat span{display:block;font-size:12px;color:#8FA6C2;letter-spacing:.04em;text-transform:uppercase;font-weight:700}
+.stat b{display:block;font-size:32px;line-height:1.15;margin-top:4px;font-variant-numeric:tabular-nums}.stat small{font-size:13px;color:#8FA6C2}
+.lap{min-width:240px;background:rgba(255,255,255,.05);border:1px solid rgba(160,200,255,.16);border-radius:14px;padding:10px 14px;font-size:14px}
+.ctl{display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap;padding:12px 0;border-bottom:1px solid rgba(120,160,255,.12)}.ctl:last-child{border-bottom:0}
+.strat .big2{font-size:28px;font-weight:800}.rules{font-size:13px;color:#B9D0E0;padding-left:18px;margin:6px 0}.today{font-size:13px;color:#A9BCD6;margin-top:8px;padding-top:8px;border-top:1px dashed rgba(120,160,255,.18)}
+@media(max-width:900px){.hero-title{font-size:30px}.stat b{font-size:24px}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet">
+</head>
 <body>
 <div class="top">
  <span class="brand">16VITAWS</span>
@@ -154,7 +193,7 @@ async function candles(id,interval='1d'){const sub=interval==='1d'?'candles':'ca
 
 /* ---------- sections registry ---------- */
 const SECTIONS=[
- ['home','Today','⌂'],['overview','Full Dashboard','🗂'],['terminal','Live Terminal','📡'],['markets','Global Markets','🌐'],['charts','Charts','📈'],['scanner','AI Scanner','🔍'],['intel','Intelligence','🧠'],['flows','Big-Money Flows','🐋'],['funds','Mutual Funds','🏦'],['value','Long-Term Value','💎'],['lab','Strategy Lab','🧪'],
+ ['home','Today','⌂'],['algo','Algo Cockpit','🤖'],['overview','Full Dashboard','🗂'],['terminal','Live Terminal','📡'],['markets','Global Markets','🌐'],['charts','Charts','📈'],['scanner','AI Scanner','🔍'],['intel','Intelligence','🧠'],['flows','Big-Money Flows','🐋'],['funds','Mutual Funds','🏦'],['value','Long-Term Value','💎'],['lab','Strategy Lab','🧪'],
  ['paper','Paper Trading','📝'],['live','Live Desk','⚡'],['portfolio','Portfolio & Growth','💹'],['plan','Small-Budget Plan','💰'],['options','Options','⛓'],['news','News & Events','📰'],
  ['research','Research & Backtests','📚'],['ipos','IPOs','🆕'],['brokers','Broker Desk','🏦'],['alerts','Alerts','🔔'],['data','Data Center','🗄'],['diag','Data Health','🩺'],['engine','Engine & Health','⚙'],['settings','Settings · Other devices','🔐']];
 const R={};  // renderers
@@ -201,6 +240,7 @@ function svgCandles(cd,opts={}){const n=Math.min(cd.d.length,160),from=cd.d.leng
  for(let q=0;q<=4;q++){const v=lo+(hi-lo)*q/4;g+=`<line x1="${P.l}" x2="${W-P.r}" y1="${Y(v)}" y2="${Y(v)}" stroke="#132239"/><text x="${P.l-6}" y="${Y(v)+4}" text-anchor="end" font-size="11" fill="#8FA6C2">${fmt0(v)}</text>`}
  for(let j=0;j<n;j++){const k=from+j,up=cd.c[k]>=cd.o[k],col=up?'#2FE39A':'#FF5C7A';g+=`<line x1="${X(j)}" x2="${X(j)}" y1="${Y(cd.h[k])}" y2="${Y(cd.l[k])}" stroke="${col}"/><rect x="${X(j)-bw/2}" y="${Y(Math.max(cd.o[k],cd.c[k]))}" width="${bw}" height="${Math.max(1,Math.abs(Y(cd.o[k])-Y(cd.c[k])))}" fill="${col}"/>`}
  (opts.overlays||[]).forEach(o=>{let d='';for(let j=0;j<n;j++){const v=o.data[from+j];if(v!=null)d+=(d?'L':'M')+X(j).toFixed(1)+','+Y(v).toFixed(1)}g+=`<path d="${d}" fill="none" stroke="${o.color}" stroke-width="1.5"/>`});
+ (opts.markers||[]).forEach(m=>{const j=cd.d.indexOf(m.t)-from;if(j<0||j>=n)return;const b=m.type==='buy',y=b?Y(cd.l[from+j])+14:Y(cd.h[from+j])-14,x=X(j);g+=`<path d="M${x-7},${b?y+8:y-8} L${x+7},${b?y+8:y-8} L${x},${b?y-4:y+4} Z" fill="${b?'#2FE39A':'#FF5C7A'}"/><text x="${x}" y="${b?y+22:y-12}" text-anchor="middle" font-size="11" font-weight="700" fill="${b?'#2FE39A':'#FF5C7A'}">${b?'BUY':'SELL'}</text>`});
  return `<svg viewBox="0 0 ${W} ${H}" width="100%" height="100%">${g}</svg>`}
 function sparkline(vals,color='#38E1FF',h=60){const v=vals.filter(x=>x!=null);if(v.length<2)return '';const W=300,lo=Math.min(...v),hi=Math.max(...v);const d=v.map((x,i)=>(i?'L':'M')+(i/(v.length-1)*W).toFixed(1)+','+(h-4-(hi===lo?h/2:(x-lo)/(hi-lo)*(h-8))).toFixed(1)).join('');return `<svg viewBox="0 0 ${W} ${h}" preserveAspectRatio="none"><path d="${d}" fill="none" stroke="${color}" stroke-width="2"/></svg>`}
 function lineChart(el,series,opts={}){ // series: [{name,color,d:[dates],v:[vals]}]
@@ -294,7 +334,7 @@ function autoCard(IN){const P=API.paper||{},C=API.live_control||{},accs=(P.accou
  const kind={trend_breakout_swing:'Stocks · swing (days–weeks)',trend_breakout_swing_us:'US stocks · swing',index_options_regime:'NIFTY options · defined risk',value_longterm:'Long-term value (monthly)'};
  const live=(P.live_actions||[]).filter(x=>accs.some(a=>a.account===x.account)).slice(-6).reverse();
  const g=C.gate||{checks:[]},n=(g.checks||[])[0]?.value??0;
- return `<div class="card" style="border-color:#1F3A6B"><h3>🤖 Auto-trading — the algorithm buys and sells by itself ${tag('PAPER')}</h3>
+ return `<div class="card" style="border-color:#1F3A6B"><div class="row" style="justify-content:space-between"><h3 style="margin:0">🤖 Auto-trading — the algorithm buys and sells by itself ${tag('PAPER')}</h3><a class="btn sm" href="#algo" onclick="show('algo');return false">Open Algo Cockpit → charts, earnings, controls</a></div>
   <p class="help" style="font-size:14px">Every signal on this page is traded automatically in these accounts: stocks at the next open (and live in market hours), stop-losses and targets checked every ~2 minutes, options spreads opened and closed by rule. No button needed.</p>
   <div class="tbl"><table><tr><th>Account</th><th>What it trades</th><th class="num">Value</th><th class="num">Return</th><th class="num">Open</th><th>Today it did</th></tr>
   ${accs.map(a=>`<tr><td><b>${esc(a.account)}</b></td><td style="font-size:13px">${esc(kind[a.strategies[0]]||a.strategies[0])}</td><td class="num">${cur(a.currency,a.equity)}</td><td class="num ${cls(+a.return_pct)}">${pct(+a.return_pct)}</td><td class="num">${(a.positions||[]).length}</td>
@@ -315,6 +355,71 @@ function homeSearch(){window.HOME_BUSY=Date.now()+300000;const q=$('#hsQ').value
     <div class="row" style="font-size:14px;margin:4px 0">${sg?`<span>Today's signal: <b class="${sg.action==='BUY'?'pos':sg.action==='SELL'?'neg':''}">${esc(sg.action||'HOLD')}</b> (score ${sg.score>0?'+':''}${sg.score})</span>`:'<span class="mut">No swing signal today</span>'}${v?`<span>Long-term: <b>${esc(v.rating)}</b>${v.exp_return?.base!=null?' · '+pct(v.exp_return.base*100)+'/yr':''}</span>`:''}${qt?.hi52?`<span class="mut">52-wk ${fmt(qt.lo52)} – ${fmt(qt.hi52)}</span>`:''}</div>
     ${sg?.why?`<div class="help">${esc(sg.why.slice(0,3).join(' · '))}</div>`:''}
     <div class="row"><button class="btn sm buy" onclick="homeTicket('${esc(i.id)}','buy',${qt?.p||0},${sg?.stop||0},${sg?.target||0},'${c}')">📝 Paper BUY</button><button class="btn sm sell" onclick="homeTicket('${esc(i.id)}','sell',${qt?.p||0},0,0,'${c}')">📝 Paper SELL</button><button class="btn sm line" onclick="liveTrade('${esc(i.id)}','buy',${qt?.p||0},'${c==='USD'?'US':'IN'}')">⚡ Live</button><button class="btn sm grey" onclick="openChart('${esc(i.id)}')">📈 Chart</button></div></div>`}).join('')||'<div class="empty">No match in the 650+ symbols 16VITAWS tracks.</div>'}
+
+/* ===================== ALGO COCKPIT: what the algorithm did, on charts, in plain words, with start/stop ===================== */
+const STRAT_INFO={
+ trend_breakout_swing:{icon:'🚀',name:'Trend + Breakout Swing (India)',what:'Buys strong NIFTY-500 stocks that are already rising and just broke out to a new 20-day high on heavy volume - and only when NIFTY itself is in an uptrend. Holds days to weeks.',
+  rules:['Scores each stock every day out of 7: uptrend (+2), fresh 21/50-day crossover (+1), healthy RSI 50-70 (+1), 20-day-high breakout on 1.5x volume (+2), beating NIFTY over 3 months (+1)','BUY when score is +5 or more and the market regime is BULL (SIDEWAYS needs +6)','Stop-loss 2xATR below entry, target 3xATR above, trailing stop 4% once up 5%, exit after 20 days or if the market turns BEAR','Risks only 1% of the account per trade']},
+ trend_breakout_swing_us:{icon:'🇺🇸',name:'Trend + Breakout Swing (US)',what:'The same breakout rules on US large caps, with the S&P 500 as the market filter.',rules:['Same score, entry and exit rules as the India swing strategy','Not yet validated on US history - paper only']},
+ index_options_regime:{icon:'🎯',name:'NIFTY Options - defined risk',what:'Trades NIFTY option spreads in the direction of the market trend. A spread has a fixed maximum loss: you can never lose more than you paid.',
+  rules:['Falling market (NIFTY below its averages, RSI under 45) -> buys a PUT debit spread','Rising market breaking its 20-day high -> buys a CALL debit spread','Exits at +50% of the maximum profit, at -50% of the cost, 2 days before expiry, or if the trend flips','Never sells naked options; at most 2 spreads open. Prices are MODELED (no live option-chain feed yet)']},
+ value_longterm:{icon:'💎',name:'Long-term Value',what:'Buys good-quality companies when they trade below a conservative estimate of their worth, and holds for years.',rules:['Needs: top-quartile value + quality score, 20%+ margin of safety, F-score 6+, ROIC 12%+ (ROE 14%+ for banks)','Reviewed monthly; sells when the rating falls to AVOID or quality breaks (F-score 4 or less)']}};
+const LIVE_URL='http://127.0.0.1:8765';
+async function laptopState(){try{const c=new AbortController();setTimeout(()=>c.abort(),1500);const r=await fetch(LIVE_URL+'/api/state',{signal:c.signal});return r.ok?await r.json():null}catch(e){return null}}
+async function laptopCmd(path){try{const r=await fetch(LIVE_URL+path,{method:'POST',headers:{'X-Vision':'1'}});return r.ok}catch(e){return false}}
+function countUp(el){const to=+el.dataset.to,dec=+(el.dataset.dec||0),pre=el.dataset.pre||'',suf=el.dataset.suf||'',t0=performance.now();const f=t=>{const k=Math.min(1,(t-t0)/900),e=1-Math.pow(1-k,3),v=to*e;el.textContent=pre+(v<0?'-':'')+Math.abs(v).toLocaleString('en-IN',{minimumFractionDigits:dec,maximumFractionDigits:dec})+suf;if(k<1)requestAnimationFrame(f)};requestAnimationFrame(f)}
+R.algo=async function(){const el=$('#s-algo'),P=API.paper||{},M=API.meta||{};
+ const auto=(P.accounts||[]).filter(a=>(a.strategies||[]).length),inr=auto.filter(a=>a.currency!=='USD');
+ const eq=inr.reduce((s,a)=>s+(+a.equity),0),st=inr.reduce((s,a)=>s+(+a.start_cash),0),pnl=eq-st,ret=st?pnl/st*100:0;
+ const autoIds=new Set(auto.map(a=>a.account)),tr=(P.trades||[]).filter(t=>autoIds.has(t.account)),wins=tr.filter(t=>+t.pnl>0).length,openN=auto.reduce((s,a)=>s+(a.positions||[]).length,0);
+ const fills=(P.fills||[]).filter(f=>autoIds.has(f.account)),paused=M.mode==='RESEARCH';
+ const syms=[...new Set(fills.map(f=>f.symbol))];
+ el.innerHTML=`<div class="hero"><div class="hero-in">
+  <div class="row" style="justify-content:space-between;align-items:flex-start"><div><div class="eyebrow"><span class="dot ${paused?'off':''}"></span>${paused?'AUTOPILOT PAUSED':'AUTOPILOT RUNNING'} · ${tag('PAPER')}</div>
+   <h1 class="hero-title">Algo Cockpit</h1><p class="hero-sub">Everything the algorithm decided by itself - every buy, every sell, every rupee - with the reason. Simulated money until the real-money lock opens.</p></div>
+   <div id="lapCard" class="lap">checking laptop…</div></div>
+  <div class="stats">
+   <div class="stat"><span>Practice capital (India)</span><b class="cu" data-to="${eq.toFixed(0)}" data-pre="₹">₹0</b></div>
+   <div class="stat"><span>Profit / loss so far</span><b class="cu ${cls(pnl)}" data-to="${pnl.toFixed(0)}" data-pre="${pnl>=0?'+':''}₹">0</b><small class="${cls(ret)}">${pct(ret)}</small></div>
+   <div class="stat"><span>Closed trades</span><b class="cu" data-to="${tr.length}">0</b><small>${tr.length?Math.round(wins/tr.length*100)+'% winners':'no closed trades yet'}</small></div>
+   <div class="stat"><span>Open positions</span><b class="cu" data-to="${openN}">0</b><small>${auto.length} strategies running</small></div></div></div></div>
+ <div class="grid g2">
+  <div class="card glow"><h3>📈 Earnings curve - each strategy, % return</h3><div id="eqChart" class="chart sm"></div><p class="help">Account value after every engine run (end of day + live session). Starts at 0%.</p></div>
+  <div class="card glow"><h3>🕹 Controls - you are always in charge</h3>
+   <div class="ctl"><div><b>💻 Laptop algo</b> <small class="mut">(live Shoonya prices, every tick)</small><div class="help">Runs while VISION-LIVE is open on your laptop and you clicked Login to Shoonya today.</div></div>
+    <div class="row"><button class="btn sell" onclick="algoStop()">■ STOP</button><button class="btn grey" onclick="algoResume()">▶ Resume</button><a class="btn line sm" href="${LIVE_URL}" target="_blank" rel="noopener">Open screen</a></div></div>
+   <div class="ctl"><div><b>☁ Cloud autopilot</b> <small class="mut">(works even when your laptop is OFF)</small><div class="help">Runs free on GitHub every ~2 min in market hours and after the close, on ~15-min-delayed prices. Paper money only.</div></div>
+    <div class="row"><span class="tag ${paused?'BEAR':'OK'}">${paused?'PAUSED':'RUNNING'}</span><a class="btn grey sm" href="https://github.com/16VITAWS/market-scanner/settings/variables/actions" target="_blank" rel="noopener">${paused?'▶ Resume':'⏸ Pause'}</a></div>
+    <div class="help">${paused?'To resume: delete the variable <b>VISION_MODE</b> on that page.':'To pause: on that page click <b>New repository variable</b>, name <b>VISION_MODE</b>, value <b>RESEARCH</b>. Delete it to resume.'}</div></div>
+   <div class="ctl"><div><b>💰 Real money</b><div class="help">Locked. Opens only after 30 closed laptop trades with profit factor ≥ 1.2, your consent phrase, a static IP registered with Shoonya, and the kill switch off.</div></div><span class="tag BEAR">LOCKED</span></div></div></div>
+ <div class="card glow"><div class="row" style="justify-content:space-between"><h3 style="margin:0">🎯 Trades on the chart</h3>
+  <select id="algoSym" style="width:auto;min-width:240px">${syms.map(s=>`<option>${esc(s)}</option>`).join('')||'<option>NIFTY</option>'}</select></div>
+  <div id="algoChart" class="chart" style="margin-top:10px"></div><p class="help" id="algoChartNote">▲ green = algorithm bought · ▼ red = algorithm sold.</p></div>
+ <h2>🧠 The strategies - how they decide</h2>
+ <div class="grid g2">${auto.map(a=>{const s=a.strategies[0],I=STRAT_INFO[s]||{icon:'⚙',name:s,what:'',rules:[]};const acts=(P.last_actions?.[a.account]||[]).slice(0,3);
+  return `<div class="card strat"><div class="row" style="justify-content:space-between"><h3 style="margin:0">${I.icon} ${esc(I.name)}</h3><span class="pill">${esc(a.account)}</span></div>
+   <div class="row" style="margin:8px 0"><span class="big2 ${cls(+a.return_pct)}">${pct(+a.return_pct)}</span><span class="mut">${cur(a.currency,a.equity,0)} · ${a.trades||0} closed · ${(a.positions||[]).length} open${a.win_rate!=null?' · '+Math.round(a.win_rate)+'% wins':''}</span></div>
+   <p style="font-size:15px;margin:6px 0">${esc(I.what)}</p><details><summary>Exact rules</summary><ul class="rules">${I.rules.map(r=>`<li>${esc(r)}</li>`).join('')}</ul></details>
+   <div class="today"><b>Today it did:</b> ${acts.map(esc).join(' · ')||'—'}</div></div>`}).join('')}</div>
+ <div class="card glow tbl"><h3>📒 Every trade the algorithm closed</h3><table><tr><th>Strategy</th><th>What</th><th>In</th><th>Out</th><th class="num">P&amp;L</th><th>Why it exited</th></tr>
+  ${tr.slice().reverse().map(t=>`<tr><td>${esc(STRAT_INFO[t.strategy]?.icon||'')} ${esc(t.account)}</td><td><b>${esc(t.symbol)}</b> ×${esc(t.qty)}</td><td>${esc(t.entry_date)}<br><small class="mut">@ ${fmt(+t.entry)}</small></td><td>${esc(t.exit_date)}<br><small class="mut">@ ${fmt(+t.exit)}</small></td><td class="num ${cls(+t.pnl)}"><b>${(+t.pnl>=0?'+':'')}${fmt(+t.pnl,0)}</b><br><small>${pct(+t.pnl_pct)}</small></td><td style="font-size:12px">${esc(t.reason)}</td></tr>`).join('')||'<tr><td colspan=6 class="mut">No closed trades yet - the first ones appear when a stop, target or exit rule is hit.</td></tr>'}</table></div>
+ <div class="card"><h3>❓ What happens when my laptop is off?</h3><ul class="steps">
+  <li><span class="ic ok">☁</span><div><b>Cloud autopilot keeps going</b>: signals, paper buys/sells, stop-losses and targets run on GitHub every ~2 minutes in market hours, laptop on or off, and this page updates by itself.</div></li>
+  <li><span class="ic wait">💻</span><div><b>Live Shoonya prices and (later) real orders need the laptop</b>: Shoonya requires your own login once a day, and SEBI requires API orders to come from your registered static IP. That's the safety rule, not a limitation of 16VITAWS.</div></li></ul></div>`;
+ $$('#s-algo .cu').forEach(countUp);
+ try{await loadLwc()}catch(e){}
+ const ser=auto.filter(a=>(a.equity_curve||[]).length>1).map((a,i)=>{const c=a.equity_curve,b=+c[0].value;return {name:a.account,color:['#38E1FF','#2FE39A','#FFC857','#B48CFF','#FF8FB1','#7CC4FF'][i%6],d:c.map(x=>x.date),v:c.map(x=>(+x.value/b-1)*100)}});
+ if(ser.length)lineChart($('#eqChart'),ser,{pct:true});else $('#eqChart').innerHTML='<div class="empty">The curve appears after a few engine runs.</div>';
+ const draw=async()=>{const s=$('#algoSym').value,opt=/SPREAD|NIFTY \d/.test(s),id=opt?'NIFTY':s;const fs=fills.filter(f=>f.symbol===s);
+  try{const cd=await candles(id);drawCandles($('#algoChart'),cd,{markers:fs.map(f=>({t:f.bar||String(f.time).slice(0,10),type:f.side,text:(f.side==='buy'?'BUY ':'SELL ')+f.qty+' @ '+fmt(+f.price)}))});
+   $('#algoChartNote').innerHTML=opt?`Option spread trades are marked on the <b>NIFTY</b> chart (the spread follows NIFTY). ▲ bought · ▼ sold. Spread prices are MODELED.`:'▲ green = algorithm bought · ▼ red = algorithm sold. Daily candles.'}
+  catch(e){$('#algoChart').innerHTML=`<div class="empty">No chart file for ${esc(id)} yet.</div>`}};
+ $('#algoSym').onchange=draw;draw();
+ const L=await laptopState(),lc=$('#lapCard');if(!lc)return;
+ if(!L){lc.innerHTML=`<b>💻 Laptop algo</b><div class="mut" style="font-size:13px">not running / not reachable from this browser</div><small class="mut">Start VISION-LIVE on your laptop for live Shoonya prices.</small>`;return}
+ const f=L.feed||{};lc.innerHTML=`<b>💻 Laptop algo · <span class="${f.state==='LIVE'?'pos':'mut'}">${esc(f.state||'?')}</span></b><div style="font-size:13px">${esc(L.mode)} mode · ${L.killed?'<span class="neg">STOPPED</span>':'<span class="pos">running</span>'} · ${L.quotes?.length||0} symbols</div><small class="mut">equity ₹${fmt(L.account?.equity,0)} · today ₹${fmt(L.account?.today,0)} · ${L.account?.closed||0} closed</small>`};
+async function algoStop(){if(!confirm('Stop the laptop algorithm now? No new orders will be placed until you resume.'))return;toast(await laptopCmd('/kill')?'Laptop algorithm STOPPED':'Could not reach VISION-LIVE - open its screen and press the red KILL SWITCH');R.algo()}
+async function algoResume(){if(prompt('Type RESUME to let the laptop algorithm trade again')!=='RESUME')return;toast(await laptopCmd('/resume')?'Laptop algorithm resumed':'Could not reach VISION-LIVE - open its screen to resume');R.algo()}
 
 R.overview=function(){
   const S=API.signals,P=API.paper,snap=API.snapshot,rep=API.reports,H=API.health;const el=$('#s-overview');
