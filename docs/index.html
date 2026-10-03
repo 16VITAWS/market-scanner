@@ -115,6 +115,24 @@ section{animation:rise .35s ease both}@keyframes rise{from{opacity:0;transform:t
 .strat .big2{font-size:28px;font-weight:800}.rules{font-size:13px;color:#B9D0E0;padding-left:18px;margin:6px 0}.today{font-size:13px;color:#A9BCD6;margin-top:8px;padding-top:8px;border-top:1px dashed rgba(120,160,255,.18)}
 @media(max-width:900px){.hero-title{font-size:30px}.stat b{font-size:24px}}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+/* ---- 10-module sidebar (compact terminal style) ---- */
+nav.side{width:212px;padding:10px 8px;display:flex;flex-direction:column;gap:2px}
+nav.side button{padding:9px 10px;gap:10px;font-size:13.5px;border-radius:9px}
+nav.side button .ic{width:20px;text-align:center;font-size:15px;flex:none}
+nav.side button .lb{flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+nav.side button .n{width:18px;height:18px;font-size:10px;opacity:.7;flex:none}
+nav.side button:hover{transform:none}
+nav.side button[aria-selected="true"]{background:linear-gradient(90deg,rgba(56,225,255,.24),rgba(124,92,255,.14));color:#fff;box-shadow:inset 3px 0 0 #38E1FF,0 0 14px rgba(56,225,255,.12)}
+nav.side .colbtn{margin-top:auto;opacity:.6;font-weight:600;font-size:12px}
+body.navcol nav.side{width:58px}body.navcol nav.side .lb,body.navcol nav.side .n{display:none}body.navcol nav.side button{justify-content:center;padding:10px 0}
+.wrap{grid-template-columns:auto minmax(0,1fr)!important}
+.subnav{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin:0 0 12px;padding:6px;border:1px solid var(--line);border-radius:12px;background:rgba(8,15,30,.5)}
+.subnav .mt{white-space:nowrap;flex:none;font-weight:800;color:#fff;padding:0 8px 0 4px;margin-right:4px;border-right:1px solid var(--line)}
+.subnav button{border:0;background:none;color:var(--muted);font-weight:700;font-size:13px;padding:7px 12px;border-radius:8px}
+.subnav button:hover{color:#fff}.subnav button[aria-selected="true"]{background:rgba(56,225,255,.16);color:#fff;box-shadow:inset 0 -2px 0 #38E1FF}
+@media(max-width:900px){.wrap{grid-template-columns:1fr!important}nav.side,body.navcol nav.side{width:auto;flex-direction:row;justify-content:space-around;overflow:hidden;gap:0;padding:4px 2px calc(4px + env(safe-area-inset-bottom,0))}
+ nav.side button,body.navcol nav.side button{flex:1 1 0;min-width:0;padding:8px 0;justify-content:center}nav.side .lb,nav.side .n,nav.side .colbtn{display:none!important}nav.side button .ic{font-size:18px;width:auto}
+ .subnav{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none}.subnav button{flex:none}}
 </style>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet">
 </head>
@@ -130,6 +148,7 @@ section{animation:rise .35s ease both}@keyframes rise{from{opacity:0;transform:t
 <main id="main">
 <div class="warn" style="margin:0 0 12px;font-size:13px"><b>Paper trading is always ON</b> (simulated money, runs automatically). <b>Live trading</b> is a separate switch on the Live Desk (without API: you place the order; with API: approve or auto). Educational analysis, not investment advice. Trading can lose money; nothing here promises profit. Data from a free, unofficial feed is delayed or end-of-day and labelled as such.</div>
 <div id="offline" class="danger" hidden>Could not load engine data (api/*.json). If you opened this file directly, open the GitHub Pages link instead. Showing whatever loaded.</div>
+<div id="subnav" class="subnav" role="tablist" hidden></div>
 <div id="sections"></div>
 <p class="foot" id="foot"></p>
 </main>
@@ -199,12 +218,39 @@ const SECTIONS=[
  ['paper','Paper Trading','📝'],['live','Live Desk','⚡'],['portfolio','Portfolio & Growth','💹'],['plan','Small-Budget Plan','💰'],['options','Options','⛓'],['news','News & Events','📰'],
  ['research','Research & Backtests','📚'],['ipos','IPOs','🆕'],['brokers','Broker Desk','🏦'],['alerts','Alerts','🔔'],['data','Data Center','🗄'],['diag','Data Health','🩺'],['engine','Engine & Health','⚙'],['settings','Settings · Other devices','🔐']];
 const R={};  // renderers
+/* ---------- navigation: 10 modules, each existing screen lives in exactly one module (as a tab) ---------- */
+const MODULES=[
+ ['today','Today','🏠',['home','overview']],
+ ['trading','Trading','⚡',['algo','terminal','paper','live','options','brokers']],
+ ['mkts','Markets','🌍',['markets','charts']],
+ ['ai','AI & Scanner','🧠',['scanner','intel','flows','news']],
+ ['rsch','Research','🔬',['research','lab','value']],
+ ['invest','Investments','💰',['funds','ipos','plan']],
+ ['pf','Portfolio','📊',['portfolio']],
+ ['alrt','Alerts','🔔',['alerts']],
+ ['sys','Data & System','🗄️',['data','diag','engine']],
+ ['set','Settings','⚙️',['settings']]];
+const modOf=id=>MODULES.find(m=>m[3].includes(id))||MODULES[0];
+const secName=id=>(SECTIONS.find(s=>s[0]===id)||[])[1]||id;
+const LAST_TAB={};
 function buildNav(){
-  $('#nav').innerHTML=SECTIONS.map(([id,n,ic],i)=>`<button role="tab" data-t="${id}" aria-selected="${i===0}"><span class="n">${i+1}</span><span>${ic} ${n}</span></button>`).join('');
+  let col=false;try{col=localStorage.getItem('navCollapsed')==='1'}catch(e){}
+  document.body.classList.toggle('navcol',col);
+  $('#nav').innerHTML=MODULES.map(([m,n,ic],i)=>`<button role="tab" data-m="${m}" title="${n}  (key ${(i+1)%10})" aria-label="${n}" aria-selected="${i===0}"><span class="ic">${ic}</span><span class="lb">${n}</span><span class="n">${(i+1)%10}</span></button>`).join('')
+    +`<button class="colbtn" id="navCol" title="Collapse / expand the menu" aria-label="Collapse or expand the menu"><span class="ic">⇔</span><span class="lb">Collapse menu</span></button>`;
   $('#sections').innerHTML=SECTIONS.map(([id])=>`<section id="s-${id}" ${id==='home'?'':'hidden'}></section>`).join('');
-  $('#nav').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;show(b.dataset.t)});
+  $('#nav').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;
+    if(b.id==='navCol'){const c=!document.body.classList.contains('navcol');document.body.classList.toggle('navcol',c);try{localStorage.setItem('navCollapsed',c?'1':'0')}catch(e){}return}
+    const m=MODULES.find(x=>x[0]===b.dataset.m);show(LAST_TAB[m[0]]||m[3][0])});
+  $('#subnav').addEventListener('click',e=>{const b=e.target.closest('button');if(b)show(b.dataset.t)});
+  document.addEventListener('keydown',e=>{if(e.ctrlKey||e.metaKey||e.altKey||e.repeat)return;const a=document.activeElement;if(a&&(/INPUT|SELECT|TEXTAREA/.test(a.tagName)||a.isContentEditable))return;
+    if(!/^[0-9]$/.test(e.key))return;const m=MODULES[(+e.key+9)%10];if(m){e.preventDefault();show(LAST_TAB[m[0]]||m[3][0])}});
 }
-function show(id){$$('#nav button').forEach(b=>b.setAttribute('aria-selected',b.dataset.t===id));$$('#sections section').forEach(s=>s.hidden=s.id!=='s-'+id);location.hash=id;window.scrollTo({top:0});if(R[id])try{R[id]()}catch(e){console.error(e);$('#s-'+id).innerHTML=`<div class="danger">This screen hit an error: ${esc(e.message)}</div>`}}
+function show(id){const M=modOf(id);LAST_TAB[M[0]]=id;
+  $$('#nav button[data-m]').forEach(b=>b.setAttribute('aria-selected',b.dataset.m===M[0]));
+  const sn=$('#subnav');sn.hidden=false;
+  sn.innerHTML=`<span class="mt">${M[2]} ${M[1]}</span>`+(M[3].length<2?'':M[3].map(t=>`<button role="tab" data-t="${t}" aria-selected="${t===id}">${secName(t)}</button>`).join(''));
+  $$('#sections section').forEach(s=>s.hidden=s.id!=='s-'+id);location.hash=id;window.scrollTo({top:0});if(R[id])try{R[id]()}catch(e){console.error(e);$('#s-'+id).innerHTML=`<div class="danger">This screen hit an error: ${esc(e.message)}</div>`}}
 
 /* ---------- status badges ---------- */
 function badges(){
