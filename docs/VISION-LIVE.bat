@@ -44,7 +44,13 @@ if not exist settings.env (
   notepad settings.env
 )
 
-start "" http://127.0.0.1:8765
+rem start automatically (minimized) every time Windows starts - the portal then always finds it
+set "SU=%APPDATA%\Microsoft\Windows\Start Menu\Programs\Startup\16VITAWS-LIVE-autostart.bat"
+> "%SU%" echo @echo off
+>> "%SU%" echo cd /d "%VL%"
+>> "%SU%" echo start "16VITAWS LIVE" /min "!PYEXE!" vision_live.py
+echo  16VITAWS LIVE will now also start by itself whenever Windows starts.
+start "" https://16vitaws.github.io/market-scanner/#algo
 "!PYEXE!" vision_live.py
 pause
 exit /b

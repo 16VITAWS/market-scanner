@@ -156,11 +156,13 @@ const FILES=['meta','snapshot','quotes','signals','signals_us','paper','health',
 
 /* tolerate NaN/Infinity written by older engine versions: they become null (missing), never a number */
 const jparse=t=>JSON.parse(t.replace(/(?<=[:,\[]\s*)-?(?:NaN|Infinity)(?=\s*[,}\]])/g,'null'));
-async function loadAll(){
-  const res=await Promise.allSettled(FILES.map(f=>fetch(`api/${f}.json?v=${Date.now()}`).then(r=>{if(!r.ok)throw new Error(r.status);return r.text()}).then(jparse)));
-  let fails=0;res.forEach((r,i)=>{if(r.status==='fulfilled'){const v=r.value,c=API[FILES[i]];if(!c||!c.generated_at||!v||!v.generated_at||v.generated_at>=c.generated_at)API[FILES[i]]=v}else{fails++;API[FILES[i]]=API[FILES[i]]||null}});
-  $('#offline').hidden=fails<FILES.length; LOADED=fails<FILES.length;
-  if(fails&&fails<FILES.length)console.warn('missing api files',fails);
+/* fast start: small files the first screens need, everything else in the background.
+   cache:'no-cache' asks the server "changed?" - unchanged files cost a few bytes instead of a full download */
+const CORE=['meta','calendar','signals','signals_us','paper','snapshot','live_control','options_model','live_status','health'];
+async function loadAll(list=FILES){
+  const res=await Promise.allSettled(list.map(f=>fetch(`api/${f}.json`,{cache:'no-cache'}).then(r=>{if(!r.ok)throw new Error(r.status);return r.text()}).then(jparse)));
+  let fails=0;res.forEach((r,i)=>{if(r.status==='fulfilled'){const v=r.value,c=API[list[i]];if(!c||!c.generated_at||!v||!v.generated_at||v.generated_at>=c.generated_at)API[list[i]]=v}else{fails++;API[list[i]]=API[list[i]]||null}});
+  if(list===FILES||list===CORE){$('#offline').hidden=fails<list.length; LOADED=fails<list.length}
 }
 /* ---------- LIVE overlay: small files the engine pushes every ~2 min during market hours (branch live-data) ---------- */
 const LIVE_BASE='https://raw.githubusercontent.com/16VITAWS/market-scanner/live-data/api/';
@@ -365,7 +367,7 @@ const STRAT_INFO={
   rules:['Falling market (NIFTY below its averages, RSI under 45) -> buys a PUT debit spread','Rising market breaking its 20-day high -> buys a CALL debit spread','Exits at +50% of the maximum profit, at -50% of the cost, 2 days before expiry, or if the trend flips','Never sells naked options; at most 2 spreads open. Prices are MODELED (no live option-chain feed yet)']},
  value_longterm:{icon:'💎',name:'Long-term Value',what:'Buys good-quality companies when they trade below a conservative estimate of their worth, and holds for years.',rules:['Needs: top-quartile value + quality score, 20%+ margin of safety, F-score 6+, ROIC 12%+ (ROE 14%+ for banks)','Reviewed monthly; sells when the rating falls to AVOID or quality breaks (F-score 4 or less)']}};
 const LIVE_URL='http://127.0.0.1:8765';
-async function laptopState(){try{const c=new AbortController();setTimeout(()=>c.abort(),1500);const r=await fetch(LIVE_URL+'/api/state',{signal:c.signal});return r.ok?await r.json():null}catch(e){return null}}
+async function laptopState(){try{const c=new AbortController();setTimeout(()=>c.abort(),6000);const r=await fetch(LIVE_URL+'/api/state',{signal:c.signal});return r.ok?await r.json():null}catch(e){return null}}
 async function laptopCmd(path){try{const r=await fetch(LIVE_URL+path,{method:'POST',headers:{'X-Vision':'1'}});return r.ok}catch(e){return false}}
 function countUp(el){const to=+el.dataset.to,dec=+(el.dataset.dec||0),pre=el.dataset.pre||'',suf=el.dataset.suf||'',t0=performance.now();const f=t=>{const k=Math.min(1,(t-t0)/900),e=1-Math.pow(1-k,3),v=to*e;el.textContent=pre+(v<0?'-':'')+Math.abs(v).toLocaleString('en-IN',{minimumFractionDigits:dec,maximumFractionDigits:dec})+suf;if(k<1)requestAnimationFrame(f)};requestAnimationFrame(f)}
 R.algo=async function(){const el=$('#s-algo'),P=API.paper||{},M=API.meta||{};
@@ -416,7 +418,7 @@ R.algo=async function(){const el=$('#s-algo'),P=API.paper||{},M=API.meta||{};
    $('#algoChartNote').innerHTML=opt?`Option spread trades are marked on the <b>NIFTY</b> chart (the spread follows NIFTY). ▲ bought · ▼ sold. Spread prices are MODELED.`:'▲ green = algorithm bought · ▼ red = algorithm sold. Daily candles.'}
   catch(e){$('#algoChart').innerHTML=`<div class="empty">No chart file for ${esc(id)} yet.</div>`}};
  $('#algoSym').onchange=draw;draw();
- livePoll();clearInterval(LIVE_TIMER);LIVE_TIMER=setInterval(livePoll,2000);
+ livePoll();clearInterval(LIVE_TIMER);LIVE_TIMER=setInterval(livePoll,3000);
  const L=await laptopState(),lc=$('#lapCard');if(!lc)return;
  if(!L){lc.innerHTML=`<b>💻 Laptop algo</b><div class="mut" style="font-size:13px">not running / not reachable from this browser</div><small class="mut">Start VISION-LIVE on your laptop for live Shoonya prices.</small>`;return}
  const f=L.feed||{};lc.innerHTML=`<b>💻 Laptop algo · <span class="${f.state==='LIVE'?'pos':'mut'}">${esc(f.state||'?')}</span></b><div style="font-size:13px">${esc(L.mode)} mode · ${L.killed?'<span class="neg">STOPPED</span>':'<span class="pos">running</span>'} · ${L.quotes?.length||0} symbols</div><small class="mut">equity ₹${fmt(L.account?.equity,0)} · today ₹${fmt(L.account?.today,0)} · ${L.account?.closed||0} closed</small>`};
@@ -425,7 +427,7 @@ R.algo=async function(){const el=$('#s-algo'),P=API.paper||{},M=API.meta||{};
 let LIVE_TIMER=null,LIVE_POP=null;
 function liveLogin(){LIVE_POP=window.open(LIVE_URL+'/shoonya/login','shoonyaLogin','width=520,height=720');toast('Log in on Shoonya\'s page - this window closes by itself when done')}
 function liveRender(L){const b=$('#liveBox');if(!b)return;
- if(!L){b.innerHTML=`<h3>⚡ Live Trading - Shoonya, every tick</h3><div class="ctl"><div><b class="neg">16VITAWS LIVE is not running on this laptop</b><div class="help">Double-click <b>VISION-LIVE-NEW</b> in your Downloads folder. This panel connects by itself within a few seconds.</div></div><span class="tag STALE">OFFLINE</span></div>`;return}
+ if(!L){b.innerHTML=`<h3>⚡ Live Trading - Shoonya, every tick</h3><div class="ctl"><div><b class="neg">16VITAWS LIVE is not running on this laptop</b><div class="help">It starts by itself when Windows starts (after the one-time setup). If it was closed, double-click <b>16VITAWS-LIVE</b> in Downloads. This panel reconnects by itself.</div></div><span class="tag STALE">OFFLINE</span></div>`;return}
  const f=L.feed||{},nl=f.state==='NEEDS LOGIN',O=L.options||{},s=O.signal||{},lg=O.legs,v=O.live,o=O.open;
  if(!nl&&LIVE_POP&&!LIVE_POP.closed){try{LIVE_POP.close()}catch(e){}LIVE_POP=null;toast('Logged in to Shoonya - live prices on')}
  const q=(L.quotes||[]).map(x=>{const c=x.pc?(x.p/x.pc-1)*100:null;return `<tr><td><b>${esc(x.sym)}</b></td><td class="num"><b>${fmt(x.p)}</b></td><td class="num ${cls(c)}">${c==null?'—':pct(c)}</td><td class="num">${x.bid?fmt(x.bid)+' / '+fmt(x.ask):'—'}</td><td>${esc(x.time||'—')}</td><td class="num">${x.age==null?'—':x.age+' s'}</td></tr>`}).join('');
@@ -442,7 +444,8 @@ function liveRender(L){const b=$('#liveBox');if(!b)return;
     ${o?`<div>OPEN ×${o.qty} · paid ${fmt(o.debit)} · P&amp;L <b class="${cls(O.open_pnl)}">₹${fmt(O.open_pnl,0)}</b></div>`:''}
    </div></div>
   <h3 style="margin-top:10px">What it just did</h3><ul class="log">${[...(L.events||[]),...(O.events||[])].sort((a,b)=>a.time<b.time?1:-1).slice(0,8).map(x=>`<li><small class="mut">${esc(x.time)}</small> ${esc(x.msg)}</li>`).join('')||'<li class="mut">Nothing yet today</li>'}</ul>`}
-async function livePoll(){if((location.hash||'').slice(1)!=='algo'){clearInterval(LIVE_TIMER);LIVE_TIMER=null;return}if(document.hidden)return;liveRender(await laptopState())}
+let LIVE_MISS=0,LIVE_BUSY=false;
+async function livePoll(){if((location.hash||'').slice(1)!=='algo'){clearInterval(LIVE_TIMER);LIVE_TIMER=null;return}if(document.hidden||LIVE_BUSY)return;LIVE_BUSY=true;try{const L=await laptopState();if(L){LIVE_MISS=0;liveRender(L)}else if(++LIVE_MISS>=3)liveRender(null);else{const b=$('#liveBox .mut');if(b)b.textContent='connecting to 16VITAWS LIVE on this laptop…'}}finally{LIVE_BUSY=false}}
 async function algoStop(){if(!confirm('Stop the laptop algorithm now? No new orders will be placed until you resume.'))return;toast(await laptopCmd('/kill')?'Live algorithm STOPPED':'16VITAWS LIVE is not running on this laptop');livePoll()}
 async function algoResume(){if(prompt('Type RESUME to let the laptop algorithm trade again')!=='RESUME')return;toast(await laptopCmd('/resume')?'Live algorithm resumed':'16VITAWS LIVE is not running on this laptop');livePoll()}
 
@@ -1284,9 +1287,11 @@ let deferredInstall=null;
 window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();deferredInstall=e;const b=$('#installBtn');if(b)b.hidden=false});
 function pwa(){if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js').catch(e=>console.warn('sw',e));
   const b=$('#installBtn');if(b)b.onclick=async()=>{if(!deferredInstall){toast('Use the browser menu: Add to Home screen / Install app');return}deferredInstall.prompt();await deferredInstall.userChoice;deferredInstall=null;b.hidden=true}}
-async function boot(){pwa();buildNav();await Promise.all([loadAll(),loadLwc()]);await loadLive().catch(()=>{});badges();markBook();evalAlerts();const h=(location.hash||'#home').slice(1);show(SECTIONS.some(s=>s[0]===h)?h:'home');
+async function boot(){pwa();buildNav();await loadAll(CORE);badges();const h=(location.hash||'#home').slice(1);show(SECTIONS.some(s=>s[0]===h)?h:'home');
+  loadLwc();                                                   // chart library loads in the background, never blocks the first screen
+  await loadLive().catch(()=>{});await loadAll(FILES.filter(f=>!CORE.includes(f)));badges();markBook();evalAlerts();{const cur=(location.hash||'#home').slice(1);if(SAFE_RERENDER.includes(cur))softRender();else if(cur!=='algo'&&R[cur]&&!document.activeElement?.matches('input,select,textarea'))try{R[cur]()}catch(e){}}
   $('#refreshBtn').onclick=async()=>{await loadAll();await loadLive().catch(()=>{});badges();markBook();evalAlerts();show((location.hash||'#home').slice(1));toast('Refreshed')};
-  setInterval(async()=>{const before=API.meta?.generated_at;await loadAll();if(API.meta?.generated_at!==before){badges();markBook();evalAlerts();softRender();toast('New engine data loaded')}},120000);
+  setInterval(async()=>{if(document.hidden)return;const before=API.meta?.generated_at;await loadAll(['meta']);if(API.meta?.generated_at!==before){await loadAll();badges();markBook();evalAlerts();softRender();toast('New engine data loaded')}},120000);   // only re-download when the engine published something new
   const liveTick=async()=>{let ch=false;try{ch=await loadLive()}catch(e){OBS.fails++}badges();if(ch){OBS.renders++;markBook();evalAlerts();softRender()}};
   setInterval(()=>{if(!document.hidden)liveTick()},60000);                       // no network while the app is in the background
   document.addEventListener('visibilitychange',()=>{if(!document.hidden)liveTick()}); // catch up immediately on return
