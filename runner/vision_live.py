@@ -572,6 +572,7 @@ def sh_symbol_tokens(http, watch):
     return out
 
 
+RAW_SITE = "https://raw.githubusercontent.com/16VITAWS/market-scanner/gh-pages/"
 PORTAL_QUOTES = "https://raw.githubusercontent.com/16VITAWS/market-scanner/live-data/api/quotes.json"
 
 
@@ -1412,9 +1413,16 @@ class App:
             pass
 
     def fetch(self, name):
-        r = self.req.get(f"{self.site}/api/{name}.json?t={int(time.time())}", timeout=20)
-        r.raise_for_status()
-        return r.json()
+        """Portal data file. The website copy can be missing for a while after a code update, so fall back to the
+        same file on the gh-pages branch (identical data) - the algorithm never runs without today's signals."""
+        try:
+            r = self.req.get(f"{self.site}/api/{name}.json?t={int(time.time())}", timeout=20)
+            r.raise_for_status()
+            return r.json()
+        except Exception:  # noqa
+            r = self.req.get(f"{RAW_SITE}api/{name}.json?t={int(time.time()) // 60}", timeout=20)
+            r.raise_for_status()
+            return r.json()
 
     def refresh_portal(self):
         try:
