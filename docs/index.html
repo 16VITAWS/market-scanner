@@ -495,7 +495,30 @@ function liveRender(L){const b=$('#liveBox');if(!b)return;
     ${s.action==='BUY'?`<div><b>${esc(s.name)}</b></div>${lg?`<div class="help">BUY ${esc(lg.long.tsym)} @ <b>${fmt(lg.long.ltp)}</b> · SELL ${esc(lg.short.tsym)} @ <b>${fmt(lg.short.ltp)}</b></div><div class="help">spread cost now ${v?fmt(v.open_debit):'—'} · value now ${v?fmt(v.close_value):'—'}</div>`:'<div class="help">waiting for option prices</div>'}`:'<div class="mut">No options trade today</div>'}
     ${o?`<div>OPEN ×${o.qty} · paid ${fmt(o.debit)} · P&amp;L <b class="${cls(O.open_pnl)}">₹${fmt(O.open_pnl,0)}</b></div>`:''}
    </div></div>
+  ${realMoneyCard(L)}
   <h3 style="margin-top:10px">What it just did</h3><ul class="log">${[...(L.events||[]),...(O.events||[])].sort((a,b)=>a.time<b.time?1:-1).slice(0,8).map(x=>`<li><small class="mut">${esc(x.time)}</small> ${esc(x.msg)}</li>`).join('')||'<li class="mut">Nothing yet today</li>'}</ul>`}
+/* Real-money trading: where it is and exactly what still keeps it locked (read-only here - unlocking is done in settings.env on the laptop) */
+function realMoneyCard(L){const H=L.broker_health||{},O=L.options||{},rb=L.real_blockers||[],ob=O.blockers||[],g=(L.gate&&L.gate.checks)||[],orc=O.record||{};
+ const ck=(ok,t,how)=>`<li class="${ok?'pos':'neg'}">${ok?'✓':'✗'} ${t}${!ok&&how?` <span class="mut">— ${how}</span>`:''}</li>`;
+ const login=H.auth==='LOGGED IN'||(L.feed||{}).state==='LIVE';
+ const has=(arr,w)=>arr.some(x=>x.toLowerCase().includes(w));
+ const stockOn=L.mode==='REAL',optOn=O.mode==='REAL';
+ return `<div class="card" style="margin-top:10px;border-color:${stockOn||optOn?'rgba(255,92,122,.6)':'rgba(255,200,80,.35)'}"><h3>💰 Real-money algorithm trading — ${stockOn||optOn?'<span class="tag BEAR">ON</span>':'<span class="tag STALE">LOCKED</span>'}</h3>
+  <p class="help">The algorithm can place REAL orders through Shoonya (LIMIT orders only, with daily limits and the STOP button). It unlocks by itself only when every line below is green. Each lock protects your money.</p>
+  <div class="grid g2"><div><b>Stocks</b><ul class="steps" style="list-style:none;padding-left:0">
+   ${ck(login,'Shoonya login works (live prices)','fix the Primary IP on Shoonya, then Login to Shoonya')}
+   ${g.map(c=>ck(c.ok,`Paper record: ${esc(c.check)} (now ${esc(c.value??'—')})`,'the paper trades build this automatically - it takes weeks')).join('')}
+   ${ck(!has(rb,'consent'),'Your written consent','in settings.env: CONSENT=I ACCEPT REAL MONEY RISK')}
+   ${ck(!has(rb,'static ip'),'Fixed address registered with Shoonya','in settings.env: STATIC_IP_REGISTERED=yes')}
+   ${ck(!has(rb,'mode is not real'),'Real mode switched on','in settings.env: MODE=REAL')}
+   ${ck(!has(rb,'kill'),'STOP button is off','')}</ul></div>
+  <div><b>NIFTY options</b><ul class="steps" style="list-style:none;padding-left:0">
+   ${ck(login,'Shoonya login works (live option prices)','same as stocks')}
+   ${ck(orc.passed,`Options paper record: ${orc.closed??0} of ${orc.need??20} trades, profit factor ${esc(orc.pf??'—')} (needs 1.2+)`,'built automatically by options paper trades')}
+   ${ck(!has(ob,'consent'),'Your written consent','same CONSENT line')}
+   ${ck(!has(ob,'static ip'),'Fixed address registered','same STATIC_IP_REGISTERED line')}
+   ${ck(!has(ob,'options_real'),'Options real mode switched on','in settings.env: OPTIONS_MODE=REAL and OPTIONS_REAL=yes')}</ul></div></div>
+  <p class="help"><b>Where to switch it on:</b> on this laptop open <code>%USERPROFILE%\\vision_live\\settings.env</code> in Notepad, change the lines shown above, save, and restart 16VITAWS-LIVE. Until the paper record lines are green it stays in paper mode even if you change the settings - that is on purpose. Trading can lose money; nothing here is investment advice.</p></div>`}
 let LIVE_MISS=0,LIVE_BUSY=false,LIVE_SEEN=false;
 async function livePoll(){if((location.hash||'').slice(1)!=='algo'){clearInterval(LIVE_TIMER);LIVE_TIMER=null;return}if((document.hidden&&LIVE_SEEN)||LIVE_BUSY)return;LIVE_BUSY=true;try{const L=await laptopState();if(L){LIVE_MISS=0;LIVE_SEEN=true;liveRender(L)}else if(++LIVE_MISS>=3)liveRender(null);else{const b=$('#liveBox .mut');if(b)b.textContent='connecting to 16VITAWS LIVE on this laptop…'}}finally{LIVE_BUSY=false}}
 async function algoStop(){if(!confirm('Stop the laptop algorithm now? No new orders will be placed until you resume.'))return;toast(await laptopCmd('/kill')?'Live algorithm STOPPED':'16VITAWS LIVE is not running on this laptop');livePoll()}
