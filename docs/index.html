@@ -177,9 +177,14 @@ const FILES=['meta','snapshot','quotes','signals','signals_us','paper','health',
 const jparse=t=>JSON.parse(t.replace(/(?<=[:,\[]\s*)-?(?:NaN|Infinity)(?=\s*[,}\]])/g,'null'));
 /* fast start: small files the first screens need, everything else in the background.
    cache:'no-cache' asks the server "changed?" - unchanged files cost a few bytes instead of a full download */
+/* data source with a backup: if the website copy is missing (it is briefly, after every code update), read the
+   same engine files straight from the gh-pages branch - so the portal never shows OFFLINE while the data exists */
+const RAW_SITE='https://raw.githubusercontent.com/16VITAWS/market-scanner/gh-pages/';let USE_RAW=false;
+async function siteFetch(path,opt){if(!USE_RAW){try{const r=await fetch(path,opt);if(r.ok||r.status!==404)return r}catch(e){}}
+  const r=await fetch(RAW_SITE+path.split('?')[0]+'?t='+Math.floor(Date.now()/60000),{cache:'no-store'});if(r.ok)USE_RAW=true;return r}
 const CORE=['meta','calendar','signals','signals_us','paper','snapshot','live_control','options_model','live_status','health'];
 async function loadAll(list=FILES){
-  const res=await Promise.allSettled(list.map(f=>fetch(`api/${f}.json`,{cache:'no-cache'}).then(r=>{if(!r.ok)throw new Error(r.status);return r.text()}).then(jparse)));
+  const res=await Promise.allSettled(list.map(f=>siteFetch(`api/${f}.json`,{cache:'no-cache'}).then(r=>{if(!r.ok)throw new Error(r.status);return r.text()}).then(jparse)));
   let fails=0;res.forEach((r,i)=>{if(r.status==='fulfilled'){const v=r.value,c=API[list[i]];if(!c||!c.generated_at||!v||!v.generated_at||v.generated_at>=c.generated_at)API[list[i]]=v}else{fails++;API[list[i]]=API[list[i]]||null}});
   if(list===FILES||list===CORE){$('#offline').hidden=fails<list.length; LOADED=fails<list.length}
 }
@@ -210,7 +215,7 @@ function dataBadge(){const q=Q('NIFTY')||Q('SPX');if(!q)return '<span class="bd 
   return `<span class="bd ${c}" id="dbadge" style="cursor:pointer" onclick="show('diag')" title="Source ${esc(q.src||'yahoo')} · market time ${esc(q.intraday?istT(q.t):q.d)} · click for Data Health">● ${f.st} · ${esc(q.sym||'NIFTY')} ${q.intraday?istT(q.t):esc(q.d||'')} · ${f.st==='CLOSED'?'market closed':ageTxt(f.age)} · ${esc(q.src||'yahoo')}</span>`}
 const SAFE_RERENDER=['diag','overview','home','markets','paper','portfolio','options','live','intel','flows','funds'];
 function softRender(){const a=document.activeElement;if(a&&/INPUT|SELECT|TEXTAREA/.test(a.tagName))return;const id=(location.hash||'#home').slice(1);if(id==='home'&&Date.now()<(window.HOME_BUSY||0))return;if(!SAFE_RERENDER.includes(id)||!R[id])return;const y=window.scrollY;try{R[id]()}catch(e){console.error(e)}window.scrollTo(0,y)}
-async function candles(id,interval='1d'){const sub=interval==='1d'?'candles':'candles_'+interval;const r=await fetch(`api/${sub}/${encodeURIComponent(id)}.json?v=${Date.now()}`);if(!r.ok)throw new Error('no candle file for '+id);return r.json()}
+async function candles(id,interval='1d'){const sub=interval==='1d'?'candles':'candles_'+interval;const r=await siteFetch(`api/${sub}/${encodeURIComponent(id)}.json?v=${Date.now()}`);if(!r.ok)throw new Error('no candle file for '+id);return r.json()}
 
 /* ---------- sections registry ---------- */
 const SECTIONS=[
@@ -1149,7 +1154,7 @@ function termPaper(side){const sym=TERM.sym.split(':').pop();const q=Q(sym);show
 
 /* ===================== LIVE DESK ===================== */
 R.live=async function(){const C=API.live_control||{},PR=API.live_proposals||{},LR=API.live_results||{},S=API.signals,el=$('#s-live');
-  let appr={items:[]};try{appr=await fetch('data/approvals.json?v='+Date.now()).then(r=>r.ok?r.json():{items:[]})}catch(e){}
+  let appr={items:[]};try{appr=await siteFetch('data/approvals.json?v='+Date.now()).then(r=>r.ok?r.json():{items:[]})}catch(e){}
   const apprMap=Object.fromEntries((appr.items||[]).map(a=>[a.id,a]));const cap=store.get('liveCap',100000);const b=book();
   const mode=C.mode||'OFF';const GH='https://github.com/16VITAWS/market-scanner';
   const tickets=(S?.buys||[]).map(s=>{const lim=Math.floor(s.entry*1.005*20)/20;const q=Math.max(0,Math.min(Math.floor(cap*0.01/Math.max(lim-s.stop,0.01)),Math.floor(cap*0.25/lim)));return {...s,lim,q}});
