@@ -66,6 +66,9 @@ BROKER=SHOONYA
 SHOONYA_UID=
 SHOONYA_CLIENT_ID=
 SHOONYA_SECRET=
+# Optional: the Primary IP Address you saved on Shoonya's Api Key page (lets the screen say MATCH / MISMATCH).
+# Leave empty: it is learned automatically after the first successful login.
+SHOONYA_REGISTERED_IP=
 SHOONYA_OAUTH_URL=https://api.shoonya.com/OAuthlogin/authorize/oauth
 # Angel One SmartAPI (free) - only if BROKER=ANGEL: create an app at smartapi.angelone.in, enable TOTP
 ANGEL_API_KEY=
@@ -348,6 +351,7 @@ class ShoonyaAuth:
         import requests
         self.cfg, self.http, self.path = cfg, http or requests, path or SH_SESSION
         self.session = None
+        self.fail_reason, self.fail_msg, self.fail_at, self.fail_count = None, None, None, 0
         try:
             s = json.load(open(self.path))
             if s.get("day") == now().date().isoformat() and s.get("access_token"):
@@ -369,23 +373,50 @@ class ShoonyaAuth:
             r = self.http.post(f"{SH_HOST}/GenAcsTok", timeout=20,
                                data="jData=" + json.dumps({"code": code, "checksum": sh_checksum(cid, sec, code), "uid": uid}))
         except Exception as e:  # noqa - Shoonya drops connections from an IP that is not registered for the API key
-            ip = public_ip(self.http)
-            raise RuntimeError("Shoonya refused the connection. Most likely your internet address changed: this computer is now "
-                               f"{ip or 'unknown'}. Put that number in 'Primary IP Address' on Shoonya's Api Key Generation page, "
-                               "click Update, then click Login to Shoonya again.") from e
-        j = r.json() if getattr(r, "content", b"x") else {}
+            self._fail("NETWORK_OR_IP", "Shoonya refused the connection. Most likely your internet address changed: this computer is now "
+                       f"{ip_text(self.http)}. Put that number in 'Primary IP Address' on Shoonya's Api Key Generation page, "
+                       "click Update, then click Login to Shoonya again. (If the internet itself is down, wait and try again.)", e)
+        try:
+            j = r.json() if getattr(r, "content", b"x") else {}
+        except ValueError:
+            j = {}
         if "access_token" not in j:
-            why = str(j.get('emsg') or j.get('stat') or r.status_code)
-            if "INVALID_IP" in why.upper():
-                ip = public_ip(self.http)
-                raise RuntimeError("Shoonya says INVALID_IP: your internet address changed. This computer is now "
-                                   f"{ip or 'unknown'}. Put exactly that number in 'Primary IP Address' on Shoonya's "
-                                   "Api Key Generation page, click Update, then click Login to Shoonya again.")
-            raise RuntimeError(f"Shoonya token exchange failed: {why}")
+            why = str(j.get('emsg') or j.get('stat') or getattr(r, "status_code", "?"))
+            kind = classify_login_error(why)
+            if kind == "INVALID_IP":
+                self._fail(kind, "Shoonya says INVALID_IP: your internet address changed. This computer is now "
+                           f"{ip_text(self.http)}. Put exactly that number in 'Primary IP Address' on Shoonya's "
+                           "Api Key Generation page, click Update, then click Login to Shoonya again. Automatic retry: OFF.")
+            if kind == "CONFIG":
+                self._fail(kind, f"Shoonya rejected the API settings ({why}). Check SHOONYA_CLIENT_ID / SHOONYA_SECRET in settings.env "
+                           "and the Redirect URL http://127.0.0.1:8765/shoonya/callback on Shoonya's Api Key page. Automatic retry: OFF.")
+            if kind == "AUTH_CODE":
+                self._fail(kind, f"Shoonya did not accept this login code ({why}). Codes work once and expire fast - click Login to Shoonya again.")
+            self._fail(kind, f"Shoonya token exchange failed: {why}")
         self.session = {"day": now().date().isoformat(), "access_token": j["access_token"], "uid": j.get("USERID") or uid,
                         "actid": j.get("actid") or uid, "at": now().isoformat(timespec="seconds")}
         os.makedirs(os.path.dirname(self.path), exist_ok=True)
         json.dump(self.session, open(self.path, "w"))
+        self.fail_reason, self.fail_msg, self.fail_count = None, None, 0
+        ok_ip = check_public_ip(self.http, max_age=30).get("ip")
+        if ok_ip:                                                       # remember the address Shoonya accepted
+            try:
+                json.dump({"ip": ok_ip, "at": now().isoformat(timespec="seconds")}, open(os.path.join(os.path.dirname(self.path), "shoonya_ip.json"), "w"))
+            except OSError:
+                pass
+
+    def _fail(self, reason, msg, cause=None):
+        self.fail_count = self.fail_count + 1 if reason == self.fail_reason else 1
+        self.fail_reason, self.fail_msg, self.fail_at = reason, msg, now().strftime("%H:%M:%S")
+        audit("shoonya_login_failed", reason=reason, retryable=False, attempt=self.fail_count)
+        if cause is not None:
+            raise RuntimeError(msg) from cause
+        raise RuntimeError(msg)
+
+    def status(self):
+        if self.session:
+            return "LOGGED IN"
+        return "FAILED" if self.fail_reason else "NOT LOGGED IN"
         try:
             os.chmod(self.path, 0o600)
         except OSError:
@@ -541,11 +572,84 @@ def sh_symbol_tokens(http, watch):
     return out
 
 
-def public_ip(http):
+IP_SOURCES = ("https://api.ipify.org", "https://checkip.amazonaws.com", "https://icanhazip.com", "https://ifconfig.me/ip")
+_IP_CACHE = {"at": 0.0, "res": None}
+SH_IP_FILE = os.path.join(HOME, "shoonya_ip.json")
+
+
+def _public(s):
+    """Only a real internet (public) address counts - never 127.0.0.1 / 192.168.x / 10.x / 172.16-31.x."""
+    import ipaddress
     try:
-        return http.get("https://api.ipify.org", timeout=8).text.strip()
+        a = ipaddress.ip_address((s or "").strip())
+    except ValueError:
+        return None
+    return str(a) if a.is_global else None
+
+
+def check_public_ip(http, max_age=120, sources=IP_SOURCES):
+    """This computer's outbound internet address, asked from several services. Cached; never polled continuously.
+    status OK = services agree; UNCERTAIN = they disagree (we do not guess); LOOKUP_FAILED = none answered."""
+    if max_age and _IP_CACHE["res"] and time.time() - _IP_CACHE["at"] < max_age:
+        return _IP_CACHE["res"]
+    v4, v6, asked = [], [], 0
+    for u in sources:
+        asked += 1
+        try:
+            ip = _public(http.get(u, timeout=6).text)
+        except Exception:  # noqa
+            ip = None
+        if ip:
+            (v6 if ":" in ip else v4).append(ip)
+        if len(v4) >= 2 and len(set(v4)) == 1:
+            break                                                     # two services agree - enough
+    if len(set(v4)) == 1 or (not v4 and len(set(v6)) == 1):
+        ip = (v4 or v6)[0]
+        res = {"ip": ip, "status": "OK", "agree": len(v4 or v6), "asked": asked}
+    elif v4 or v6:
+        res = {"ip": None, "status": "UNCERTAIN", "seen": sorted(set(v4 + v6)), "asked": asked}
+    else:
+        res = {"ip": None, "status": "LOOKUP_FAILED", "asked": asked}
+    res["checked"] = now().strftime("%H:%M:%S")
+    _IP_CACHE.update(at=time.time(), res=res)
+    return res
+
+
+def public_ip(http):
+    return check_public_ip(http, max_age=30)["ip"]
+
+
+def ip_text(http):
+    r = check_public_ip(http, max_age=30)
+    if r["ip"]:
+        return r["ip"]
+    if r["status"] == "UNCERTAIN":
+        return "not certain (services disagree: " + ", ".join(r.get("seen", [])) + ")"
+    return "unknown - the address check did not answer (is the internet working?)"
+
+
+def accepted_ip():
+    """The last internet address Shoonya actually accepted a login from (saved after every successful login)."""
+    try:
+        return json.load(open(SH_IP_FILE)).get("ip")
     except Exception:  # noqa
         return None
+
+
+def registered_ip(cfg):
+    return (cfg.get("SHOONYA_REGISTERED_IP") or "").strip() or accepted_ip()
+
+
+def classify_login_error(msg):
+    """CONFIG/IP problems need YOU to change something - never retried automatically. Others: start a fresh login."""
+    m = (msg or "").upper()
+    if "INVALID_IP" in m or "IP_NOT" in m:
+        return "INVALID_IP"
+    if any(w in m for w in ("CLIENT", "SECRET", "CHECKSUM", "NOT ENABLED", "REDIRECT", "APP KEY", "APPKEY")):
+        return "CONFIG"
+    if any(w in m for w in ("CODE", "EXPIRED", "TOKEN", "SESSION")):
+        return "AUTH_CODE"
+    return "BROKER"
 
 
 def sh_key(tok):
@@ -1010,7 +1114,7 @@ button{background:#8B1E2E;color:#fff;border:0;border-radius:8px;padding:8px 14px
 </style></head><body><header><b class="brand">16VITAWS LIVE</b><span id="feed" class="chip">…</span><span id="mode" class="chip">…</span><span id="mkt" class="chip">…</span>
 <span id="clock" class="chip mut"></span><span style="flex:1"></span><a id="login" class="chip" href="/shoonya/login" target="_blank" style="display:none;background:#1F6A4A;color:#fff;text-decoration:none;font-weight:600">🔑 Login to Shoonya</a><button id="kill">■ KILL SWITCH</button></header>
 <div id="codebox" style="display:none;padding:10px 16px;background:#1B2842"><b>After logging in:</b> if Shoonya's page did not come back here by itself, copy the full address from that tab and paste it: <input id="code" style="width:50%;padding:6px" placeholder="https://...?code=..."> <button class="g" id="codebtn">Use this login</button> <span id="codemsg" class="mut"></span></div>
-<main><div class="card" style="grid-column:1/-1"><table id="q"></table><p class="mut" style="font-size:12px">Prices: your broker's exchange feed, updated on every trade (tick). "Age" = seconds since that symbol's last exchange tick. Nothing is estimated: a symbol without a tick shows "—".</p></div>
+<main><div class="card" style="grid-column:1/-1;border-color:#2A4A7A"><h3>Connection check</h3><div id="diag" class="mut">…</div></div><div class="card" style="grid-column:1/-1"><table id="q"></table><p class="mut" style="font-size:12px">Prices: your broker's exchange feed, updated on every trade (tick). "Age" = seconds since that symbol's last exchange tick. Nothing is estimated: a symbol without a tick shows "—".</p></div>
 <div class="card"><h3>Positions (live P&amp;L)</h3><table id="pos"></table><p id="acct" class="mut"></p></div>
 <div class="card"><h3>REAL trading lock</h3><div id="gate"></div></div>
 <div class="card" style="grid-column:1/-1;border-color:#3E2A5C"><h3>&#127919; NIFTY options - live Shoonya prices</h3><div id="opt"></div></div>
@@ -1039,7 +1143,13 @@ function drawOpt(O){if(!O){$('#opt').innerHTML='<p class=mut>Not loaded yet.</p>
  (o?`<p>OPEN: ${e(o.name)} ×${o.qty} · paid ${f2(o.debit)} · P&L now <b class="${O.open_pnl>=0?'up':'dn'}">₹${f2(O.open_pnl)}</b></p>`:'')+
  `<p class=mut>Closed options trades: ${O.record.closed} (need ${O.record.need} with profit factor ≥ 1.2 before REAL) · ${(O.trades||[]).slice(-3).map(t=>e(t.name)+' ₹'+f2(t.pnl)).join(' · ')}</p>`+
  (O.events||[]).slice(-4).reverse().map(x=>`<div class=mut style="font-size:12px">${e(x.time)} ${e(x.msg)}</div>`).join('')}
-const _draw=draw;draw=S=>{_draw(S);drawOpt(S.options)};
+function drawDiag(H){if(!H)return;const c=(ok,t)=>`<b class=${ok?'up':'dn'}>${e(t)}</b>`;
+ $('#diag').innerHTML=`<table><tr><td>Shoonya login</td><td>${c(H.auth==='LOGGED IN',H.auth+(H.auth_reason?' - '+H.auth_reason:''))}${H.auth_attempts>1?' <span class=mut>('+H.auth_attempts+' tries, last '+e(H.auth_failed_at)+')</span>':''}</td></tr>
+ <tr><td>This computer's internet address</td><td>${c(!!H.public_ip,H.public_ip||H.public_ip_status)} <span class=mut>checked ${e(H.public_ip_checked||'—')}</span></td></tr>
+ <tr><td>Address Shoonya knows</td><td>${e(H.registered_ip||'unknown')} <span class=mut>${e(H.registered_ip_source||'')}</span> ${H.ip_status==='UNKNOWN'?'':c(H.ip_status==='MATCH',H.ip_status)}</td></tr>
+ <tr><td>Live prices</td><td>${c(H.market_data==='LIVE',H.market_data)} <span class=mut>${H.symbols_live}/${H.symbols_requested} symbols ticking</span></td></tr>
+ <tr><td>Paper engine · Real orders</td><td><b class=up>${e(H.paper_engine)}</b> · ${c(H.real_orders==='BLOCKED',H.real_orders)}</td></tr></table>${H.auth_detail?`<p class=dn style="font-size:13px">${e(H.auth_detail)}</p>`:''}`}
+const _draw=draw;draw=S=>{_draw(S);drawOpt(S.options);drawDiag(S.broker_health)};
 connect();
 </script></body></html>"""
 
@@ -1062,7 +1172,32 @@ def state_json(app):
             "killed": app.safety.killed(), "quotes": quotes, "positions": pos,
             "account": {"equity": app.paper.equity(app.book), "cash": app.paper.s["cash"], "closed": len(app.paper.s["trades"]), "today": app.paper.realized_today()},
             "real_blockers": app.safety.real_blockers(app.paper), "gate": app.paper.record(), "signals": app.trader.signals,
-            "events": app.trader.events[-60:], "rejected": app.book.rejected, "options": app.opt.state()}
+            "events": app.trader.events[-60:], "rejected": app.book.rejected, "options": app.opt.state(), "broker_health": broker_health(app)}
+
+
+def broker_health(app):
+    """One honest status object: is the login OK, is my internet address right, are prices really live, are real orders blocked?"""
+    cfg, a = app.cfg, app.sh_auth
+    feed = app.feed.health() if app.feed else {"state": "NOT STARTED"}
+    snap = app.book.snapshot()
+    fresh = sum(1 for q in snap.values() if q.get("recv") and time.time() - q["recv"] < 60)
+    ip = getattr(app, "ipinfo", None) or {}
+    reg = registered_ip(cfg)
+    ipst = "UNKNOWN" if not (ip.get("ip") and reg) else ("MATCH" if ip["ip"] == reg else "MISMATCH")
+    live = feed.get("state") == "LIVE" and fresh > 0
+    return {"broker": app.broker, "auth_mode": "OAuth (Shoonya login page)" if app.broker == "SHOONYA" else "API key + TOTP",
+            "client_id": "configured" if cfg.get("SHOONYA_CLIENT_ID") else "MISSING",
+            "secret": "configured" if cfg.get("SHOONYA_SECRET") else "MISSING",
+            "redirect_uri": "http://127.0.0.1:8765/shoonya/callback",
+            "auth": a.status() if a else "n/a", "auth_reason": getattr(a, "fail_reason", None), "auth_detail": getattr(a, "fail_msg", None),
+            "auth_failed_at": getattr(a, "fail_at", None), "auth_attempts": getattr(a, "fail_count", 0),
+            "token": "present (today)" if a and a.session else "absent",
+            "public_ip": ip.get("ip"), "public_ip_status": ip.get("status", "NOT CHECKED"), "public_ip_checked": ip.get("checked"),
+            "registered_ip": reg, "registered_ip_source": "settings.env" if cfg.get("SHOONYA_REGISTERED_IP") else ("last accepted login" if reg else None),
+            "ip_status": ipst, "market_data": "LIVE" if live else ("NOT LIVE - " + str(feed.get("state"))),
+            "last_tick_age_s": feed.get("last_tick_age_s"), "symbols_requested": len(app.tokens), "symbols_live": fresh,
+            "paper_engine": "RUNNING", "mode": app.trader.mode(),
+            "real_orders": "BLOCKED" if app.trader.mode() != "REAL" else "ALLOWED (limits apply)"}
 
 
 class QuietServer(ThreadingHTTPServer):
@@ -1167,6 +1302,17 @@ class App:
         self.trader = Trader(cfg, self.book, self.paper, self.safety, {}, None, self.notify)
         self.opt = OptionsTrader(cfg, self.book, self.safety, self.notify)
         self.opt_loaded = None
+        self.ipinfo = None
+
+    def refresh_ip(self, force=False):
+        try:
+            self.ipinfo = check_public_ip(self.req, max_age=0 if force else 600)
+        except Exception:  # noqa
+            pass
+
+    def _ip_loop(self):
+        while True:                                                     # every 10 minutes - never a continuous poll
+            self.refresh_ip(force=True); time.sleep(600)
 
     def shoonya_code(self, text):
         try:
@@ -1177,7 +1323,13 @@ class App:
             return True, "Live prices are starting. You can close this tab."
         except Exception as e:  # noqa
             m = scrub(e, self.cfg)
-            self.trader.log("login", f"Shoonya login failed: {m}")
+            self.refresh_ip(force=True)
+            n = self.sh_auth.fail_count or 1
+            prev = next((x for x in reversed(self.trader.events) if x.get("kind") == "login"), None)
+            if prev and prev.get("base") == m and n > 1:                    # same error again: one line with a counter, not 100 lines
+                prev.update(time=now().strftime("%H:%M:%S"), msg=f"Shoonya login failed ({n} times, last {now().strftime('%H:%M')}): {m}")
+            else:
+                self.trader.log("login", f"Shoonya login failed: {m}", base=m)
             return False, m
 
     def notify(self, title, msg):
@@ -1259,6 +1411,7 @@ class App:
             print(f"\n  16VITAWS LIVE is already running on this computer (port {port}). Nothing to do - open the 16VITAWS portal.\n", flush=True)
             return
         threading.Thread(target=srv.serve_forever, daemon=True).start()
+        threading.Thread(target=self._ip_loop, daemon=True).start()
         print(f"\n  VISION LIVE screen:  http://127.0.0.1:{port}\n", flush=True)
         self.refresh_portal()
         need = ("SHOONYA_UID", "SHOONYA_CLIENT_ID", "SHOONYA_SECRET") if self.broker == "SHOONYA" else \
@@ -1279,7 +1432,11 @@ class App:
             else:
                 self.feed = Feed(self.cfg, self.book, self.tokens)
             self.trader.feed = self.feed; self.opt.feed = self.feed; self.feed.start()
-            self.trader.log("start", f"{self.broker}: watching {len(self.tokens)} symbols in {self.trader.mode()} mode")
+            if self.broker == "SHOONYA" and not self.sh_auth.session:
+                self.trader.log("start", f"PAPER engine running ({self.trader.mode()} mode). {len(self.tokens)} symbols ready - prices are NOT live "
+                                         "until the Shoonya login works. Real orders: BLOCKED.")
+            else:
+                self.trader.log("start", f"{self.broker}: connecting to {len(self.tokens)} symbols in {self.trader.mode()} mode")
         seen = {}
         last_portal = time.time()
         while True:
@@ -1298,8 +1455,43 @@ class App:
             time.sleep(0.25)
 
 
+def diagnose(cfg, http=None, out=print):
+    """python vision_live.py --diagnose-shoonya : a plain report. Never prints a secret, token or login code."""
+    import platform, socket
+    http = http or __import__("requests")
+    ok = lambda b: "OK" if b else "PROBLEM"
+    out("16VITAWS LIVE - Shoonya connection check")
+    out(f"  Python              {platform.python_version()} ({sys.executable})")
+    out(f"  Shoonya library     none needed - this program talks to Shoonya's official REST/WebSocket API directly (OAuth)")
+    for k in ("SHOONYA_UID", "SHOONYA_CLIENT_ID", "SHOONYA_SECRET"):
+        out(f"  {k:<19} {'configured' if cfg.get(k) else 'MISSING - add it to ' + SETTINGS}")
+    out(f"  Redirect URL        must be exactly http://127.0.0.1:8765/shoonya/callback on Shoonya's Api Key page")
+    ip = check_public_ip(http, max_age=0)
+    out(f"  Internet address    {ip.get('ip') or ip['status']}" + (f" (services disagree: {', '.join(ip.get('seen', []))})" if ip["status"] == "UNCERTAIN" else ""))
+    reg = registered_ip(cfg)
+    out(f"  Registered address  {reg or 'unknown - set SHOONYA_REGISTERED_IP in settings.env, or it is learned after the first good login'}")
+    if ip.get("ip") and reg:
+        out(f"  Address check       {'MATCH' if ip['ip'] == reg else 'MISMATCH - put ' + ip['ip'] + ' in Primary IP Address on Shoonya, click Update'}")
+    try:
+        socket.getaddrinfo("api.shoonya.com", 443); dns = True
+    except OSError:
+        dns = False
+    out(f"  DNS api.shoonya.com {ok(dns)}")
+    try:
+        http.get("https://api.shoonya.com/NSE_symbols.txt.zip", timeout=15, stream=True); web = True
+    except Exception:  # noqa
+        web = False
+    out(f"  HTTPS to Shoonya    {ok(web)}")
+    a = ShoonyaAuth(cfg, http)
+    out(f"  Today's login       {'YES - token saved for today' if a.session else 'NO - click Login to Shoonya in the portal'}")
+    out(f"  Mode                {(cfg.get('MODE') or 'PAPER').upper()} (real orders need MODE=REAL plus every safety lock)")
+    out("  Note: Shoonya requires a STATIC registered address. Mobile internet changes it, so logins fail until you update it.")
+
+
 def main():
     cfg = load_settings()
+    if "--diagnose-shoonya" in sys.argv:
+        diagnose(cfg); return
     try:
         App(cfg).run()
     except KeyboardInterrupt:
