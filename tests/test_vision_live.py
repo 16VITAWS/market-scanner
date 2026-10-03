@@ -382,3 +382,23 @@ def test_login_failure_names_the_new_ip(VL, tmp_path):
     with pytest.raises(RuntimeError) as e:
         a.exchange("http://127.0.0.1:8765/shoonya/callback?code=ABC")
     assert "27.61.41.198" in str(e.value) and "Primary IP Address" in str(e.value)
+
+
+def test_invalid_ip_reply_names_the_new_ip(VL, tmp_path):
+    class H:
+        def post(self, *a, **k): return _Resp({"stat": "Not_Ok", "emsg": "Invalid Input : INVALID_IP"})
+        def get(self, url, timeout=None):
+            r = _Resp(None); r.text = "27.61.39.198"; return r
+    a = VL.ShoonyaAuth({"SHOONYA_CLIENT_ID": "C", "SHOONYA_SECRET": "S", "SHOONYA_UID": "U"}, H(), path=str(tmp_path / "s.json"))
+    with pytest.raises(RuntimeError) as e:
+        a.exchange("http://127.0.0.1:8765/shoonya/callback?code=ABC")
+    assert "27.61.39.198" in str(e.value) and "INVALID_IP" in str(e.value)
+
+
+def test_browser_abort_is_silent(VL, capsys):
+    srv = VL.QuietServer.__new__(VL.QuietServer)
+    try:
+        raise ConnectionAbortedError(10053, "aborted")
+    except ConnectionAbortedError:
+        srv.handle_error(None, ("127.0.0.1", 1))
+    assert "Traceback" not in capsys.readouterr().err
