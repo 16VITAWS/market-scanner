@@ -404,6 +404,12 @@ class ShoonyaAuth:
                 json.dump({"ip": ok_ip, "at": now().isoformat(timespec="seconds")}, open(os.path.join(os.path.dirname(self.path), "shoonya_ip.json"), "w"))
             except OSError:
                 pass
+        try:
+            os.chmod(self.path, 0o600)                                    # today's token: readable by this user only
+        except OSError:
+            pass
+        audit("shoonya_login_ok", uid=self.session["uid"][:2] + "***")
+        return self.session
 
     def _fail(self, reason, msg, cause=None):
         self.fail_count = self.fail_count + 1 if reason == self.fail_reason else 1
@@ -417,12 +423,6 @@ class ShoonyaAuth:
         if self.session:
             return "LOGGED IN"
         return "FAILED" if self.fail_reason else "NOT LOGGED IN"
-        try:
-            os.chmod(self.path, 0o600)
-        except OSError:
-            pass
-        audit("shoonya_login_ok", uid=self.session["uid"][:2] + "***")
-        return self.session
 
     def headers(self):
         return {"Authorization": f"Bearer {self.session['access_token']}", "Content-Type": "application/json; charset=utf-8"}
@@ -1329,6 +1329,10 @@ def make_handler(app):
                 ok, msg = app.shoonya_code(self.rfile.read(min(n, 4000)).decode("utf-8", "ignore"))
                 b = json.dumps({"ok": ok, "msg": msg}).encode()
                 self.send_response(200); self.send_header("Content-Type", "application/json"); self.end_headers(); self.wfile.write(b); return
+            elif self.path == "/quit":                      # a newer copy is starting: hand over (local screen only)
+                app.trader.log("start", "a new copy of 16VITAWS LIVE is starting - this one closes")
+                self.send_response(204); self.end_headers()
+                threading.Thread(target=lambda: (time.sleep(0.5), os._exit(0)), daemon=True).start(); return
             elif self.path == "/resume":
                 if os.path.exists(KILL_FILE):
                     os.remove(KILL_FILE)
@@ -1485,9 +1489,19 @@ class App:
     def run(self):
         os.makedirs(HOME, exist_ok=True)
         port = int(self.cfg.get("PORT") or 8765)
-        try:
-            srv = QuietServer(("127.0.0.1", port), make_handler(self))
-        except OSError:
+        srv = None
+        for attempt in range(2):
+            try:
+                srv = QuietServer(("127.0.0.1", port), make_handler(self))
+                break
+            except OSError:
+                if attempt == 0:                                          # an older copy is running: ask it to close, take over
+                    try:
+                        self.req.post(f"http://127.0.0.1:{port}/quit", headers={"X-Vision": "1", "Origin": f"http://127.0.0.1:{port}"}, timeout=5)
+                    except Exception:  # noqa
+                        pass
+                    time.sleep(3)
+        if srv is None:
             print(f"\n  16VITAWS LIVE is already running on this computer (port {port}). Nothing to do - open the 16VITAWS portal.\n", flush=True)
             return
         threading.Thread(target=srv.serve_forever, daemon=True).start()
