@@ -1382,6 +1382,28 @@ class App:
                 self.trader.log("login", f"Shoonya login failed: {m}", base=m)
             return False, m
 
+    def check_ready(self):
+        """Tell the user (phone + screen) the moment a paper track record earns the right to real money - once.
+        This is the 'good time' signal: proven on live paper trades, not a promise of profit."""
+        regime = (self.trader.signals or {}).get("regime") or "?"
+        for key, name, rec in (("stocks", "Stocks algorithm", self.paper.record()), ("options", "NIFTY options algorithm", self.opt.record())):
+            flag = os.path.join(HOME, f"ready_{key}.flag")
+            if rec.get("passed") and not os.path.exists(flag):
+                open(flag, "w").write(now().isoformat(timespec="seconds"))
+                if key == "stocks":
+                    detail = "; ".join(f"{c['check']}: {c['value']}" for c in rec.get("checks", []))
+                else:
+                    detail = f"{rec.get('closed')} closed trades, profit factor {rec.get('pf')}"
+                msg = (f"{name} passed its paper test ({detail}). Market regime today: {regime}. If you want, you can now switch it to "
+                       "real money in settings.env (CONSENT, STATIC_IP_REGISTERED, MODE=REAL). Start small. Past paper results are not a "
+                       "guarantee - real trading can still lose money.")
+                self.trader.log("ready", "READY FOR REAL MONEY: " + msg)
+                self.notify("16VITAWS: ready for real money", msg)
+            elif not rec.get("passed") and os.path.exists(flag):
+                os.remove(flag)                                           # record fell below the bar: warn again next time it passes
+                self.trader.log("ready", f"{name}: paper record fell below the bar again - stay on paper / reduce real size.")
+                self.notify("16VITAWS: paper record weakened", f"{name} no longer passes its paper test. Consider stopping real trading.")
+
     def notify(self, title, msg):
         try:
             self.req.post(f"https://ntfy.sh/{self.cfg.get('NTFY_TOPIC') or 'vision-ai-16vitaws-k7q2m9x4'}", data=msg.encode(),
@@ -1495,6 +1517,7 @@ class App:
         while True:
             if time.time() - last_portal > 60:
                 self.refresh_portal(); last_portal = time.time()
+                self.check_ready()
             for s, q in self.book.snapshot().items():                     # act on every symbol that ticked since last pass
                 if q.get("recv") != seen.get(s):
                     seen[s] = q.get("recv")
