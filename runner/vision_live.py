@@ -375,7 +375,13 @@ class ShoonyaAuth:
                                "click Update, then click Login to Shoonya again.") from e
         j = r.json() if getattr(r, "content", b"x") else {}
         if "access_token" not in j:
-            raise RuntimeError(f"Shoonya token exchange failed: {j.get('emsg') or j.get('stat') or r.status_code}")
+            why = str(j.get('emsg') or j.get('stat') or r.status_code)
+            if "INVALID_IP" in why.upper():
+                ip = public_ip(self.http)
+                raise RuntimeError("Shoonya says INVALID_IP: your internet address changed. This computer is now "
+                                   f"{ip or 'unknown'}. Put exactly that number in 'Primary IP Address' on Shoonya's "
+                                   "Api Key Generation page, click Update, then click Login to Shoonya again.")
+            raise RuntimeError(f"Shoonya token exchange failed: {why}")
         self.session = {"day": now().date().isoformat(), "access_token": j["access_token"], "uid": j.get("USERID") or uid,
                         "actid": j.get("actid") or uid, "at": now().isoformat(timespec="seconds")}
         os.makedirs(os.path.dirname(self.path), exist_ok=True)
@@ -1059,6 +1065,16 @@ def state_json(app):
             "events": app.trader.events[-60:], "rejected": app.book.rejected, "options": app.opt.state()}
 
 
+class QuietServer(ThreadingHTTPServer):
+    daemon_threads = True
+
+    def handle_error(self, request, client_address):
+        # the browser closing a page or giving up on a slow answer is normal - no scary tracebacks on screen
+        if isinstance(sys.exc_info()[1], (ConnectionError, TimeoutError)):
+            return
+        super().handle_error(request, client_address)
+
+
 PORTAL_ORIGIN = "https://16vitaws.github.io"
 LOCAL_ORIGINS = ("http://127.0.0.1:8765", "http://localhost:8765")
 
@@ -1238,7 +1254,7 @@ class App:
         os.makedirs(HOME, exist_ok=True)
         port = int(self.cfg.get("PORT") or 8765)
         try:
-            srv = ThreadingHTTPServer(("127.0.0.1", port), make_handler(self))
+            srv = QuietServer(("127.0.0.1", port), make_handler(self))
         except OSError:
             print(f"\n  16VITAWS LIVE is already running on this computer (port {port}). Nothing to do - open the 16VITAWS portal.\n", flush=True)
             return
