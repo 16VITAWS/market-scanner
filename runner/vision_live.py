@@ -365,8 +365,14 @@ class ShoonyaAuth:
         if not code:
             raise RuntimeError("no auth code found")
         cid, sec, uid = self.cfg.get("SHOONYA_CLIENT_ID", ""), self.cfg.get("SHOONYA_SECRET", ""), self.cfg.get("SHOONYA_UID", "")
-        r = self.http.post(f"{SH_HOST}/GenAcsTok", timeout=20,
-                           data="jData=" + json.dumps({"code": code, "checksum": sh_checksum(cid, sec, code), "uid": uid}))
+        try:
+            r = self.http.post(f"{SH_HOST}/GenAcsTok", timeout=20,
+                               data="jData=" + json.dumps({"code": code, "checksum": sh_checksum(cid, sec, code), "uid": uid}))
+        except Exception as e:  # noqa - Shoonya drops connections from an IP that is not registered for the API key
+            ip = public_ip(self.http)
+            raise RuntimeError("Shoonya refused the connection. Most likely your internet address changed: this computer is now "
+                               f"{ip or 'unknown'}. Put that number in 'Primary IP Address' on Shoonya's Api Key Generation page, "
+                               "click Update, then click Login to Shoonya again.") from e
         j = r.json() if getattr(r, "content", b"x") else {}
         if "access_token" not in j:
             raise RuntimeError(f"Shoonya token exchange failed: {j.get('emsg') or j.get('stat') or r.status_code}")
@@ -527,6 +533,13 @@ def sh_symbol_tokens(http, watch):
         if ts.endswith("-EQ") and ts[:-3] in want:
             out[ts[:-3]] = (row.get("Token") or "").strip()
     return out
+
+
+def public_ip(http):
+    try:
+        return http.get("https://api.ipify.org", timeout=8).text.strip()
+    except Exception:  # noqa
+        return None
 
 
 def sh_key(tok):
@@ -1224,7 +1237,11 @@ class App:
     def run(self):
         os.makedirs(HOME, exist_ok=True)
         port = int(self.cfg.get("PORT") or 8765)
-        srv = ThreadingHTTPServer(("127.0.0.1", port), make_handler(self))
+        try:
+            srv = ThreadingHTTPServer(("127.0.0.1", port), make_handler(self))
+        except OSError:
+            print(f"\n  16VITAWS LIVE is already running on this computer (port {port}). Nothing to do - open the 16VITAWS portal.\n", flush=True)
+            return
         threading.Thread(target=srv.serve_forever, daemon=True).start()
         print(f"\n  VISION LIVE screen:  http://127.0.0.1:{port}\n", flush=True)
         self.refresh_portal()
