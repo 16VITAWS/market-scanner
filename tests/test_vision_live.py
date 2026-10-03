@@ -512,3 +512,22 @@ def test_delayed_portal_prices_keep_paper_working_and_never_trade_real(VL):
     tr.mode = lambda: "REAL"                                                       # even if REAL were unlocked...
     b2.update("TCS", {"p": 3405.0, "t": 5.0, "src": "portal-delayed"}); tr.on_tick("TCS")
     assert calls == [] and not p2.s["pos"]                                         # ...delayed prices never place real orders
+
+
+def test_ready_for_real_money_alert_fires_once_and_rearms(VL, tmp_path):
+    from types import SimpleNamespace as NS
+    sent, logs = [], []
+    app = VL.App.__new__(VL.App)
+    good = {"passed": True, "checks": [{"check": ">= 30 closed live-paper trades", "value": 31, "ok": True}]}
+    state = {"rec": good}
+    app.paper = NS(record=lambda: state["rec"])
+    app.opt = NS(record=lambda: {"passed": False, "closed": 3, "need": 20, "pf": None})
+    app.trader = NS(signals={"regime": "BULL"}, log=lambda k, m, **kw: logs.append(m))
+    app.notify = lambda t, m: sent.append((t, m))
+    app.check_ready(); app.check_ready()
+    assert len(sent) == 1 and "ready for real money" in sent[0][0] and "BULL" in sent[0][1] and "not a" in sent[0][1]
+    state["rec"] = {"passed": False, "checks": []}
+    app.check_ready()
+    assert "weakened" in sent[-1][0]
+    state["rec"] = good; app.check_ready()
+    assert sum("ready for real money" in t for t, _ in sent) == 2
