@@ -505,6 +505,7 @@ function realMoneyCard(L){const H=L.broker_health||{},O=L.options||{},rb=L.real_
  const stockOn=L.mode==='REAL',optOn=O.mode==='REAL';
  return `<div class="card" style="margin-top:10px;border-color:${stockOn||optOn?'rgba(255,92,122,.6)':'rgba(255,200,80,.35)'}"><h3>💰 Real-money algorithm trading — ${stockOn||optOn?'<span class="tag BEAR">ON</span>':'<span class="tag STALE">LOCKED</span>'}</h3>
   <p class="help">The algorithm can place REAL orders through Shoonya (LIMIT orders only, with daily limits and the STOP button). It unlocks by itself only when every line below is green. Each lock protects your money.</p>
+  <div class="ctl" style="margin:6px 0"><div><b>📲 You get told when it is a good time</b><div class="help">The moment the paper test passes, 16VITAWS LIVE sends a phone message <b>"ready for real money"</b> (and says so here). Free: install the <b>ntfy</b> app on your phone and subscribe to <code>vision-ai-16vitaws-k7q2m9x4</code>. If the record later weakens, you get a warning too.</div></div></div>
   <div class="grid g2"><div><b>Stocks</b><ul class="steps" style="list-style:none;padding-left:0">
    ${ck(login,'Shoonya login works (live prices)','fix the Primary IP on Shoonya, then Login to Shoonya')}
    ${g.map(c=>ck(c.ok,`Paper record: ${esc(c.check)} (now ${esc(c.value??'—')})`,'the paper trades build this automatically - it takes weeks')).join('')}
