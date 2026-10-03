@@ -48,6 +48,65 @@ def _row(df, *names):
     return []
 
 
+def _ups(newest_first):
+    """How many year-on-year increases (and comparisons) in a newest-first list."""
+    xs = [x for x in newest_first if x is not None][::-1]
+    pairs = list(zip(xs, xs[1:]))
+    return sum(1 for a, b in pairs if b > a), len(pairs)
+
+
+def price_trend(df):
+    """Is the chart really going UP steadily? From daily closes (up to 3 years).
+    STEADY UP = 1-year return > 0, price above a RISING 200-day average, and a straight-ish climb
+    (R-squared of a straight line through log prices >= 0.6). SIDEWAYS / DOWN otherwise."""
+    if df is None or len(df) < 260:
+        return None
+    c = df["Close"].astype(float)
+    c = c[c > 0]
+    if len(c) < 260:
+        return None
+    last = float(c.iloc[-1])
+    d200 = c.rolling(200).mean()
+    y = np.log(c.iloc[-252:].values)
+    x = np.arange(len(y))
+    slope, icpt = np.polyfit(x, y, 1)
+    r2 = 1 - float(np.sum((y - (slope * x + icpt)) ** 2) / np.sum((y - y.mean()) ** 2)) if np.sum((y - y.mean()) ** 2) > 0 else 0.0
+    peak = c.iloc[-252:].cummax()
+    t = {"ret_1y": last / float(c.iloc[-252]) - 1,
+         "ret_3y": (last / float(c.iloc[0])) ** (252 / len(c)) - 1 if len(c) >= 700 else None,
+         "above_200dma": bool(last > float(d200.iloc[-1])),
+         "dma200_rising": bool(float(d200.iloc[-1]) > float(d200.iloc[-61])),
+         "trend_r2": round(r2, 3), "max_drawdown_1y": float((c.iloc[-252:] / peak - 1).min())}
+    if t["ret_1y"] > 0 and t["above_200dma"] and t["dma200_rising"] and slope > 0 and r2 >= 0.6:
+        t["trend"] = "STEADY UP"
+    elif t["ret_1y"] < -0.10 and not t["above_200dma"]:
+        t["trend"] = "DOWN"
+    else:
+        t["trend"] = "SIDEWAYS"
+    return {k: (round(v, 4) if isinstance(v, float) else v) for k, v in t.items()}
+
+
+GROWER_RULES = ["revenue grew EVERY year (at least 3 years of data)", "net profit grew EVERY year", "profitable now",
+                "ROE >= 15% (or ROIC >= 15%)", "Piotroski F-score >= 6", "debt under control (net debt <= 2x EBIT, or net cash)",
+                "price chart STEADY UP: above a rising 200-day average, 1-year return > 0, smooth climb (R2 >= 0.6)"]
+
+
+def steady_growers(scored, limit=40):
+    """Companies whose business AND share price have both been rising. Past trend is not a promise of future profit."""
+    out = []
+    for r in scored:
+        t = r.get("price_trend") or {}
+        rows_ok = (r.get("rev_years_compared") or 0) >= 2 and r.get("rev_up_years") == r.get("rev_years_compared")
+        ni_ok = (r.get("ni_years_compared") or 0) >= 2 and r.get("ni_up_years") == r.get("ni_years_compared") and (r.get("ni_hist") or [0])[-1] and r["ni_hist"][-1] > 0
+        q_ok = max(r.get("roe") or 0, r.get("roic") or 0) >= 0.15 and (r.get("fscore") or 0) >= 6
+        debt_ok = r.get("financial") or r.get("net_debt_to_ebit") is None or r["net_debt_to_ebit"] <= 2
+        if rows_ok and ni_ok and q_ok and debt_ok and t.get("trend") == "STEADY UP":
+            g = ((r.get("rev_cagr") or 0) + (r.get("ni_cagr") or 0)) / 2
+            out.append({**r, "grower_score": round(g * 0.6 + (t.get("trend_r2") or 0) * 0.2 + min(t.get("ret_1y") or 0, 1) * 0.2, 4)})
+    out.sort(key=lambda r: -r["grower_score"])
+    return out[:limit]
+
+
 def _v(lst, i=0):
     return lst[i] if len(lst) > i and lst[i] is not None else None
 
@@ -147,6 +206,13 @@ def compute(info, fin, bs, cf, market="IN"):
         m["rev_cagr"] = (rev[0] / rev[n_rev - 1]) ** (1 / (n_rev - 1)) - 1
     else:
         m["rev_cagr"] = None
+    # year-by-year history (oldest -> newest) so growth can be checked EVERY year, not just start vs end
+    m["rev_hist"] = [float(x) if x is not None else None for x in rev[:4]][::-1]        # reported currency units
+    m["ni_hist"] = [float(x) if x is not None else None for x in ni[:4]][::-1]
+    m["rev_up_years"], m["rev_years_compared"] = _ups(rev[:4])
+    m["ni_up_years"], m["ni_years_compared"] = _ups(ni[:4])
+    n_ni = len([x for x in ni[:4] if x is not None])
+    m["ni_cagr"] = ((ni[0] / ni[n_ni - 1]) ** (1 / (n_ni - 1)) - 1) if n_ni >= 2 and _v(ni) and ni[n_ni - 1] and ni[0] > 0 and ni[n_ni - 1] > 0 else None
     margins = [e / r for e, r in zip(ebit, rev) if e is not None and r]
     m["op_margin"] = margins[0] if margins else None
     m["margin_stability"] = float(np.std(margins)) if len(margins) >= 3 else None
@@ -257,13 +323,13 @@ def fetch(yahoo):
 def refresh(universe, cache, max_fetch=150, today=None, stale_days=7):
     """universe: [(id, yahoo, market, name)]. cache: {id: {..., 'fetched': iso}} -> refresh the oldest `max_fetch`."""
     today = today or dt.date.today()
-    order = sorted(universe, key=lambda u: (cache.get(u[0], {}).get("fetched") or "0000"))
+    order = sorted(universe, key=lambda u: ("rev_hist" in cache.get(u[0], {}), cache.get(u[0], {}).get("fetched") or "0000"))
     done, errors = 0, {}
     for uid, yh, mkt, name in order:
         if done >= max_fetch:
             break
         f = cache.get(uid, {}).get("fetched")
-        if f and (today - dt.date.fromisoformat(f[:10])).days < stale_days:
+        if f and (today - dt.date.fromisoformat(f[:10])).days < stale_days and ("rev_hist" in cache.get(uid, {}) or cache[uid].get("error")):
             continue
         try:
             info, fin, bs, cf = fetch(yh)
@@ -277,7 +343,7 @@ def refresh(universe, cache, max_fetch=150, today=None, stale_days=7):
     return cache, {"fetched_this_run": done, "errors": len(errors), "error_sample": dict(list(errors.items())[:5])}
 
 
-def build(cache, prices=None):
+def build(cache, prices=None, frames=None):
     """Score everything cached; refresh price-dependent fields with today's prices (margin of safety, returns)."""
     rows = []
     for uid, m in cache.items():
@@ -294,6 +360,8 @@ def build(cache, prices=None):
                                for k in ("bear", "base", "bull")}
         elif p:
             m["price"] = p
+        if frames is not None and uid in frames:
+            m["price_trend"] = price_trend(frames[uid])
         rows.append(m)
     scored = score(rows)
     for r in scored:

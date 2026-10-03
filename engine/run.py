@@ -352,7 +352,7 @@ def job_eod(site, offline=False, universe_limit=None, fetch_news=True, weekend=F
             vcache, vrep = VAL.refresh(univ, vcache, max_fetch=400 if weekend else 150)
             json.dump(vcache, open(vc_path, "w"), default=str)
         prices = {k: float(v["Close"].iloc[-1]) for k, v in clean.items()}
-        vscored, vrecs = VAL.build(vcache, prices)
+        vscored, vrecs = VAL.build(vcache, prices, clean)
         vacts = {}
         if C.PAPER_ON and data_status == "OK":
             mk = L.state.setdefault("value_rebalanced", {})
@@ -370,6 +370,7 @@ def job_eod(site, offline=False, universe_limit=None, fetch_news=True, weekend=F
         n_cov = {m_: sum(1 for r in vscored if r.get("market") == m_) for m_ in ("IN", "US")}
         api.write(site.path, "value.json", {"as_of": str(bar_date), "coverage": n_cov, "universe_cached": len(vcache), "refresh": vrep,
                                             "recommendations": vrecs, "stocks": vscored, "actions": vacts,
+                                            "growers": [g["id"] for g in VAL.steady_growers(vscored)], "grower_rules": VAL.GROWER_RULES,
                                             "method": VAL.__doc__.strip(), "status": "DELAYED fundamentals (annual statements) + today's close",
                                             "honesty": "Point-in-time fundamentals are not available free, so this scanner has NOT been backtested. "
                                                        "Its live record starts with the IN-VALUE / US-VALUE paper accounts. Conviction is a model score, not a probability."})
