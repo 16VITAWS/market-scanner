@@ -490,3 +490,25 @@ def test_diagnose_report_never_prints_secrets(VL, tmp_path, monkeypatch):
     VL.diagnose({"SHOONYA_UID": "FN0001", "SHOONYA_CLIENT_ID": "FN0001_U", "SHOONYA_SECRET": "TOPSECRETVALUE123", "SHOONYA_REGISTERED_IP": "27.61.41.198"}, h, lines.append)
     txt = "\n".join(lines)
     assert "TOPSECRETVALUE123" not in txt and "27.61.43.198" in txt and "MISMATCH" in txt
+
+
+def test_delayed_portal_prices_keep_paper_working_and_never_trade_real(VL):
+    class H:
+        def __init__(self, j): self.j = j
+        def get(self, url, timeout=None):
+            r = _Resp(self.j); return r
+    t, book, paper, _ = _trader(VL)
+    f = VL.PortalDelayedFeed(H({"quotes": {"TCS": {"p": 3405.0, "pc": 3390.0, "t": "2026-10-01T04:50:00+00:00"}}}), book, lambda: ["TCS"], lambda: True)
+    assert f.pull() == 1 and book.get("TCS")["src"] == "portal-delayed"
+    assert f.pull() == 0                                                           # same quote again: nothing new
+    t.on_tick("TCS")
+    assert paper.s["pos"]["TCS"]["qty"] == 7                                       # PAPER still trades, on delayed prices
+    calls = []
+    class Trap:
+        def place_limit(self, *a, **k): calls.append(a)
+        place_order = place_limit
+    os.remove(VL.PAPER_FILE)                                                       # fresh paper book for the REAL check
+    tr, b2, p2, _ = _trader(VL, {"MODE": "REAL", "CONSENT": VL.CONSENT_PHRASE, "STATIC_IP_REGISTERED": "yes"}); tr.feed = Trap()
+    tr.mode = lambda: "REAL"                                                       # even if REAL were unlocked...
+    b2.update("TCS", {"p": 3405.0, "t": 5.0, "src": "portal-delayed"}); tr.on_tick("TCS")
+    assert calls == [] and not p2.s["pos"]                                         # ...delayed prices never place real orders
