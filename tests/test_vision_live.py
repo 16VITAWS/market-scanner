@@ -371,3 +371,14 @@ def test_shoonya_feed_streams_option_legs(VL, monkeypatch, tmp_path):
     assert sent[1] == {"t": "t", "k": "NSE|26000#NFO|43210"}
     q = book.get("OPT NIFTY 06OCT26 22400 PE")
     assert q["p"] == 131.25 and q["bid"] == 131.2 and q["ask"] == 131.3
+
+
+def test_login_failure_names_the_new_ip(VL, tmp_path):
+    class H:
+        def post(self, *a, **k): raise OSError("SSL: UNEXPECTED_EOF_WHILE_READING")
+        def get(self, url, timeout=None):
+            r = _Resp(None); r.text = "27.61.41.198"; return r
+    a = VL.ShoonyaAuth({"SHOONYA_CLIENT_ID": "C", "SHOONYA_SECRET": "S", "SHOONYA_UID": "U"}, H(), path=str(tmp_path / "s.json"))
+    with pytest.raises(RuntimeError) as e:
+        a.exchange("http://127.0.0.1:8765/shoonya/callback?code=ABC")
+    assert "27.61.41.198" in str(e.value) and "Primary IP Address" in str(e.value)
