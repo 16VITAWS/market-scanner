@@ -1,0 +1,1009 @@
+{
+ "version": 2,
+ "created": "2026-09-27T20:47:31+05:30",
+ "accounts": {
+  "IN-SWING": {
+   "id": "IN-SWING",
+   "name": "India swing (auto)",
+   "currency": "INR",
+   "start_cash": "200000",
+   "cash": "200000",
+   "created": "2026-09-27T20:47:31+05:30",
+   "strategies": [
+    "trend_breakout_swing"
+   ],
+   "positions": {},
+   "equity": [
+    {
+     "date": "2026-09-25",
+     "value": "200000.00",
+     "cash": "200000.00"
+    },
+    {
+     "date": "2026-09-28",
+     "value": "200000.00",
+     "cash": "200000.00"
+    },
+    {
+     "date": "2026-09-25",
+     "value": "200000.00",
+     "cash": "200000.00"
+    },
+    {
+     "date": "2026-09-28",
+     "value": "200000.00",
+     "cash": "200000.00"
+    },
+    {
+     "date": "2026-09-29",
+     "value": "200000.00",
+     "cash": "200000.00"
+    },
+    {
+     "date": "2026-09-30",
+     "value": "200000.00",
+     "cash": "200000.00"
+    }
+   ],
+   "peak": "200000",
+   "status": "ACTIVE",
+   "realized_pnl": "0",
+   "fees_paid": "0"
+  },
+  "IN-MANUAL": {
+   "id": "IN-MANUAL",
+   "name": "India manual practice",
+   "currency": "INR",
+   "start_cash": "200000",
+   "cash": "200000",
+   "created": "2026-09-27T20:47:31+05:30",
+   "strategies": [],
+   "positions": {},
+   "equity": [
+    {
+     "date": "2026-09-25",
+     "value": "200000.00",
+     "cash": "200000.00"
+    },
+    {
+     "date": "2026-09-28",
+     "value": "200000.00",
+     "cash": "200000.00"
+    },
+    {
+     "date": "2026-09-25",
+     "value": "200000.00",
+     "cash": "200000.00"
+    },
+    {
+     "date": "2026-09-29",
+     "value": "200000.00",
+     "cash": "200000.00"
+    },
+    {
+     "date": "2026-09-30",
+     "value": "200000.00",
+     "cash": "200000.00"
+    }
+   ],
+   "peak": "200000",
+   "status": "ACTIVE",
+   "realized_pnl": "0",
+   "fees_paid": "0"
+  },
+  "US-MANUAL": {
+   "id": "US-MANUAL",
+   "name": "US manual practice",
+   "currency": "USD",
+   "start_cash": "10000",
+   "cash": "10000",
+   "created": "2026-09-27T20:47:31+05:30",
+   "strategies": [],
+   "positions": {},
+   "equity": [
+    {
+     "date": "2026-09-25",
+     "value": "10000.00",
+     "cash": "10000.00"
+    },
+    {
+     "date": "2026-09-28",
+     "value": "10000.00",
+     "cash": "10000.00"
+    },
+    {
+     "date": "2026-09-25",
+     "value": "10000.00",
+     "cash": "10000.00"
+    },
+    {
+     "date": "2026-09-29",
+     "value": "10000.00",
+     "cash": "10000.00"
+    },
+    {
+     "date": "2026-09-30",
+     "value": "10000.00",
+     "cash": "10000.00"
+    }
+   ],
+   "peak": "10000",
+   "status": "ACTIVE",
+   "realized_pnl": "0",
+   "fees_paid": "0"
+  },
+  "US-SWING": {
+   "id": "US-SWING",
+   "name": "US swing (auto)",
+   "currency": "USD",
+   "start_cash": "10000",
+   "cash": "10000",
+   "created": "2026-09-28T23:14:01+05:30",
+   "strategies": [
+    "trend_breakout_swing_us"
+   ],
+   "positions": {},
+   "equity": [
+    {
+     "date": "2026-09-28",
+     "value": "10000.00",
+     "cash": "10000.00"
+    },
+    {
+     "date": "2026-09-29",
+     "value": "10000.00",
+     "cash": "10000.00"
+    },
+    {
+     "date": "2026-09-28",
+     "value": "10000.00",
+     "cash": "10000.00"
+    },
+    {
+     "date": "2026-09-29",
+     "value": "10000.00",
+     "cash": "10000.00"
+    },
+    {
+     "date": "2026-09-30",
+     "value": "10000.00",
+     "cash": "10000.00"
+    },
+    {
+     "date": "2026-09-29",
+     "value": "10000.00",
+     "cash": "10000.00"
+    }
+   ],
+   "peak": "10000",
+   "status": "ACTIVE",
+   "realized_pnl": "0",
+   "fees_paid": "0"
+  },
+  "IN-OPTIONS": {
+   "id": "IN-OPTIONS",
+   "name": "India index options (auto, modeled prices)",
+   "currency": "INR",
+   "start_cash": "200000",
+   "cash": "189516.83",
+   "created": "2026-09-28T23:14:01+05:30",
+   "strategies": [
+    "index_options_regime"
+   ],
+   "positions": {
+    "NIFTY 06OCT26 22800/22600 PE DEBIT SPREAD": {
+     "symbol": "NIFTY 06OCT26 22800/22600 PE DEBIT SPREAD",
+     "qty": "65",
+     "avg_price": "81.42",
+     "fees": "55.08",
+     "opened": "2026-09-28",
+     "bars_held": 0,
+     "stop": null,
+     "target": null,
+     "strategy": "index_options_regime",
+     "reason": "Regime BEAR; Close 22,780 < SMA50 23,963; RSI 28 < 45",
+     "sector": null,
+     "segment": "options",
+     "high_water": "114.15",
+     "last": "111.65",
+     "spread": {
+      "underlying": "NIFTY",
+      "kind": "P",
+      "expiry": "2026-10-06",
+      "k_long": 22800,
+      "k_short": 22600,
+      "width": 200,
+      "lot": 65
+     },
+     "max_loss": "5402.46",
+     "max_profit": "7597.54"
+    },
+    "NIFTY 06OCT26 22700/22500 PE DEBIT SPREAD": {
+     "symbol": "NIFTY 06OCT26 22700/22500 PE DEBIT SPREAD",
+     "qty": "65",
+     "avg_price": "78.18",
+     "fees": "54.09",
+     "opened": "2026-09-29",
+     "bars_held": 0,
+     "stop": null,
+     "target": null,
+     "strategy": "index_options_regime",
+     "reason": "Regime BEAR; Close 22,693 < SMA50 23,932; RSI 26 < 45",
+     "sector": null,
+     "segment": "options",
+     "high_water": "94.39",
+     "last": "91.58",
+     "spread": {
+      "underlying": "NIFTY",
+      "kind": "P",
+      "expiry": "2026-10-06",
+      "k_long": 22700,
+      "k_short": 22500,
+      "width": 200,
+      "lot": 65
+     },
+     "max_loss": "5189.88",
+     "max_profit": "7810.12"
+    }
+   },
+   "equity": [
+    {
+     "date": "2026-09-28",
+     "value": "199944.92",
+     "cash": "194652.62"
+    },
+    {
+     "date": "2026-09-29",
+     "value": "200323.08",
+     "cash": "189516.83"
+    },
+    {
+     "date": "2026-09-30",
+     "value": "202726.78",
+     "cash": "189516.83"
+    }
+   ],
+   "peak": "203071.93",
+   "status": "ACTIVE",
+   "realized_pnl": "0",
+   "fees_paid": "109.17"
+  },
+  "IN-VALUE": {
+   "id": "IN-VALUE",
+   "name": "India long-term value (auto, monthly)",
+   "currency": "INR",
+   "start_cash": "500000",
+   "cash": "464531.71",
+   "created": "2026-09-29T21:09:44+05:30",
+   "strategies": [
+    "value_longterm"
+   ],
+   "positions": {
+    "BBTC": {
+     "symbol": "BBTC",
+     "qty": "7",
+     "avg_price": "1366.53",
+     "fees": "16.99",
+     "opened": "2026-09-30",
+     "bars_held": 0,
+     "stop": "1016.25",
+     "target": null,
+     "strategy": "value_longterm",
+     "reason": "value BUY: conviction 0.78, base 5y return 32.6%/yr",
+     "sector": "Consumer Defensive",
+     "segment": "delivery",
+     "high_water": "1378.8",
+     "last": "1354.6"
+    },
+    "BLS": {
+     "symbol": "BLS",
+     "qty": "50",
+     "avg_price": "220.04",
+     "fees": "19.54",
+     "opened": "2026-09-30",
+     "bars_held": 1,
+     "stop": "164.66",
+     "target": null,
+     "strategy": "value_longterm",
+     "reason": "value BUY: conviction 0.687, base 5y return 16.4%/yr",
+     "sector": "Industrials",
+     "segment": "delivery",
+     "high_water": "223.92999267578125",
+     "last": "218.25999450683594"
+    },
+    "BPCL": {
+     "symbol": "BPCL",
+     "qty": "49",
+     "avg_price": "302.81",
+     "fees": "26.36",
+     "opened": "2026-09-30",
+     "bars_held": 1,
+     "stop": "224.51",
+     "target": null,
+     "strategy": "value_longterm",
+     "reason": "value BUY: conviction 0.841, base 5y return 20.2%/yr",
+     "sector": "Energy",
+     "segment": "delivery",
+     "high_water": "308.25",
+     "last": "303.20001220703125"
+    }
+   },
+   "equity": [
+    {
+     "date": "2026-09-29",
+     "value": "500000.00",
+     "cash": "500000.00"
+    },
+    {
+     "date": "2026-09-30",
+     "value": "499783.71",
+     "cash": "464531.71"
+    }
+   ],
+   "peak": "500426.56",
+   "status": "ACTIVE",
+   "realized_pnl": "0",
+   "fees_paid": "62.89"
+  },
+  "US-VALUE": {
+   "id": "US-VALUE",
+   "name": "US long-term value (auto, monthly)",
+   "currency": "USD",
+   "start_cash": "20000",
+   "cash": "20000",
+   "created": "2026-09-29T21:09:44+05:30",
+   "strategies": [
+    "value_longterm"
+   ],
+   "positions": {},
+   "equity": [
+    {
+     "date": "2026-09-29",
+     "value": "20000.00",
+     "cash": "20000.00"
+    },
+    {
+     "date": "2026-09-30",
+     "value": "20000.00",
+     "cash": "20000.00"
+    }
+   ],
+   "peak": "20000",
+   "status": "ACTIVE",
+   "realized_pnl": "0",
+   "fees_paid": "0"
+  }
+ },
+ "orders": [
+  {
+   "id": "O0000006-48fde5",
+   "account": "IN-OPTIONS",
+   "symbol": "NIFTY 06OCT26 22800/22600 PE DEBIT SPREAD",
+   "side": "buy",
+   "qty": "65",
+   "filled_qty": "65",
+   "type": "MARKET",
+   "limit": null,
+   "stop_px": null,
+   "status": "FILLED",
+   "created_at": "2026-09-28T23:31:41+05:30",
+   "decided_on_bar": "None",
+   "strategy": "index_options_regime",
+   "signal_id": null,
+   "reason": "Regime BEAR; Close 22,780 < SMA50 23,963; RSI 28 < 45",
+   "stop": null,
+   "target": null,
+   "dedupe_key": "IN-OPTIONS|NIFTY 06OCT26 22800/22600 PE DEBIT SPREAD|2026-09-28",
+   "risk": null,
+   "segment": "options",
+   "currency": "INR",
+   "sector": null,
+   "expires_after_bars": 3,
+   "bars_waited": 0,
+   "fills": [
+    "F0000007"
+   ],
+   "meta": {
+    "spread": {
+     "action": "BUY",
+     "name": "NIFTY 06OCT26 22800/22600 PE DEBIT SPREAD",
+     "underlying": "NIFTY",
+     "kind": "P",
+     "expiry": "2026-10-06",
+     "dte": 8,
+     "k_long": 22800,
+     "k_short": 22600,
+     "width": 200,
+     "debit": 81.42,
+     "long_px": 177.15,
+     "short_px": 95.73,
+     "max_profit": 118.58,
+     "max_loss": 81.42,
+     "lot": 65,
+     "spot": 22780.25,
+     "sigma": 0.13637499809265136,
+     "sigma_source": "India VIX 13.64 (2026-09-28)",
+     "breakeven": 22718.58,
+     "why": [
+      "Regime BEAR",
+      "Close 22,780 < SMA50 23,963",
+      "RSI 28 < 45"
+     ],
+     "pricing": "MODELED (Black-Scholes)"
+    }
+   },
+   "closed_at": "2026-09-28T23:31:41+05:30"
+  },
+  {
+   "id": "O0000008-a25f55",
+   "account": "IN-OPTIONS",
+   "symbol": "NIFTY 06OCT26 22700/22500 PE DEBIT SPREAD",
+   "side": "buy",
+   "qty": "65",
+   "filled_qty": "65",
+   "type": "MARKET",
+   "limit": null,
+   "stop_px": null,
+   "status": "FILLED",
+   "created_at": "2026-09-29T15:13:41+05:30",
+   "decided_on_bar": "None",
+   "strategy": "index_options_regime",
+   "signal_id": null,
+   "reason": "Regime BEAR; Close 22,693 < SMA50 23,932; RSI 26 < 45",
+   "stop": null,
+   "target": null,
+   "dedupe_key": "IN-OPTIONS|NIFTY 06OCT26 22700/22500 PE DEBIT SPREAD|2026-09-29",
+   "risk": null,
+   "segment": "options",
+   "currency": "INR",
+   "sector": null,
+   "expires_after_bars": 3,
+   "bars_waited": 0,
+   "fills": [
+    "F0000009"
+   ],
+   "meta": {
+    "spread": {
+     "action": "BUY",
+     "name": "NIFTY 06OCT26 22700/22500 PE DEBIT SPREAD",
+     "underlying": "NIFTY",
+     "kind": "P",
+     "expiry": "2026-10-06",
+     "dte": 7,
+     "k_long": 22700,
+     "k_short": 22500,
+     "width": 200,
+     "debit": 78.18,
+     "long_px": 158.28,
+     "short_px": 80.11,
+     "max_profit": 121.82,
+     "max_loss": 78.18,
+     "lot": 65,
+     "spot": 22693.25,
+     "sigma": 0.1347249984741211,
+     "sigma_source": "India VIX 13.47 (2026-09-29)",
+     "breakeven": 22621.82,
+     "why": [
+      "Regime BEAR",
+      "Close 22,693 < SMA50 23,932",
+      "RSI 26 < 45"
+     ],
+     "pricing": "MODELED (Black-Scholes)"
+    }
+   },
+   "closed_at": "2026-09-29T15:13:41+05:30"
+  },
+  {
+   "id": "O0000012-50f57f",
+   "account": "IN-VALUE",
+   "symbol": "BLS",
+   "side": "buy",
+   "qty": "50",
+   "filled_qty": "50",
+   "type": "MARKET",
+   "limit": null,
+   "stop_px": null,
+   "status": "FILLED",
+   "created_at": "2026-09-29T21:36:37+05:30",
+   "decided_on_bar": "2026-09-29",
+   "strategy": "value_longterm",
+   "signal_id": null,
+   "reason": "value BUY: conviction 0.687, base 5y return 16.4%/yr",
+   "stop": "164.66",
+   "target": null,
+   "dedupe_key": "IN-VALUE|BLS|buy|2026-09-29|value_longterm",
+   "risk": null,
+   "segment": "delivery",
+   "currency": "INR",
+   "sector": "Industrials",
+   "expires_after_bars": 5,
+   "bars_waited": 0,
+   "fills": [
+    "F0000016"
+   ],
+   "meta": {
+    "weight": 0.0223,
+    "conviction": 0.687
+   },
+   "closed_at": "2026-09-30T09:21:24+05:30"
+  },
+  {
+   "id": "O0000013-53d89e",
+   "account": "IN-VALUE",
+   "symbol": "BBTC",
+   "side": "buy",
+   "qty": "7",
+   "filled_qty": "7",
+   "type": "MARKET",
+   "limit": null,
+   "stop_px": null,
+   "status": "FILLED",
+   "created_at": "2026-09-29T21:36:37+05:30",
+   "decided_on_bar": "2026-09-29",
+   "strategy": "value_longterm",
+   "signal_id": null,
+   "reason": "value BUY: conviction 0.78, base 5y return 32.6%/yr",
+   "stop": "1016.25",
+   "target": null,
+   "dedupe_key": "IN-VALUE|BBTC|buy|2026-09-29|value_longterm",
+   "risk": null,
+   "segment": "delivery",
+   "currency": "INR",
+   "sector": "Consumer Defensive",
+   "expires_after_bars": 5,
+   "bars_waited": 0,
+   "fills": [
+    "F0000015"
+   ],
+   "meta": {
+    "weight": 0.0212,
+    "conviction": 0.78
+   },
+   "closed_at": "2026-09-30T09:21:24+05:30"
+  },
+  {
+   "id": "O0000014-b6e083",
+   "account": "IN-VALUE",
+   "symbol": "BPCL",
+   "side": "buy",
+   "qty": "49",
+   "filled_qty": "49",
+   "type": "MARKET",
+   "limit": null,
+   "stop_px": null,
+   "status": "FILLED",
+   "created_at": "2026-09-29T21:36:37+05:30",
+   "decided_on_bar": "2026-09-29",
+   "strategy": "value_longterm",
+   "signal_id": null,
+   "reason": "value BUY: conviction 0.841, base 5y return 20.2%/yr",
+   "stop": "224.51",
+   "target": null,
+   "dedupe_key": "IN-VALUE|BPCL|buy|2026-09-29|value_longterm",
+   "risk": null,
+   "segment": "delivery",
+   "currency": "INR",
+   "sector": "Energy",
+   "expires_after_bars": 5,
+   "bars_waited": 0,
+   "fills": [
+    "F0000017"
+   ],
+   "meta": {
+    "weight": 0.0295,
+    "conviction": 0.841
+   },
+   "closed_at": "2026-09-30T09:21:24+05:30"
+  }
+ ],
+ "fills": [
+  {
+   "id": "F0000007",
+   "order": "O0000006-48fde5",
+   "account": "IN-OPTIONS",
+   "symbol": "NIFTY 06OCT26 22800/22600 PE DEBIT SPREAD",
+   "side": "buy",
+   "qty": "65",
+   "price": "81.42",
+   "value": "5292.30",
+   "fees": "55.08",
+   "fee_breakdown": {
+    "total": "55.08",
+    "method": "override (multi-leg / modeled)"
+   },
+   "bar": "2026-09-28",
+   "time": "2026-09-28T23:31:41+05:30",
+   "rule": "modeled_bs_close",
+   "note": "MODELED debit at today's close (no option quote feed)"
+  },
+  {
+   "id": "F0000009",
+   "order": "O0000008-a25f55",
+   "account": "IN-OPTIONS",
+   "symbol": "NIFTY 06OCT26 22700/22500 PE DEBIT SPREAD",
+   "side": "buy",
+   "qty": "65",
+   "price": "78.18",
+   "value": "5081.70",
+   "fees": "54.09",
+   "fee_breakdown": {
+    "total": "54.09",
+    "method": "override (multi-leg / modeled)"
+   },
+   "bar": "2026-09-29",
+   "time": "2026-09-29T15:13:41+05:30",
+   "rule": "modeled_bs_close",
+   "note": "MODELED debit at today's close (no option quote feed)"
+  },
+  {
+   "id": "F0000015",
+   "order": "O0000013-53d89e",
+   "account": "IN-VALUE",
+   "symbol": "BBTC",
+   "side": "buy",
+   "qty": "7",
+   "price": "1366.53",
+   "value": "9565.71",
+   "fees": "16.99",
+   "fee_breakdown": {
+    "brokerage": "4.78",
+    "stt": "9.57",
+    "stamp": "1.43",
+    "exchange": "0.28",
+    "sebi": "0.01",
+    "dp": "0.00",
+    "gst": "0.91",
+    "total": "16.99",
+    "broker": "groww",
+    "segment": "delivery"
+   },
+   "bar": "2026-09-30",
+   "time": "2026-09-30T09:21:24+05:30",
+   "rule": "next_bar_open",
+   "note": "[filled live during the session]"
+  },
+  {
+   "id": "F0000016",
+   "order": "O0000012-50f57f",
+   "account": "IN-VALUE",
+   "symbol": "BLS",
+   "side": "buy",
+   "qty": "50",
+   "price": "220.04",
+   "value": "11002.00",
+   "fees": "19.54",
+   "fee_breakdown": {
+    "brokerage": "5.50",
+    "stt": "11.00",
+    "stamp": "1.65",
+    "exchange": "0.33",
+    "sebi": "0.01",
+    "dp": "0.00",
+    "gst": "1.05",
+    "total": "19.54",
+    "broker": "groww",
+    "segment": "delivery"
+   },
+   "bar": "2026-09-30",
+   "time": "2026-09-30T09:21:24+05:30",
+   "rule": "next_bar_open",
+   "note": "[filled live during the session]"
+  },
+  {
+   "id": "F0000017",
+   "order": "O0000014-b6e083",
+   "account": "IN-VALUE",
+   "symbol": "BPCL",
+   "side": "buy",
+   "qty": "49",
+   "price": "302.81",
+   "value": "14837.69",
+   "fees": "26.36",
+   "fee_breakdown": {
+    "brokerage": "7.42",
+    "stt": "14.84",
+    "stamp": "2.23",
+    "exchange": "0.44",
+    "sebi": "0.01",
+    "dp": "0.00",
+    "gst": "1.42",
+    "total": "26.36",
+    "broker": "groww",
+    "segment": "delivery"
+   },
+   "bar": "2026-09-30",
+   "time": "2026-09-30T09:21:24+05:30",
+   "rule": "next_bar_open",
+   "note": "[filled live during the session]"
+  }
+ ],
+ "cash_ledger": [
+  {
+   "time": "2026-09-27T20:47:31+05:30",
+   "account": "IN-SWING",
+   "type": "DEPOSIT",
+   "amount": "200000.00",
+   "balance_after": "200000.00",
+   "ref": "opening balance"
+  },
+  {
+   "time": "2026-09-27T20:47:31+05:30",
+   "account": "IN-MANUAL",
+   "type": "DEPOSIT",
+   "amount": "200000.00",
+   "balance_after": "200000.00",
+   "ref": "opening balance"
+  },
+  {
+   "time": "2026-09-27T20:47:31+05:30",
+   "account": "US-MANUAL",
+   "type": "DEPOSIT",
+   "amount": "10000.00",
+   "balance_after": "10000.00",
+   "ref": "opening balance"
+  },
+  {
+   "time": "2026-09-28T23:14:01+05:30",
+   "account": "US-SWING",
+   "type": "DEPOSIT",
+   "amount": "10000.00",
+   "balance_after": "10000.00",
+   "ref": "opening balance"
+  },
+  {
+   "time": "2026-09-28T23:14:01+05:30",
+   "account": "IN-OPTIONS",
+   "type": "DEPOSIT",
+   "amount": "200000.00",
+   "balance_after": "200000.00",
+   "ref": "opening balance"
+  },
+  {
+   "time": "2026-09-28T23:31:41+05:30",
+   "account": "IN-OPTIONS",
+   "type": "BUY",
+   "amount": "-5347.38",
+   "balance_after": "194652.62",
+   "ref": "O0000006-48fde5"
+  },
+  {
+   "time": "2026-09-29T15:13:41+05:30",
+   "account": "IN-OPTIONS",
+   "type": "BUY",
+   "amount": "-5135.79",
+   "balance_after": "189516.83",
+   "ref": "O0000008-a25f55"
+  },
+  {
+   "time": "2026-09-29T21:09:44+05:30",
+   "account": "IN-VALUE",
+   "type": "DEPOSIT",
+   "amount": "500000.00",
+   "balance_after": "500000.00",
+   "ref": "opening balance"
+  },
+  {
+   "time": "2026-09-29T21:09:44+05:30",
+   "account": "US-VALUE",
+   "type": "DEPOSIT",
+   "amount": "20000.00",
+   "balance_after": "20000.00",
+   "ref": "opening balance"
+  },
+  {
+   "time": "2026-09-30T09:21:24+05:30",
+   "account": "IN-VALUE",
+   "type": "BUY",
+   "amount": "-9582.70",
+   "balance_after": "490417.30",
+   "ref": "O0000013-53d89e"
+  },
+  {
+   "time": "2026-09-30T09:21:24+05:30",
+   "account": "IN-VALUE",
+   "type": "BUY",
+   "amount": "-11021.54",
+   "balance_after": "479395.76",
+   "ref": "O0000012-50f57f"
+  },
+  {
+   "time": "2026-09-30T09:21:24+05:30",
+   "account": "IN-VALUE",
+   "type": "BUY",
+   "amount": "-14864.05",
+   "balance_after": "464531.71",
+   "ref": "O0000014-b6e083"
+  }
+ ],
+ "trades": [],
+ "audit": [
+  {
+   "seq": 1,
+   "time": "2026-09-27T20:47:31+05:30",
+   "kind": "account_created",
+   "account": "IN-SWING",
+   "cash": "200000",
+   "currency": "INR"
+  },
+  {
+   "seq": 2,
+   "time": "2026-09-27T20:47:31+05:30",
+   "kind": "account_created",
+   "account": "IN-MANUAL",
+   "cash": "200000",
+   "currency": "INR"
+  },
+  {
+   "seq": 3,
+   "time": "2026-09-27T20:47:31+05:30",
+   "kind": "account_created",
+   "account": "US-MANUAL",
+   "cash": "10000",
+   "currency": "USD"
+  },
+  {
+   "seq": 4,
+   "time": "2026-09-28T23:14:01+05:30",
+   "kind": "account_created",
+   "account": "US-SWING",
+   "cash": "10000",
+   "currency": "USD"
+  },
+  {
+   "seq": 5,
+   "time": "2026-09-28T23:14:01+05:30",
+   "kind": "account_created",
+   "account": "IN-OPTIONS",
+   "cash": "200000",
+   "currency": "INR"
+  },
+  {
+   "seq": 6,
+   "time": "2026-09-28T23:31:41+05:30",
+   "kind": "order_submitted",
+   "order": "O0000006-48fde5",
+   "account": "IN-OPTIONS",
+   "symbol": "NIFTY 06OCT26 22800/22600 PE DEBIT SPREAD",
+   "side": "buy",
+   "qty": "65",
+   "type": "MARKET",
+   "strategy": "index_options_regime"
+  },
+  {
+   "seq": 7,
+   "time": "2026-09-28T23:31:41+05:30",
+   "kind": "fill",
+   "order": "O0000006-48fde5",
+   "fill": "F0000007",
+   "symbol": "NIFTY 06OCT26 22800/22600 PE DEBIT SPREAD",
+   "side": "buy",
+   "qty": "65",
+   "price": "81.42",
+   "fees": "55.08"
+  },
+  {
+   "seq": 8,
+   "time": "2026-09-29T15:13:41+05:30",
+   "kind": "order_submitted",
+   "order": "O0000008-a25f55",
+   "account": "IN-OPTIONS",
+   "symbol": "NIFTY 06OCT26 22700/22500 PE DEBIT SPREAD",
+   "side": "buy",
+   "qty": "65",
+   "type": "MARKET",
+   "strategy": "index_options_regime"
+  },
+  {
+   "seq": 9,
+   "time": "2026-09-29T15:13:41+05:30",
+   "kind": "fill",
+   "order": "O0000008-a25f55",
+   "fill": "F0000009",
+   "symbol": "NIFTY 06OCT26 22700/22500 PE DEBIT SPREAD",
+   "side": "buy",
+   "qty": "65",
+   "price": "78.18",
+   "fees": "54.09"
+  },
+  {
+   "seq": 10,
+   "time": "2026-09-29T21:09:44+05:30",
+   "kind": "account_created",
+   "account": "IN-VALUE",
+   "cash": "500000",
+   "currency": "INR"
+  },
+  {
+   "seq": 11,
+   "time": "2026-09-29T21:09:44+05:30",
+   "kind": "account_created",
+   "account": "US-VALUE",
+   "cash": "20000",
+   "currency": "USD"
+  },
+  {
+   "seq": 12,
+   "time": "2026-09-29T21:36:37+05:30",
+   "kind": "order_submitted",
+   "order": "O0000012-50f57f",
+   "account": "IN-VALUE",
+   "symbol": "BLS",
+   "side": "buy",
+   "qty": "50",
+   "type": "MARKET",
+   "strategy": "value_longterm"
+  },
+  {
+   "seq": 13,
+   "time": "2026-09-29T21:36:37+05:30",
+   "kind": "order_submitted",
+   "order": "O0000013-53d89e",
+   "account": "IN-VALUE",
+   "symbol": "BBTC",
+   "side": "buy",
+   "qty": "7",
+   "type": "MARKET",
+   "strategy": "value_longterm"
+  },
+  {
+   "seq": 14,
+   "time": "2026-09-29T21:36:37+05:30",
+   "kind": "order_submitted",
+   "order": "O0000014-b6e083",
+   "account": "IN-VALUE",
+   "symbol": "BPCL",
+   "side": "buy",
+   "qty": "49",
+   "type": "MARKET",
+   "strategy": "value_longterm"
+  },
+  {
+   "seq": 15,
+   "time": "2026-09-30T09:21:24+05:30",
+   "kind": "fill",
+   "order": "O0000013-53d89e",
+   "fill": "F0000015",
+   "symbol": "BBTC",
+   "side": "buy",
+   "qty": "7",
+   "price": "1366.53",
+   "fees": "16.99"
+  },
+  {
+   "seq": 16,
+   "time": "2026-09-30T09:21:24+05:30",
+   "kind": "fill",
+   "order": "O0000012-50f57f",
+   "fill": "F0000016",
+   "symbol": "BLS",
+   "side": "buy",
+   "qty": "50",
+   "price": "220.04",
+   "fees": "19.54"
+  },
+  {
+   "seq": 17,
+   "time": "2026-09-30T09:21:24+05:30",
+   "kind": "fill",
+   "order": "O0000014-b6e083",
+   "fill": "F0000017",
+   "symbol": "BPCL",
+   "side": "buy",
+   "qty": "49",
+   "price": "302.81",
+   "fees": "26.36"
+  }
+ ],
+ "seq": 17,
+ "migrations": [
+  {
+   "at": "2026-09-27T20:47:31+05:30",
+   "from": "v1 (market-scanner main, portfolio.json absent; paper_log.csv empty)",
+   "note": "v1 auto paper account had cash 2,00,000 and 0 positions on 2026-09-25; IN-SWING starts from the same state."
+  }
+ ],
+ "value_rebalanced": {
+  "IN-VALUE": "2026-09",
+  "US-VALUE": "2026-09"
+ }
+}
