@@ -402,3 +402,91 @@ def test_browser_abort_is_silent(VL, capsys):
     except ConnectionAbortedError:
         srv.handle_error(None, ("127.0.0.1", 1))
     assert "Traceback" not in capsys.readouterr().err
+
+
+class _IPHttp:
+    def __init__(self, answers): self.answers, self.asked = answers, []
+    def get(self, url, timeout=None, **k):
+        self.asked.append(url); a = self.answers.get(url, OSError("down"))
+        if isinstance(a, Exception): raise a
+        r = _Resp(None); r.text = a + "\n"; return r
+
+
+def test_public_ip_agreement_disagreement_failure_and_private_rejected(VL):
+    S = VL.IP_SOURCES
+    ok = VL.check_public_ip(_IPHttp({S[0]: "27.61.43.198", S[1]: "27.61.43.198"}), max_age=0)
+    assert ok["ip"] == "27.61.43.198" and ok["status"] == "OK"
+    bad = VL.check_public_ip(_IPHttp({S[0]: "27.61.43.198", S[1]: "49.205.1.2"}), max_age=0)
+    assert bad["ip"] is None and bad["status"] == "UNCERTAIN"                     # never guess
+    none = VL.check_public_ip(_IPHttp({}), max_age=0)
+    assert none["ip"] is None and none["status"] == "LOOKUP_FAILED"
+    priv = VL.check_public_ip(_IPHttp({S[0]: "192.168.1.25", S[1]: "127.0.0.1", S[2]: "10.0.0.4", S[3]: "172.16.0.9"}), max_age=0)
+    assert priv["status"] == "LOOKUP_FAILED"                                      # local addresses are never offered for Shoonya
+    assert "did not answer" in (VL._IP_CACHE.update(at=0, res=None) or VL.ip_text(_IPHttp({})))
+
+
+def test_ip_cache_is_not_polled_continuously(VL):
+    h = _IPHttp({VL.IP_SOURCES[0]: "27.61.43.198", VL.IP_SOURCES[1]: "27.61.43.198"})
+    VL.check_public_ip(h, max_age=0); n = len(h.asked)
+    for _ in range(50):
+        VL.check_public_ip(h, max_age=120)
+    assert len(h.asked) == n
+
+
+def test_login_errors_are_classified_and_config_errors_say_retry_off(VL, tmp_path):
+    assert VL.classify_login_error("Invalid Input : INVALID_IP") == "INVALID_IP"
+    assert VL.classify_login_error("Invalid client id") == "CONFIG"
+    assert VL.classify_login_error("auth code expired") == "AUTH_CODE"
+    class H:
+        def post(self, *a, **k): return _Resp({"stat": "Not_Ok", "emsg": "Invalid Input : INVALID_IP"})
+        def get(self, url, timeout=None): r = _Resp(None); r.text = "27.61.43.198"; return r
+    a = VL.ShoonyaAuth({"SHOONYA_CLIENT_ID": "C", "SHOONYA_SECRET": "S", "SHOONYA_UID": "U"}, H(), path=str(tmp_path / "s.json"))
+    for _ in range(3):
+        with pytest.raises(RuntimeError) as e:
+            a.exchange("code=ABC")
+    assert a.status() == "FAILED" and a.fail_reason == "INVALID_IP" and a.fail_count == 3 and "Automatic retry: OFF" in str(e.value)
+
+
+def test_successful_login_remembers_accepted_ip_and_health_reports_mismatch(VL, tmp_path, monkeypatch):
+    monkeypatch.setattr(VL, "SH_IP_FILE", str(tmp_path / "shoonya_ip.json"))
+    class H:
+        def post(self, *a, **k): return _Resp({"access_token": "T", "USERID": "U"})
+        def get(self, url, timeout=None): r = _Resp(None); r.text = "27.61.41.198"; return r
+    a = VL.ShoonyaAuth({"SHOONYA_CLIENT_ID": "C", "SHOONYA_SECRET": "S", "SHOONYA_UID": "U"}, H(), path=str(tmp_path / "s.json"))
+    a.exchange("code=ABC")
+    assert VL.accepted_ip() == "27.61.41.198" and a.status() == "LOGGED IN"
+    from types import SimpleNamespace as NS
+    a.session = None; a.fail_reason, a.fail_msg = "INVALID_IP", "x"
+    app = NS(cfg={"SHOONYA_CLIENT_ID": "C", "SHOONYA_SECRET": "S"}, sh_auth=a, feed=None, book=VL.Book(), ipinfo={"ip": "27.61.43.198", "status": "OK"},
+             tokens={"1": "NIFTY"}, broker="SHOONYA", trader=NS(mode=lambda: "PAPER"))
+    h = VL.broker_health(app)
+    assert h["ip_status"] == "MISMATCH" and h["registered_ip"] == "27.61.41.198" and h["market_data"].startswith("NOT LIVE")
+    assert h["real_orders"] == "BLOCKED" and h["paper_engine"] == "RUNNING" and h["token"] == "absent"
+    assert h["secret"] == "configured" and "S" not in str(h["client_id"]) + str(h["secret"]).replace("configured", "")
+
+
+def test_paper_and_alert_orders_never_reach_the_broker(VL, tmp_path):
+    calls = []
+    class Trap:
+        state = "LIVE"
+        def place_limit(self, *a, **k): calls.append(a); raise AssertionError("PAPER sent a real order")
+        def place_order(self, *a, **k): calls.append(a); raise AssertionError("PAPER sent a real order")
+    for mode in ("PAPER", "ALERT", "REAL"):                                        # REAL requested but locked -> must behave as PAPER
+        t, book, paper, _ = _trader(VL, {"MODE": mode}); t.feed = Trap()
+        book.update("TCS", {"p": 3405.0, "t": 2.0}); t.on_tick("TCS")
+        book.update("TCS", {"p": 3329.0, "t": 3.0}); t.on_tick("TCS")
+        assert paper.s["trades"], mode
+    for mode in ("PAPER", "ALERT"):
+        o, book, legs, L, px, _ = _opt(VL, tmp_path / mode, {"OPTIONS_MODE": mode}); o.feed = Trap()
+        px(130.0, 58.0, 1.0); o.on_tick(); px(190.0, 50.0, 2.0); o.on_tick()
+        assert o.s["trades"], mode
+    assert calls == []
+
+
+def test_diagnose_report_never_prints_secrets(VL, tmp_path, monkeypatch):
+    monkeypatch.setattr(VL, "SH_SESSION", str(tmp_path / "none.json")); monkeypatch.setattr(VL, "SH_IP_FILE", str(tmp_path / "ip.json"))
+    lines = []
+    h = _IPHttp({VL.IP_SOURCES[0]: "27.61.43.198", VL.IP_SOURCES[1]: "27.61.43.198"})
+    VL.diagnose({"SHOONYA_UID": "FN0001", "SHOONYA_CLIENT_ID": "FN0001_U", "SHOONYA_SECRET": "TOPSECRETVALUE123", "SHOONYA_REGISTERED_IP": "27.61.41.198"}, h, lines.append)
+    txt = "\n".join(lines)
+    assert "TOPSECRETVALUE123" not in txt and "27.61.43.198" in txt and "MISMATCH" in txt
