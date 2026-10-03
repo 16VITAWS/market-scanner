@@ -572,6 +572,49 @@ def sh_symbol_tokens(http, watch):
     return out
 
 
+PORTAL_QUOTES = "https://raw.githubusercontent.com/16VITAWS/market-scanner/live-data/api/quotes.json"
+
+
+class PortalDelayedFeed(threading.Thread):
+    """No working broker login (e.g. INVALID_IP)? Keep the PAPER engine useful with the portal's free quotes:
+    ~15 minutes behind the exchange, refreshed about every 2 minutes in market hours. Always labelled DELAYED,
+    never called live, and never used for real orders."""
+    daemon = True
+
+    def __init__(self, http, book, syms, needed, url=PORTAL_QUOTES):
+        super().__init__()
+        self.http, self.book, self.syms, self.needed, self.url = http, book, syms, needed, url
+        self.last_ok, self.last_error, self.count = None, "", 0
+
+    def pull(self):
+        j = self.http.get(f"{self.url}?t={int(time.time())}", timeout=20).json()
+        n = 0
+        for sym in list(self.syms()):
+            q = (j.get("quotes") or {}).get(sym) or {}
+            if not q.get("p") or not q.get("t"):
+                continue
+            try:
+                t = dt.datetime.fromisoformat(str(q["t"]).replace("Z", "+00:00")).timestamp()
+            except ValueError:
+                continue
+            if (self.book.get(sym).get("t") or 0) >= t:
+                continue                                                  # nothing newer
+            if self.book.update(sym, {"p": q["p"], "pc": q.get("pc"), "o": q.get("day_o"), "h": q.get("day_h"), "l": q.get("day_l"),
+                                      "v": q.get("day_v"), "t": t, "src": "portal-delayed"}):
+                n += 1
+        self.last_ok, self.count = now().strftime("%H:%M:%S"), n
+        return n
+
+    def run(self):
+        while True:
+            if self.needed():
+                try:
+                    self.pull()
+                except Exception as e:  # noqa
+                    self.last_error = str(e)[:200]
+            time.sleep(60)
+
+
 IP_SOURCES = ("https://api.ipify.org", "https://checkip.amazonaws.com", "https://icanhazip.com", "https://ifconfig.me/ip")
 _IP_CACHE = {"at": 0.0, "res": None}
 SH_IP_FILE = os.path.join(HOME, "shoonya_ip.json")
@@ -1013,13 +1056,17 @@ class Trader:
         px = q.get("p")
         if not px:
             return
+        delayed = q.get("src") == "portal-delayed"
+        if delayed and self.mode() == "REAL":
+            return                                                        # real money never acts on ~15-min-old prices
+        lv = "delayed" if delayed else "live"
         pos = self.paper.s["pos"].get(sym)
         if pos:
             why = None
             if px <= pos["stop"]:
-                why = f"stop-loss hit at live {px:.2f} (stop {pos['stop']:.2f})"
+                why = f"stop-loss hit at {lv} {px:.2f} (stop {pos['stop']:.2f})"
             elif pos.get("target") and px >= pos["target"]:
-                why = f"target hit at live {px:.2f} (target {pos['target']:.2f})"
+                why = f"target hit at {lv} {px:.2f} (target {pos['target']:.2f})"
             elif sym in self.signals["sells"]:
                 why = "portal signal turned SELL"
             if why:
@@ -1162,7 +1209,7 @@ def state_json(app):
         q = snap.get(s, {})
         t = q.get("t")
         quotes.append({"sym": s, "p": q.get("p"), "pc": q.get("pc"), "o": q.get("o"), "h": q.get("h"), "l": q.get("l"), "vwap": q.get("vwap"),
-                       "bid": q.get("bid"), "ask": q.get("ask"), "v": q.get("v"),
+                       "bid": q.get("bid"), "ask": q.get("ask"), "v": q.get("v"), "src": q.get("src"),
                        "time": dt.datetime.fromtimestamp(t, IST).strftime("%H:%M:%S") if t else None,
                        "age": round(time.time() - t, 1) if t else None})
     pos = [{"sym": s, "qty": p["qty"], "avg": p["avg"], "stop": p["stop"], "target": p.get("target"), "ltp": snap.get(s, {}).get("p"),
@@ -1185,6 +1232,8 @@ def broker_health(app):
     reg = registered_ip(cfg)
     ipst = "UNKNOWN" if not (ip.get("ip") and reg) else ("MATCH" if ip["ip"] == reg else "MISMATCH")
     live = feed.get("state") == "LIVE" and fresh > 0
+    dly = getattr(app, "delayed", None)
+    delayed_on = bool(dly and dly.last_ok and not live)
     return {"broker": app.broker, "auth_mode": "OAuth (Shoonya login page)" if app.broker == "SHOONYA" else "API key + TOTP",
             "client_id": "configured" if cfg.get("SHOONYA_CLIENT_ID") else "MISSING",
             "secret": "configured" if cfg.get("SHOONYA_SECRET") else "MISSING",
@@ -1194,7 +1243,7 @@ def broker_health(app):
             "token": "present (today)" if a and a.session else "absent",
             "public_ip": ip.get("ip"), "public_ip_status": ip.get("status", "NOT CHECKED"), "public_ip_checked": ip.get("checked"),
             "registered_ip": reg, "registered_ip_source": "settings.env" if cfg.get("SHOONYA_REGISTERED_IP") else ("last accepted login" if reg else None),
-            "ip_status": ipst, "market_data": "LIVE" if live else ("NOT LIVE - " + str(feed.get("state"))),
+            "ip_status": ipst, "market_data": "LIVE" if live else ("DELAYED ~15 min (portal, last pull " + dly.last_ok + ") - Shoonya " + str(feed.get("state")) if delayed_on else "NOT LIVE - " + str(feed.get("state"))),
             "last_tick_age_s": feed.get("last_tick_age_s"), "symbols_requested": len(app.tokens), "symbols_live": fresh,
             "paper_engine": "RUNNING", "mode": app.trader.mode(),
             "real_orders": "BLOCKED" if app.trader.mode() != "REAL" else "ALLOWED (limits apply)"}
@@ -1303,6 +1352,7 @@ class App:
         self.opt = OptionsTrader(cfg, self.book, self.safety, self.notify)
         self.opt_loaded = None
         self.ipinfo = None
+        self.delayed = None
 
     def refresh_ip(self, force=False):
         try:
@@ -1432,9 +1482,12 @@ class App:
             else:
                 self.feed = Feed(self.cfg, self.book, self.tokens)
             self.trader.feed = self.feed; self.opt.feed = self.feed; self.feed.start()
+            self.delayed = PortalDelayedFeed(self.req, self.book, lambda: list(self.watch),
+                                             lambda: self.feed is None or self.feed.health().get("state") != "LIVE")
+            self.delayed.start()
             if self.broker == "SHOONYA" and not self.sh_auth.session:
-                self.trader.log("start", f"PAPER engine running ({self.trader.mode()} mode). {len(self.tokens)} symbols ready - prices are NOT live "
-                                         "until the Shoonya login works. Real orders: BLOCKED.")
+                self.trader.log("start", f"PAPER engine running ({self.trader.mode()} mode) on the portal's DELAYED prices (~15 min) until the "
+                                         f"Shoonya login works; then it switches to live ticks for {len(self.tokens)} symbols. Real orders: BLOCKED.")
             else:
                 self.trader.log("start", f"{self.broker}: connecting to {len(self.tokens)} symbols in {self.trader.mode()} mode")
         seen = {}
