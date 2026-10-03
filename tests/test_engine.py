@@ -707,3 +707,27 @@ def test_api_write_never_emits_nan(tmp_path):
     assert "NaN" not in txt.replace('"NaN"', "") and "Infinity" not in txt
     d = _j.loads(txt)
     assert d["a"] is None and d["b"] == [1.5, None, None] and d["c"]["d"] is None and d["s"] == "NaN"
+
+
+def test_steady_growers_need_rising_business_and_rising_chart():
+    from engine import value as V
+    fin, bs, cf = _val_statements()
+    m = V.compute({"currentPrice": 25, "sharesOutstanding": 100, "marketCap": 2500, "sector": "Technology"}, fin, bs, cf, "IN")
+    assert m["rev_up_years"] == m["rev_years_compared"] == 3 and m["ni_up_years"] == 3 and m["ni_cagr"] > 0.18
+    assert m["rev_hist"][0] < m["rev_hist"][-1]                                          # oldest -> newest
+    idx = pd.bdate_range("2023-10-01", periods=760)
+    rng = np.random.default_rng(3)
+    up = pd.DataFrame({"Close": 100 * np.exp(np.cumsum(0.001 + rng.normal(0, 0.004, 760)))}, index=idx)
+    flat = pd.DataFrame({"Close": 100 * np.exp(np.cumsum(rng.normal(0, 0.01, 760)) * 0.2)}, index=idx)
+    down = pd.DataFrame({"Close": 100 * np.exp(np.cumsum(-0.0012 + rng.normal(0, 0.004, 760)))}, index=idx)
+    assert V.price_trend(up)["trend"] == "STEADY UP"
+    assert V.price_trend(flat)["trend"] in ("SIDEWAYS", "DOWN") and V.price_trend(down)["trend"] == "DOWN"
+    assert V.price_trend(up.head(100)) is None                                          # too little history: no claim
+    bad_fin = fin.copy(); bad_fin.loc["Net Income"] = [150.0, 160, 110, 90]             # profit fell one year
+    m2 = V.compute({"currentPrice": 25, "sharesOutstanding": 100, "marketCap": 2500, "sector": "Technology"}, bad_fin, bs, cf, "IN")
+    m["roe"] = m2["roe"] = 0.2                                                          # fixture ROE is 13%: lift it over the 15% bar
+    cache = {"A": {**m, "id": "A", "market": "IN", "name": "A"}, "B": {**m2, "id": "B", "market": "IN", "name": "B"},
+             "C": {**m, "id": "C", "market": "IN", "name": "C"}}
+    scored, _ = V.build(cache, frames={"A": up, "B": up, "C": down})
+    g = [r["id"] for r in V.steady_growers(scored)]
+    assert g == ["A"]                                     # B: profit dipped one year; C: chart going down
