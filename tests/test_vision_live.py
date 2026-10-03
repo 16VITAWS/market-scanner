@@ -531,3 +531,18 @@ def test_ready_for_real_money_alert_fires_once_and_rearms(VL, tmp_path):
     assert "weakened" in sent[-1][0]
     state["rec"] = good; app.check_ready()
     assert sum("ready for real money" in t for t, _ in sent) == 2
+
+
+def test_portal_files_fall_back_to_gh_pages_copy(VL):
+    asked = []
+    class R:
+        def __init__(self, ok, j): self.ok, self.j = ok, j
+        def raise_for_status(self):
+            if not self.ok: raise OSError("404")
+        def json(self): return self.j
+    class H:
+        def get(self, url, timeout=None):
+            asked.append(url)
+            return R("raw.githubusercontent.com" in url, {"buys": [], "from": "raw"})
+    app = VL.App.__new__(VL.App); app.req = H(); app.site = "https://16vitaws.github.io/market-scanner"
+    assert app.fetch("signals")["from"] == "raw" and "gh-pages/api/signals.json" in asked[-1]
