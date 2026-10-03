@@ -496,8 +496,8 @@ function liveRender(L){const b=$('#liveBox');if(!b)return;
     ${o?`<div>OPEN ×${o.qty} · paid ${fmt(o.debit)} · P&amp;L <b class="${cls(O.open_pnl)}">₹${fmt(O.open_pnl,0)}</b></div>`:''}
    </div></div>
   <h3 style="margin-top:10px">What it just did</h3><ul class="log">${[...(L.events||[]),...(O.events||[])].sort((a,b)=>a.time<b.time?1:-1).slice(0,8).map(x=>`<li><small class="mut">${esc(x.time)}</small> ${esc(x.msg)}</li>`).join('')||'<li class="mut">Nothing yet today</li>'}</ul>`}
-let LIVE_MISS=0,LIVE_BUSY=false;
-async function livePoll(){if((location.hash||'').slice(1)!=='algo'){clearInterval(LIVE_TIMER);LIVE_TIMER=null;return}if(document.hidden||LIVE_BUSY)return;LIVE_BUSY=true;try{const L=await laptopState();if(L){LIVE_MISS=0;liveRender(L)}else if(++LIVE_MISS>=3)liveRender(null);else{const b=$('#liveBox .mut');if(b)b.textContent='connecting to 16VITAWS LIVE on this laptop…'}}finally{LIVE_BUSY=false}}
+let LIVE_MISS=0,LIVE_BUSY=false,LIVE_SEEN=false;
+async function livePoll(){if((location.hash||'').slice(1)!=='algo'){clearInterval(LIVE_TIMER);LIVE_TIMER=null;return}if((document.hidden&&LIVE_SEEN)||LIVE_BUSY)return;LIVE_BUSY=true;try{const L=await laptopState();if(L){LIVE_MISS=0;LIVE_SEEN=true;liveRender(L)}else if(++LIVE_MISS>=3)liveRender(null);else{const b=$('#liveBox .mut');if(b)b.textContent='connecting to 16VITAWS LIVE on this laptop…'}}finally{LIVE_BUSY=false}}
 async function algoStop(){if(!confirm('Stop the laptop algorithm now? No new orders will be placed until you resume.'))return;toast(await laptopCmd('/kill')?'Live algorithm STOPPED':'16VITAWS LIVE is not running on this laptop');livePoll()}
 async function algoResume(){if(prompt('Type RESUME to let the laptop algorithm trade again')!=='RESUME')return;toast(await laptopCmd('/resume')?'Live algorithm resumed':'16VITAWS LIVE is not running on this laptop');livePoll()}
 
