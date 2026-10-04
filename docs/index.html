@@ -221,12 +221,12 @@ async function candles(id,interval='1d'){const sub=interval==='1d'?'candles':'ca
 const SECTIONS=[
  ['home','Today','⌂'],['algo','Algo Cockpit','🤖'],['overview','Full Dashboard','🗂'],['terminal','Live Terminal','📡'],['markets','Global Markets','🌐'],['charts','Charts','📈'],['scanner','AI Scanner','🔍'],['intel','Intelligence','🧠'],['flows','Big-Money Flows','🐋'],['funds','Mutual Funds','🏦'],['value','Long-Term Value','💎'],['lab','Strategy Lab','🧪'],
  ['paper','Paper Trading','📝'],['live','Live Desk','⚡'],['portfolio','Portfolio & Growth','💹'],['plan','Small-Budget Plan','💰'],['options','Options','⛓'],['news','News & Events','📰'],
- ['research','Research & Backtests','📚'],['ipos','IPOs','🆕'],['brokers','Broker Desk','🏦'],['alerts','Alerts','🔔'],['data','Data Center','🗄'],['diag','Data Health','🩺'],['engine','Engine & Health','⚙'],['settings','Settings · Other devices','🔐'],['real','💰 Real Money','💰']];
+ ['research','Research & Backtests','📚'],['ipos','IPOs','🆕'],['brokers','Broker Desk','🏦'],['alerts','Alerts','🔔'],['data','Data Center','🗄'],['diag','Data Health','🩺'],['engine','Engine & Health','⚙'],['settings','Settings · Other devices','🔐'],['real','💰 Real Money','💰'],['chain','🎯 AI Option Chain','🎯']];
 const R={};  // renderers
 /* ---------- navigation: 10 modules, each existing screen lives in exactly one module (as a tab) ---------- */
 const MODULES=[
  ['today','Today','🏠',['home','overview']],
- ['trading','Trading','⚡',['algo','real','terminal','paper','live','options','brokers']],
+ ['trading','Trading','⚡',['algo','real','chain','terminal','paper','live','options','brokers']],
  ['mkts','Markets','🌍',['markets','charts']],
  ['ai','AI & Scanner','🧠',['scanner','intel','flows','news']],
  ['rsch','Research','🔬',['research','lab','value']],
@@ -497,6 +497,47 @@ function liveRender(L){const b=$('#liveBox');if(!b)return;
    </div></div>
   ${realMoneyCard(L)}
   <h3 style="margin-top:10px">What it just did</h3><ul class="log">${[...(L.events||[]),...(O.events||[])].sort((a,b)=>a.time<b.time?1:-1).slice(0,8).map(x=>`<li><small class="mut">${esc(x.time)}</small> ${esc(x.msg)}</li>`).join('')||'<li class="mut">Nothing yet today</li>'}</ul>`}
+/* ===== AI Option Chain: CE/PE auto-selection from 16VITAWS LIVE (live Shoonya quotes; decisions made on the laptop, shown here) ===== */
+let CHAIN_TIMER=null,CHAIN_U=null;
+R.chain=function(){chainPoll();clearInterval(CHAIN_TIMER);CHAIN_TIMER=setInterval(chainPoll,3000)};
+async function chainPoll(){if((location.hash||'').slice(1)!=='chain'){clearInterval(CHAIN_TIMER);CHAIN_TIMER=null;return}if(document.hidden&&CHAIN_U!==null)return;
+ const L=await laptopState();chainRender(L)}
+function chainRender(L){const el=$('#s-chain');if(!el)return;const head=`<h1>🎯 AI Option Chain <span class="tag PAPER">MODE: PAPER</span></h1><p class="sub">The algorithm finds today's NIFTY / BANKNIFTY contracts by itself (from Shoonya's official contract list), reads live CE and PE prices, decides the market direction first, then scores every contract and picks the best one - or says NO TRADE. Trades here are paper only.</p>`;
+ if(!L){el.innerHTML=head+`<div class="danger">16VITAWS LIVE is not running on this laptop. Start <b>16VITAWS-LIVE</b> from the Desktop.</div>`;return}
+ const C=L.chain;if(!C){el.innerHTML=head+`<div class="warn">This laptop runs an older 16VITAWS LIVE. Restart the laptop (or close 16VITAWS LIVE and start it again from the Desktop) to get the option-chain engine.</div>`;return}
+ const D=C.decisions||{},us=Object.keys(D);if(!us.length){el.innerHTML=head+`<div class="empty">Building the option chain… it needs the Shoonya login and a live index price (market hours). ${esc((L.broker_health||{}).market_data||'')}</div>`+chainPaper(C.paper);return}
+ if(!us.includes(CHAIN_U))CHAIN_U=us[0];const d=D[CHAIN_U],P=d.plan||{},k=d.contract||{},b=d.bias||{};
+ const dc=d.decision||'NO_TRADE',col=/^BUY_CE/.test(dc)?'pos':/^BUY_PE/.test(dc)?'neg':/^WATCH/.test(dc)?'':'mut';
+ const big={BUY_CE:'🟢 BUY CE',BUY_PE:'🔴 BUY PE',WATCH_CE:'🟡 WATCH CE',WATCH_PE:'🟡 WATCH PE',NO_TRADE:'⚪ NO TRADE'}[dc]||esc(dc);
+ const cell=(x,f=2)=>x==null?'—':fmt(x,f);const ce=d.ce||[],pe=d.pe||[],byK=a=>Object.fromEntries(a.map(x=>[x.strike,x]));const CE=byK(ce),PE=byK(pe);
+ const ks=[...new Set([...ce,...pe].map(x=>x.strike))].sort((a,b)=>a-b);
+ const sc=x=>x&&!x.rejected?`<b>${Math.round(x.score)}</b>`:`<span class="mut" title="${esc(x&&x.rejected||'')}">✗</span>`;
+ const sel=x=>k&&x&&x.tsym===k.tsym?' style="background:rgba(47,227,154,.18);font-weight:800"':'';
+ el.innerHTML=head+`<div class="row" style="gap:6px;margin-bottom:8px">${us.map(u=>`<button class="btn sm ${u===CHAIN_U?'':'grey'}" onclick="CHAIN_U='${esc(u)}';chainPoll()">${esc(u)}</button>`).join('')}</div>
+ ${d.paused?`<div class="danger"><b>${esc(d.reasons[0])}</b></div>`:''}
+ <div class="grid g2">
+  <div class="card glow" style="border-color:${col==='pos'?'rgba(47,227,154,.6)':col==='neg'?'rgba(255,92,122,.6)':'var(--line)'}"><div class="eyebrow">VISION AI SELECTION · ${esc(CHAIN_U)}</div>
+   <h1 class="${col}" style="margin:6px 0">${big}</h1>
+   ${k.tsym?`<div class="kpi"><b>${esc(k.tsym)}</b><span>expiry ${esc(d.expiry)} (${d.dte} days) · strike ${cell(k.strike,0)} · ${esc(k.moneyness||'')}</span></div>
+   <div class="grid g4" style="margin-top:8px">${[['LTP',cell(k.ltp)],['Bid',cell(k.bid)],['Ask',cell(k.ask)],['Score',(d.score??'—')+'/100']].map(([a,v])=>`<div class="stat"><span>${a}</span><b style="font-size:20px">${v}</b></div>`).join('')}</div>
+   <div class="grid g4" style="margin-top:6px">${[['Entry',cell(P.entry)],['Stop loss',cell(P.stop)],['Target',cell(P.target)],['Risk/Reward',esc(P.rr||'—')]].map(([a,v])=>`<div class="stat"><span>${a}</span><b style="font-size:18px">${v}</b></div>`).join('')}</div>
+   <p>Confidence: <b>${esc(d.confidence||'—')}</b> · minimum score to act: ${d.min_score??75}</p>`:''}
+   <h3>Why</h3><ul>${(d.reasons||[]).map(r=>`<li>${/below the minimum|unclear|no |PAUSED|market is/i.test(r)?'✗':'✓'} ${esc(r)}</li>`).join('')}</ul>
+   ${(d.warnings||[]).length?`<h3>Warnings</h3><ul>${d.warnings.map(w=>`<li class="neg">! ${esc(w)}</li>`).join('')}</ul>`:''}
+   <p class="help">Action: <b>${esc(d.action||'WAIT')}</b>. ${dc.startsWith('BUY')?'The paper engine buys this automatically (1 lot, at the ask) with the stop and target shown, then trails the stop.':'NO TRADE is a normal, safe answer - the system never forces a trade.'} ${esc(d.sell_open_note||'')}</p></div>
+  <div class="grid" style="gap:12px;align-content:start">
+   <div class="card"><h3>Market direction (stage 1)</h3><div class="kpi"><b class="${b.bias==='BULLISH'?'pos':b.bias==='BEARISH'?'neg':''}">${esc(b.bias||'—')}</b><span>confidence ${b.confidence??'—'}% · ${esc(CHAIN_U)} ${cell(d.spot)} · ATM ${cell(d.atm,0)}</span></div><ul>${(b.why||[]).map(w=>`<li>${esc(w)}</li>`).join('')}</ul></div>
+   <div class="card"><h3>Best contracts (stage 2)</h3><table><tr><th></th><th>Contract</th><th class="num">Ask</th><th class="num">Score</th></tr>${[['CE',d.best_ce],['PE',d.best_pe]].map(([t,x])=>`<tr><td>${t}</td><td>${x?esc(x.tsym):'<span class="mut">none passes filters</span>'}</td><td class="num">${x?cell(x.ask):'—'}</td><td class="num">${x?Math.round(x.score):'—'}</td></tr>`).join('')}</table></div>
+   <div class="card"><h3>Option-chain intelligence</h3><table>${[['PCR (put OI / call OI)',d.intel?.pcr??'—'],['Possible resistance (max call OI)',cell(d.intel?.resistance,0)],['Possible support (max put OI)',cell(d.intel?.support,0)],['Highest CE volume',cell(d.intel?.top_ce_volume,0)],['Highest PE volume',cell(d.intel?.top_pe_volume,0)]].map(([a,v])=>`<tr><td>${a}</td><td class="num">${v}</td></tr>`).join('')}</table><p class="help">From live OI and volume in the window shown. No single number predicts the market.</p></div>
+  </div></div>
+ <div class="card"><h3>Live option chain · ${esc(CHAIN_U)} · expiry ${esc(d.expiry||'')}</h3><div class="tbl"><table><tr><th class="num">CE OI</th><th class="num">OI chg</th><th class="num">Vol</th><th class="num">LTP</th><th class="num">Bid</th><th class="num">Ask</th><th class="num">Score</th><th class="num" style="text-align:center">STRIKE</th><th class="num">Score</th><th class="num">Bid</th><th class="num">Ask</th><th class="num">LTP</th><th class="num">Vol</th><th class="num">OI chg</th><th class="num">PE OI</th></tr>
+  ${ks.map(s=>{const c=CE[s]||{},p=PE[s]||{};const atm=s===d.atm;return `<tr${atm?' style="outline:1px solid #38E1FF"':''}><td class="num"${sel(c)}>${cell(c.oi,0)}</td><td class="num ${cls(c.oi_chg)}">${cell(c.oi_chg,0)}</td><td class="num">${cell(c.volume,0)}</td><td class="num"${sel(c)}>${cell(c.ltp)}</td><td class="num">${cell(c.bid)}</td><td class="num">${cell(c.ask)}</td><td class="num">${sc(c)}</td><td class="num" style="text-align:center"><b>${fmt(s,0)}</b>${atm?' <span class="tag">ATM</span>':''}</td><td class="num">${sc(p)}</td><td class="num">${cell(p.bid)}</td><td class="num">${cell(p.ask)}</td><td class="num"${sel(p)}>${cell(p.ltp)}</td><td class="num">${cell(p.volume,0)}</td><td class="num ${cls(p.oi_chg)}">${cell(p.oi_chg,0)}</td><td class="num"${sel(p)}>${cell(p.oi,0)}</td></tr>`}).join('')}</table></div>
+  <p class="help">✗ = rejected (hover for the reason: no live quote, old quote, or spread too wide). Highlighted = the selected contract. Contracts, symbols and lot sizes come from Shoonya's official list - never guessed.</p></div>
+ ${chainPaper(C.paper)}`}
+function chainPaper(P){if(!P)return '';const o=P.open,r=P.record||{};
+ return `<div class="grid g2"><div class="card"><h3>Paper position (option chain engine)</h3>${o?`<div class="kpi"><b class="${cls(o.pnl)}">₹${fmt(o.pnl,0)}</b><span>${esc(o.tsym)} ×${o.qty} · bought ${fmt(o.entry)} · now ${fmt(o.bid)} (bid) · stop ${fmt(o.stop)} · target ${fmt(o.target)}</span></div>`:'<div class="mut">No open paper position</div>'}
+  <p class="help">${esc(P.live_note||'')}</p><ul class="log">${(P.events||[]).slice().reverse().slice(0,8).map(e=>`<li><small class="mut">${esc(e.time)}</small> ${esc(e.msg)}</li>`).join('')||'<li class="mut">Nothing yet</li>'}</ul></div>
+  <div class="card"><h3>Trade journal · ${r.closed||0} trades · net ₹${fmt(r.net||0,0)}${r.win_rate!=null?' · '+r.win_rate+'% winners':''}${r.pf!=null?' · PF '+r.pf:''}</h3><div class="tbl"><table><tr><th>Date</th><th>Contract</th><th class="num">Qty</th><th class="num">Entry</th><th class="num">Exit</th><th class="num">Net P&amp;L</th><th>Why exit</th></tr>${(P.trades||[]).slice().reverse().map(t=>`<tr><td>${esc((t.entry_time||'').slice(0,16).replace('T',' '))}</td><td>${esc(t.tsym)}</td><td class="num">${t.qty}</td><td class="num">${fmt(t.entry)}</td><td class="num">${fmt(t.exit)}</td><td class="num ${cls(t.pnl)}">${fmt(t.pnl,0)}</td><td>${esc(t.why)}</td></tr>`).join('')||'<tr><td colspan=7 class="mut">No closed trades yet</td></tr>'}</table></div></div></div>`}
 R.real=async function(){const el=$('#s-real');el.innerHTML=`<h1>💰 Real-money trading</h1><div class="empty">checking 16VITAWS LIVE on this laptop…</div>`;
  const L=await laptopState();
  const intro=`<h1>💰 Real-money trading ${L?(L.mode==='REAL'||(L.options||{}).mode==='REAL'?'<span class="tag BEAR">ON</span>':'<span class="tag STALE">LOCKED - paper first</span>'):''}</h1>
