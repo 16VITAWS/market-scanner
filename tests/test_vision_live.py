@@ -546,3 +546,75 @@ def test_portal_files_fall_back_to_gh_pages_copy(VL):
             return R("raw.githubusercontent.com" in url, {"buys": [], "from": "raw"})
     app = VL.App.__new__(VL.App); app.req = H(); app.site = "https://16vitaws.github.io/market-scanner"
     assert app.fetch("signals")["from"] == "raw" and "gh-pages/api/signals.json" in asked[-1]
+
+
+def _chain_fixture(VL, spot=25143.0):
+    exp = dt.date(2026, 10, 6)
+    strikes = [25000.0, 25050.0, 25100.0, 25150.0, 25200.0, 25250.0, 25300.0]
+    master = {"NIFTY": {dt.date(2026, 9, 29): {}, exp: {k: {ot: {"token": f"{ot}{int(k)}", "tsym": f"NIFTY06OCT26{ot[0]}{int(k)}", "lot": 65, "tick": 0.05}
+                                                            for ot in ("CE", "PE")} for k in strikes}}}
+    ch = VL.chain_window(master, "NIFTY", spot, n=2, min_dte=1, today=dt.date(2026, 10, 1))
+    return ch
+
+
+def _quote_chain(VL, book, ch, ts, bull=True, spread=0.5, stale=False):
+    t = ts - (100 if stale else 1)
+    book.q["NIFTY"] = {"p": 25143.0, "vwap": 25080.0 if bull else 25200.0, "pc": 25000.0 if bull else 25300.0, "o": 25050.0 if bull else 25250.0, "recv": t}
+    for i, r in enumerate(ch["rows"]):
+        for ot in ("CE", "PE"):
+            px = 100.0 + 10 * i
+            book.q[VL.chain_sym("NIFTY", ch["expiry"], r["strike"], ot)] = {"p": px, "bid": px - spread / 2, "ask": px + spread / 2, "pc": px * 0.9,
+                                                                            "v": 1000 * (i + 1), "oi": 5000 * (i + 1), "poi": 4000 * (i + 1), "recv": t}
+
+
+def test_chain_atm_comes_from_listed_strikes_and_nearest_valid_expiry(VL):
+    ch = _chain_fixture(VL)
+    assert ch["expiry"] == "2026-10-06" and ch["atm"] == 25150.0                  # nearest LISTED strike to 25,143
+    assert [r["strike"] for r in ch["rows"]] == [25050.0, 25100.0, 25150.0, 25200.0, 25250.0]
+    assert ch["rows"][0]["CE"]["tsym"] == "NIFTY06OCT26C25050" and ch["rows"][0]["CE"]["lot"] == 65   # from the master, never guessed
+
+
+def test_chain_decides_ce_pe_or_no_trade_with_reasons(VL):
+    ch = _chain_fixture(VL); book = VL.Book(); ts = time.time()
+    _quote_chain(VL, book, ch, ts, bull=True)
+    d = VL.decide(book, ch, {"OPT_MIN_SCORE": "60"}, "BULL", "OPEN", ts)
+    assert d["decision"] == "BUY_CE" and d["contract"]["type"] == "CE" and d["plan"]["stop"] < d["plan"]["entry"] < d["plan"]["target"]
+    assert d["reasons"] and d["intel"]["pcr"] == 1.0 and "Selling options to OPEN" in d["sell_open_note"]
+    _quote_chain(VL, book, ch, ts, bull=False)
+    assert VL.decide(book, ch, {"OPT_MIN_SCORE": "60"}, "BEAR", "OPEN", ts)["decision"] == "BUY_PE"
+    book.q["NIFTY"].update(vwap=25143.0, pc=25143.0, o=25143.0)                    # no direction
+    d = VL.decide(book, ch, {}, None, "OPEN", ts)
+    assert d["decision"] == "NO_TRADE" and "unclear" in d["reasons"][0]
+    _quote_chain(VL, book, ch, ts, bull=True, stale=True)
+    d = VL.decide(book, ch, {}, "BULL", "OPEN", ts)
+    assert d["decision"] == "NO_TRADE" and d["paused"] and "DATA SAFETY" in d["reasons"][0]
+    _quote_chain(VL, book, ch, ts, bull=True, spread=20.0)                          # every contract too wide
+    d = VL.decide(book, ch, {}, "BULL", "OPEN", ts)
+    assert d["decision"] == "NO_TRADE" and all(c["rejected"] for c in d["ce"])
+    assert VL.decide(book, ch, {}, "BULL", "CLOSED", ts)["decision"] == "NO_TRADE"
+
+
+def test_chain_paper_trader_entry_duplicate_trailing_stop_and_never_a_broker(VL, tmp_path, monkeypatch):
+    ch = _chain_fixture(VL); book = VL.Book(); ts = time.time()
+    _quote_chain(VL, book, ch, ts, bull=True)
+    sent = []
+    tr = VL.ChainTrader({}, book, lambda a, b: sent.append(a), path=str(tmp_path / "c.json"))
+    assert not hasattr(tr, "feed")                                                   # no route to a broker exists in this engine
+    monkeypatch.setattr(VL, "now", lambda: dt.datetime(2026, 10, 1, 10, 30, tzinfo=VL.IST))
+    d = VL.decide(book, ch, {"OPT_MIN_SCORE": "60"}, "BULL", "OPEN", ts)
+    tr.on_decision(d)
+    o = tr.s["open"]
+    assert o and o["qty"] == 65 and o["entry"] == d["contract"]["ask"]
+    sym = o["sym"]
+    book.q[sym].update(p=o["entry"] * 1.35, bid=o["entry"] * 1.35)                # +1.17R: stop to break-even
+    tr.manage()
+    assert tr.s["open"]["stop"] == o["entry"]
+    book.q[sym].update(p=o["entry"] * 1.5, bid=o["entry"] * 1.5)                  # +1.67R: trail 1R below the high
+    tr.manage()
+    assert tr.s["open"]["stop"] > o["entry"]
+    book.q[sym].update(p=o["entry"] * 1.1, bid=o["entry"] * 1.1)
+    tr.manage()
+    t = tr.s["trades"][-1]
+    assert not tr.s["open"] and "stop" in t["why"] and t["pnl"] > 0
+    tr.on_decision(d)
+    assert not tr.s["open"]                                                          # same signal again: no duplicate entry
