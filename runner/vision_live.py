@@ -441,6 +441,9 @@ def sh_tick(m):
     out = {"p": f("lp"), "o": f("o"), "h": f("h"), "l": f("l"), "pc": f("c"), "vwap": f("ap"), "bid": f("bp1"), "ask": f("sp1")}
     if m.get("v") not in (None, ""):
         out["v"] = int(float(m["v"]))
+    for k in ("oi", "poi"):                                    # open interest / previous OI (options)
+        if m.get(k) not in (None, ""):
+            out[k] = int(float(m[k]))
     if m.get("ft"):
         out["t"] = float(m["ft"])
     return out
@@ -737,6 +740,299 @@ def sh_option_legs(http, sig):
     if len(out) != 2:
         raise RuntimeError(f"option contracts not found in Shoonya's list ({sig['name']})")
     return out
+
+
+# ------------------------------------------------------------------ AI option chain (CE/PE auto-selection)
+CHAIN_DEFAULTS = {"OPT_CHAIN_UNDERLYINGS": "NIFTY,BANKNIFTY", "OPT_CHAIN_STRIKES": "5", "OPT_MIN_DTE": "1", "OPT_MIN_SCORE": "75",
+                  "OPT_MAX_SPREAD_PCT": "3", "OPT_SL_PCT": "30", "OPT_RR": "2", "OPT_MAX_TRADES_DAY": "2", "OPT_LOTS": "1",
+                  "OPT_W_LIQ": "25", "OPT_W_SPREAD": "15", "OPT_W_MONEY": "30", "OPT_W_MOM": "20", "OPT_W_OI": "10",
+                  "OPT_NO_ENTRY_BEFORE": "09:30", "OPT_NO_ENTRY_AFTER": "14:30", "OPT_FORCE_EXIT": "15:15", "OPT_STALE_S": "30"}
+
+
+def nfo_index_options(http, underlyings):
+    """All live index-option contracts for the given underlyings from Shoonya's NFO master (symbols, tokens, lot sizes
+    come ONLY from this list - never guessed). -> {underlying: {expiry(date): {strike(float): {'CE': {...}, 'PE': {...}}}}}"""
+    import io, zipfile, csv
+    r = http.get(SH_NFO, timeout=120)
+    r.raise_for_status()
+    z = zipfile.ZipFile(io.BytesIO(r.content))
+    out = {u: {} for u in underlyings}
+    for row in csv.DictReader(io.TextIOWrapper(z.open(z.namelist()[0]), encoding="utf-8")):
+        g = {k.strip().lower(): (v or "").strip() for k, v in row.items() if k}
+        u = g.get("symbol")
+        if u not in out or not g.get("instrument", "").startswith("OPTIDX") or g.get("optiontype") not in ("CE", "PE"):
+            continue
+        e = _expiry_date(g.get("expiry"))
+        try:
+            k = float(g.get("strikeprice") or 0)
+        except ValueError:
+            continue
+        if not e or k <= 0:
+            continue
+        out[u].setdefault(e, {}).setdefault(k, {})[g["optiontype"]] = {
+            "token": g["token"], "tsym": g.get("tradingsymbol"), "lot": int(float(g.get("lotsize") or 0)), "tick": float(g.get("ticksize") or 0.05)}
+    return out
+
+
+def chain_window(master, underlying, spot, n=5, min_dte=1, today=None):
+    """Nearest expiry at least `min_dte` days away; ATM = the listed strike nearest to spot (never an assumed interval);
+    ATM +/- n listed strikes that have BOTH a CE and a PE."""
+    today = today or now().date()
+    exps = sorted(e for e in (master.get(underlying) or {}) if (e - today).days >= min_dte)
+    if not exps or not spot:
+        return None
+    exp = exps[0]
+    strikes = sorted(k for k, v in master[underlying][exp].items() if "CE" in v and "PE" in v)
+    if not strikes:
+        return None
+    atm = min(strikes, key=lambda k: abs(k - spot))
+    i = strikes.index(atm)
+    win = strikes[max(0, i - n): i + n + 1]
+    return {"underlying": underlying, "expiry": exp.isoformat(), "dte": (exp - today).days, "atm": atm, "spot_at_build": spot,
+            "rows": [{"strike": k, "CE": master[underlying][exp][k]["CE"], "PE": master[underlying][exp][k]["PE"]} for k in win]}
+
+
+def chain_sym(u, expiry, strike, ot):
+    return f"OPT {u} {expiry} {strike:g} {ot}"
+
+
+def _pct_rank(vals):
+    xs = sorted(v for v in vals if v is not None)
+    return (lambda v: None if v is None or not xs else 100.0 * sum(1 for x in xs if x <= v) / len(xs))
+
+
+def rank_side(book, ch, side, cfg, now_ts=None, stale_s=30):
+    """Score every CE (or PE) in the window 0-100 with configurable weights. Hard filters: live two-sided quote, fresh, spread."""
+    now_ts = now_ts or time.time()
+    w = {k: float(cfg.get(f"OPT_W_{k}") or CHAIN_DEFAULTS[f"OPT_W_{k}"]) for k in ("LIQ", "SPREAD", "MONEY", "MOM", "OI")}
+    max_sp = float(cfg.get("OPT_MAX_SPREAD_PCT") or CHAIN_DEFAULTS["OPT_MAX_SPREAD_PCT"]) / 100
+    rows = ch["rows"]
+    ks = [r["strike"] for r in rows]
+    ai = ks.index(ch["atm"])
+    c = []
+    for j, r in enumerate(rows):
+        q = book.get(chain_sym(ch["underlying"], ch["expiry"], r["strike"], side))
+        d = {"strike": r["strike"], "type": side, "tsym": r[side]["tsym"], "token": r[side]["token"], "lot": r[side]["lot"],
+             "ltp": q.get("p"), "bid": q.get("bid"), "ask": q.get("ask"), "volume": q.get("v"), "oi": q.get("oi"),
+             "oi_chg": (q["oi"] - q["poi"]) if q.get("oi") is not None and q.get("poi") is not None else None,
+             "prem_chg_pct": ((q["p"] / q["pc"] - 1) * 100) if q.get("p") and q.get("pc") else None,
+             "age_s": round(now_ts - q["recv"], 1) if q.get("recv") else None}
+        steps = j - ai                                         # + above ATM
+        d["itm_steps"] = -steps if side == "CE" else steps     # >0 in the money, <0 out of the money
+        d["moneyness"] = "ATM" if steps == 0 else ("ITM" if d["itm_steps"] > 0 else "OTM")
+        why = None
+        if not d["ltp"] or not d["bid"] or not d["ask"]:
+            why = "no live two-sided quote"
+        elif d["age_s"] is None or d["age_s"] > stale_s:
+            why = f"quote older than {stale_s} s"
+        else:
+            mid = (d["bid"] + d["ask"]) / 2
+            d["spread_pct"] = round((d["ask"] - d["bid"]) / mid * 100, 2) if mid else None
+            if d["spread_pct"] is None or d["spread_pct"] / 100 > max_sp:
+                why = f"spread {d['spread_pct']}% wider than {max_sp * 100:g}%"
+        d["rejected"] = why
+        c.append(d)
+    ok = [d for d in c if not d["rejected"]]
+    rv, ro, rm, rc = (_pct_rank([d[k] for d in ok]) for k in ("volume", "oi", "prem_chg_pct", "oi_chg"))
+    for d in ok:
+        liq = [x for x in (rv(d["volume"]), ro(d["oi"])) if x is not None]
+        s = {"liquidity": sum(liq) / len(liq) if liq else 0.0,
+             "spread": max(0.0, 100 * (1 - d["spread_pct"] / (max_sp * 100))),
+             "moneyness": {0: 100, 1: 100, -1: 80, 2: 70, -2: 50}.get(d["itm_steps"], 0),   # near-ATM / 1 ITM preferred (delta ~0.5-0.6)
+             "momentum": rm(d["prem_chg_pct"]) if d["prem_chg_pct"] is not None else 50.0,
+             "oi": rc(d["oi_chg"]) if d["oi_chg"] is not None else 50.0}
+        d["scores"] = {k: round(v, 1) for k, v in s.items()}
+        d["score"] = round((w["LIQ"] * s["liquidity"] + w["SPREAD"] * s["spread"] + w["MONEY"] * s["moneyness"] + w["MOM"] * s["momentum"]
+                            + w["OI"] * s["oi"]) / sum(w.values()), 1)
+    return sorted(c, key=lambda d: -(d.get("score") or -1))
+
+
+def market_bias(q, regime):
+    """Stage 1: direction of the UNDERLYING from live facts only. Each check is +1 bullish / -1 bearish."""
+    pts, why = 0, []
+    p, vw, pc, o = q.get("p"), q.get("vwap"), q.get("pc"), q.get("o")
+    if p and vw:
+        pts += (p > vw) - (p < vw); why.append(("above" if p > vw else "below" if p < vw else "at") + f" VWAP {vw:,.2f}")
+    if p and pc:
+        ch = (p / pc - 1) * 100
+        if abs(ch) >= 0.3:
+            pts += 1 if ch > 0 else -1
+        why.append(f"day change {ch:+.2f}%")
+    if p and o:
+        pts += (p > o) - (p < o); why.append(("above" if p > o else "below" if p < o else "at") + f" today's open {o:,.2f}")
+    if regime in ("BULL", "BEAR"):
+        pts += 1 if regime == "BULL" else -1; why.append(f"portal market regime {regime}")
+    bias = "BULLISH" if pts >= 2 else "BEARISH" if pts <= -2 else "SIDEWAYS"
+    return {"bias": bias, "points": pts, "confidence": round(min(abs(pts), 4) / 4 * 100), "why": why}
+
+
+def decide(book, ch, cfg, regime, market="OPEN", now_ts=None):
+    """Stage 2 + final decision. Returns BUY_CE / BUY_PE / WATCH_CE / WATCH_PE / NO_TRADE with every reason. Never forced."""
+    now_ts = now_ts or time.time()
+    stale = float(cfg.get("OPT_STALE_S") or CHAIN_DEFAULTS["OPT_STALE_S"])
+    min_score = float(cfg.get("OPT_MIN_SCORE") or CHAIN_DEFAULTS["OPT_MIN_SCORE"])
+    u = ch["underlying"]
+    q = book.get(u)
+    out = {"underlying": u, "spot": q.get("p"), "expiry": ch["expiry"], "dte": ch["dte"], "atm": ch["atm"], "min_score": min_score}
+    ce, pe = rank_side(book, ch, "CE", cfg, now_ts, stale), rank_side(book, ch, "PE", cfg, now_ts, stale)
+    out["ce"], out["pe"] = ce, pe
+    out["best_ce"] = next((d for d in ce if not d["rejected"]), None)
+    out["best_pe"] = next((d for d in pe if not d["rejected"]), None)
+    # option-chain intelligence (from live OI/volume only)
+    oi_ce = {d["strike"]: d["oi"] for d in ce if d.get("oi")}
+    oi_pe = {d["strike"]: d["oi"] for d in pe if d.get("oi")}
+    out["intel"] = {"pcr": round(sum(oi_pe.values()) / sum(oi_ce.values()), 2) if oi_ce and oi_pe and sum(oi_ce.values()) else None,
+                    "resistance": max(oi_ce, key=oi_ce.get) if oi_ce else None, "support": max(oi_pe, key=oi_pe.get) if oi_pe else None,
+                    "top_ce_volume": max(ce, key=lambda d: d.get("volume") or 0)["strike"] if any(d.get("volume") for d in ce) else None,
+                    "top_pe_volume": max(pe, key=lambda d: d.get("volume") or 0)["strike"] if any(d.get("volume") for d in pe) else None}
+    age = (now_ts - q["recv"]) if q.get("recv") else None
+    if market != "OPEN":
+        out.update(decision="NO_TRADE", reasons=[f"market is {market}"], action="WAIT"); return out
+    if not q.get("p") or age is None or age > stale:
+        out.update(decision="NO_TRADE", paused=True, reasons=[f"TRADING PAUSED - DATA SAFETY: {u} price is {'missing' if age is None else f'{age:.0f} s old'}"],
+                   action="WAIT"); return out
+    b = market_bias(q, regime)
+    out["bias"] = b
+    if b["bias"] == "SIDEWAYS":
+        out.update(decision="NO_TRADE", action="WAIT", reasons=[f"market direction unclear ({'; '.join(b['why'])})",
+                   f"best CE score {out['best_ce']['score'] if out['best_ce'] else '-'}, best PE score {out['best_pe']['score'] if out['best_pe'] else '-'}"]); return out
+    side = "CE" if b["bias"] == "BULLISH" else "PE"
+    best = out["best_" + side.lower()]
+    if not best:
+        out.update(decision="NO_TRADE", action="WAIT", reasons=[f"{b['bias']} but no {side} passes the liquidity/spread/freshness filters"]); return out
+    score = round(0.5 * b["confidence"] + 0.5 * best["score"], 1)
+    sl_pct = float(cfg.get("OPT_SL_PCT") or CHAIN_DEFAULTS["OPT_SL_PCT"]) / 100
+    rr = float(cfg.get("OPT_RR") or CHAIN_DEFAULTS["OPT_RR"])
+    entry = best["ask"]
+    plan = {"entry": entry, "stop": round(entry * (1 - sl_pct), 2), "target": round(entry * (1 + sl_pct * rr), 2), "rr": f"1 : {rr:g}"}
+    reasons = [f"underlying {b['bias'].lower()}: " + "; ".join(b["why"]),
+               f"{best['tsym']}: {best['moneyness']}, spread {best['spread_pct']}%, liquidity {best['scores']['liquidity']:.0f}/100, "
+               f"premium momentum {best['scores']['momentum']:.0f}/100, OI change {best['scores']['oi']:.0f}/100"]
+    warn = []
+    if ch["dte"] <= 1:
+        warn.append("expiry is very close - premium decays fast")
+    if best["spread_pct"] > 1.5:
+        warn.append(f"spread {best['spread_pct']}% is on the wide side")
+    if (out["intel"]["resistance"] and side == "CE" and q["p"] < out["intel"]["resistance"] <= q["p"] * 1.005):
+        warn.append(f"big call OI just above at {out['intel']['resistance']:g} (possible resistance)")
+    if (out["intel"]["support"] and side == "PE" and q["p"] > out["intel"]["support"] >= q["p"] * 0.995):
+        warn.append(f"big put OI just below at {out['intel']['support']:g} (possible support)")
+    dec = ("BUY_" if score >= min_score else "WATCH_" if score >= min_score - 15 else "NO_TRADE") + ("" if score < min_score - 15 else side)
+    if dec == "NO_TRADE":
+        reasons.append(f"combined score {score} is below the minimum {min_score:g}")
+    out.update(decision=dec, side=side, contract=best, score=score, confidence="HIGH" if score >= 85 else "MEDIUM" if score >= min_score else "LOW",
+               plan=plan, reasons=reasons, warnings=warn, action="BUY" if dec.startswith("BUY") else "WAIT",
+               sell_open_note="Selling options to OPEN (short) is blocked: margin/SPAN cannot be verified from here.")
+    return out
+
+
+class ChainTrader:
+    """PAPER-ONLY single-leg trades on the AI chain decision (BUY_OPEN at ask, SELL_EXIT at bid). Never sends a broker order:
+    it has no feed/broker reference at all. One position at a time, stop + target + trailing stop, daily trade limit, time exits."""
+
+    def __init__(self, cfg, book, notify, path=None):
+        self.cfg, self.book, self.notify = cfg, book, notify
+        self.path = path or os.path.join(HOME, "options_chain_paper.json")
+        try:
+            self.s = json.load(open(self.path))
+        except Exception:  # noqa
+            self.s = {"open": None, "trades": [], "signals": {}}
+        self.events = []
+
+    def c(self, k):
+        return self.cfg.get(k) or CHAIN_DEFAULTS[k]
+
+    def save(self):
+        os.makedirs(os.path.dirname(self.path) or ".", exist_ok=True)
+        tmp = self.path + ".tmp"; json.dump(self.s, open(tmp, "w"), indent=1); os.replace(tmp, self.path)
+
+    def log(self, msg):
+        self.events = (self.events + [{"time": now().strftime("%H:%M:%S"), "msg": msg}])[-50:]
+        audit("chain_paper", msg=msg)
+
+    def today_trades(self):
+        d = now().date().isoformat()
+        return [t for t in self.s["trades"] if t["entry_time"][:10] == d]
+
+    def on_decision(self, dec):
+        """Called with each fresh decision. Entries only on BUY_CE / BUY_PE inside the entry window."""
+        t = now().time()
+        hm = lambda k: dt.time(*map(int, self.c(k).split(":")))
+        o = self.s["open"]
+        if o:
+            return self.manage(dec)
+        if not dec or not dec.get("decision", "").startswith("BUY_") or dec.get("paused"):
+            return
+        if not (hm("OPT_NO_ENTRY_BEFORE") <= t <= hm("OPT_NO_ENTRY_AFTER")):
+            return
+        if len(self.today_trades()) >= int(self.c("OPT_MAX_TRADES_DAY")):
+            return
+        k = dec["contract"]
+        sig_id = f"{now().date()}|{k['tsym']}|{dec['decision']}"
+        if sig_id in self.s["signals"]:
+            return                                                # duplicate protection: one entry per signal per day
+        qty = int(self.c("OPT_LOTS")) * int(k["lot"] or 0)
+        if qty <= 0:
+            return
+        self.s["signals"][sig_id] = now().isoformat(timespec="seconds")
+        self.s["open"] = {"id": sig_id, "sym": chain_sym(dec["underlying"], dec["expiry"], k["strike"], k["type"]), "tsym": k["tsym"],
+                          "type": k["type"], "underlying": dec["underlying"], "qty": qty, "entry": k["ask"], "stop": dec["plan"]["stop"],
+                          "target": dec["plan"]["target"], "high": k["ask"], "risk": round(k["ask"] - dec["plan"]["stop"], 2), "score": dec["score"], "reasons": dec["reasons"],
+                          "entry_time": now().isoformat(timespec="seconds")}
+        self.save()
+        self.log(f"PAPER BUY_OPEN {qty} {k['tsym']} @ {k['ask']:.2f} (ask) - score {dec['score']}, SL {dec['plan']['stop']}, target {dec['plan']['target']}")
+        self.notify("16VITAWS paper option BUY", f"{dec['decision']} {k['tsym']} @ {k['ask']:.2f}, SL {dec['plan']['stop']}, T {dec['plan']['target']} (paper)")
+
+    def manage(self, dec=None):
+        o = self.s["open"]
+        q = self.book.get(o["sym"])
+        bid, p = q.get("bid"), q.get("p")
+        if not bid or not p:
+            return
+        o["high"] = max(o["high"], p)
+        risk = o.get("risk") or (o["entry"] - min(o["stop"], o["entry"]))      # the ORIGINAL 1R, fixed at entry
+        if risk > 0 and o["high"] >= o["entry"] + risk and o["stop"] < o["entry"]:
+            o["stop"] = o["entry"]; self.log(f"{o['tsym']}: +1R reached - stop moved to break-even {o['entry']:.2f}")
+        if risk > 0 and o["high"] >= o["entry"] + 1.5 * risk:
+            trail = round(o["high"] - risk, 2)
+            if trail > o["stop"]:
+                o["stop"] = trail                                 # stops only ever move up, never loosen
+        why = None
+        if bid <= o["stop"]:
+            why = f"stop {o['stop']:.2f} hit"
+        elif bid >= o["target"]:
+            why = f"target {o['target']:.2f} hit"
+        elif now().time() >= dt.time(*map(int, self.c("OPT_FORCE_EXIT").split(":"))):
+            why = "end-of-day exit"
+        elif dec and dec.get("decision", "").startswith("BUY_") and dec.get("side") and dec["side"] != o["type"]:
+            why = f"signal reversed to {dec['decision']}"
+        if why:
+            self.exit(bid, why)
+        else:
+            self.save()
+
+    def exit(self, px, why):
+        o = self.s.pop("open"); self.s["open"] = None
+        gross = (px - o["entry"]) * o["qty"]
+        charges = 60.0                                            # flat estimate: brokerage + STT + exchange + GST for one round trip
+        t = {**o, "exit": px, "exit_time": now().isoformat(timespec="seconds"), "why": why, "gross": round(gross, 2),
+             "charges": charges, "pnl": round(gross - charges, 2)}
+        self.s["trades"].append(t); self.save()
+        self.log(f"PAPER SELL_EXIT {o['qty']} {o['tsym']} @ {px:.2f} (bid) - {why} - net P&L {t['pnl']:+.2f}")
+
+    def record(self):
+        tr = self.s["trades"]
+        wins = sum(t["pnl"] for t in tr if t["pnl"] > 0); losses = -sum(t["pnl"] for t in tr if t["pnl"] < 0)
+        return {"closed": len(tr), "net": round(sum(t["pnl"] for t in tr), 2), "win_rate": round(100 * sum(1 for t in tr if t["pnl"] > 0) / len(tr)) if tr else None,
+                "pf": round(wins / losses, 2) if losses else None, "max_loss": min((t["pnl"] for t in tr), default=None)}
+
+    def state(self):
+        o = self.s["open"]
+        if o:
+            q = self.book.get(o["sym"])
+            o = {**o, "ltp": q.get("p"), "bid": q.get("bid"), "pnl": round(((q.get("bid") or o["entry"]) - o["entry"]) * o["qty"], 2)}
+        return {"mode": "PAPER", "open": o, "trades": self.s["trades"][-20:], "record": self.record(), "events": self.events[-20:],
+                "live_note": "Single-leg LIVE option orders are not enabled. This engine is paper-only by design."}
 
 
 class OptionsTrader:
@@ -1220,7 +1516,9 @@ def state_json(app):
             "killed": app.safety.killed(), "quotes": quotes, "positions": pos,
             "account": {"equity": app.paper.equity(app.book), "cash": app.paper.s["cash"], "closed": len(app.paper.s["trades"]), "today": app.paper.realized_today()},
             "real_blockers": app.safety.real_blockers(app.paper), "gate": app.paper.record(), "signals": app.trader.signals,
-            "events": app.trader.events[-60:], "rejected": app.book.rejected, "options": app.opt.state(), "broker_health": broker_health(app)}
+            "events": app.trader.events[-60:], "rejected": app.book.rejected, "options": app.opt.state(), "broker_health": broker_health(app),
+            "chain": {"decisions": getattr(app, "decisions", {}), "paper": app.chain_tr.state() if getattr(app, "chain_tr", None) else None,
+                      "config": {k: app.cfg.get(k) or v for k, v in CHAIN_DEFAULTS.items()}}}
 
 
 def broker_health(app):
@@ -1358,6 +1656,8 @@ class App:
         self.opt_loaded = None
         self.ipinfo = None
         self.delayed = None
+        self.chain_tr = ChainTrader(cfg, self.book, self.notify)
+        self.chains, self.decisions, self.nfo, self.nfo_day, self.last_decide = {}, {}, None, None, 0.0
 
     def refresh_ip(self, force=False):
         try:
@@ -1386,6 +1686,55 @@ class App:
             else:
                 self.trader.log("login", f"Shoonya login failed: {m}", base=m)
             return False, m
+
+    def refresh_chain(self):
+        """Discover the live option chain around ATM for each configured index (contracts only from Shoonya's NFO list),
+        re-centre when the index has moved more than 2 strikes, and stream every contract in the window."""
+        if self.broker != "SHOONYA" or not self.feed:
+            return
+        unds = [u.strip().upper() for u in (self.cfg.get("OPT_CHAIN_UNDERLYINGS") or CHAIN_DEFAULTS["OPT_CHAIN_UNDERLYINGS"]).split(",") if u.strip()]
+        if self.nfo_day != now().date():
+            try:
+                self.nfo, self.nfo_day = nfo_index_options(self.req, unds), now().date()
+            except Exception as e:  # noqa
+                self.chain_tr.log(f"option list download failed ({scrub(e, self.cfg)}) - retry in a minute"); return
+        n = int(self.cfg.get("OPT_CHAIN_STRIKES") or CHAIN_DEFAULTS["OPT_CHAIN_STRIKES"])
+        mdte = int(self.cfg.get("OPT_MIN_DTE") or CHAIN_DEFAULTS["OPT_MIN_DTE"])
+        for u in unds:
+            spot = self.book.get(u).get("p")
+            ch = self.chains.get(u)
+            if not spot:
+                continue
+            if ch:
+                ks = [r["strike"] for r in ch["rows"]]
+                near = min(ks, key=lambda k: abs(k - spot))
+                if abs(ks.index(near) - ks.index(ch["atm"])) <= 2 and ch["expiry"] >= (now().date() + dt.timedelta(days=mdte)).isoformat():
+                    continue
+            new = chain_window(self.nfo, u, spot, n, mdte)
+            if not new:
+                continue
+            self.chains[u] = new
+            more = {f"NFO|{r[ot]['token']}": chain_sym(u, new["expiry"], r["strike"], ot) for r in new["rows"] for ot in ("CE", "PE")}
+            if hasattr(self.feed, "add_tokens"):
+                self.feed.add_tokens(more)
+            self.chain_tr.log(f"{u} option chain: expiry {new['expiry']}, ATM {new['atm']:g}, {len(more)} contracts streaming")
+
+    def run_chain(self):
+        """Every 2 s: fresh CE/PE decision per index; the best BUY (if any) goes to the paper-only chain trader."""
+        if not self.chains or time.time() - self.last_decide < 2:
+            return
+        self.last_decide = time.time()
+        regime = (self.trader.signals or {}).get("regime")
+        for u, ch in self.chains.items():
+            try:
+                self.decisions[u] = decide(self.book, ch, self.cfg, regime, self.market if self.market in ("OPEN", "CLOSED", "WEEKEND", "HOLIDAY") else market_state())
+            except Exception as e:  # noqa
+                self.decisions[u] = {"underlying": u, "decision": "NO_TRADE", "reasons": [f"engine error: {e}"], "paused": True}
+        o = self.chain_tr.s.get("open")
+        if o:
+            return self.chain_tr.on_decision(self.decisions.get(o["underlying"]))
+        buys = [d for d in self.decisions.values() if str(d.get("decision", "")).startswith("BUY_")]
+        self.chain_tr.on_decision(max(buys, key=lambda d: d["score"]) if buys else None)
 
     def check_ready(self):
         """Tell the user (phone + screen) the moment a paper track record earns the right to real money - once.
@@ -1540,6 +1889,14 @@ class App:
             if time.time() - last_portal > 60:
                 self.refresh_portal(); last_portal = time.time()
                 self.check_ready()
+                try:
+                    self.refresh_chain()
+                except Exception as e:  # noqa
+                    self.chain_tr.log(f"option chain error: {scrub(e, self.cfg)}")
+            try:
+                self.run_chain()
+            except Exception as e:  # noqa
+                self.chain_tr.log(f"option decision error: {scrub(e, self.cfg)}")
             for s, q in self.book.snapshot().items():                     # act on every symbol that ticked since last pass
                 if q.get("recv") != seen.get(s):
                     seen[s] = q.get("recv")
