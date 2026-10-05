@@ -24,6 +24,7 @@ from . import options as OPT, notify as NOTIFY, forecast as FC, contagion as CG,
 from .live import control as LCTL, proposals as LPROP
 from . import nse_eod as NSEEOD, livefeed as LF, simulator, value as VAL
 from . import quality as QA, telemetry as TEL
+from . import company_intel as CI
 from . import regime_hmm as HMM, impact as IM, flows as FL, mf as MF, macro as MAC, rules as RULES
 
 IST = dt.timezone(dt.timedelta(hours=5, minutes=30))
@@ -527,6 +528,7 @@ def write_common(site, M, clean, rejected, dqrep, reg, scan, L, actions, data_st
     intel["forecast_history"] = old_fc[-120:]
     intel["events"] = scan.get("events")
     write_feeds(site, offline)
+    write_company_intel(site, offline)
     try:
         news_items = (site.load_json("api/news.json", {}).get("live") or {}).get("items", [])
         stk = {k: v for k, v in clean.items() if k in master.index and master.loc[k, "kind"] == "stock" and master.loc[k, "currency"] == "INR"}
@@ -591,6 +593,59 @@ def write_common(site, M, clean, rejected, dqrep, reg, scan, L, actions, data_st
     api.write(site.path, "reports.json", rep)
     api.write(site.path, "meta.json", {"data_status": data_status, "data_date": reg["date"], "regime": reg["state"], "offline": offline,
               "portal_note": "All numbers come from api/*.json written by the engine; the portal never invents data."})
+
+
+def _watch_symbols(site):
+    """Symbols the user holds or is being signalled on (paper ledger + today's signals) - their filings raise alerts."""
+    out = set()
+    def walk(o, depth=0):
+        if depth > 4:
+            return
+        if isinstance(o, dict):
+            for k, v in o.items():
+                if k in ("symbol", "sym", "id") and isinstance(v, str) and 1 < len(v) < 25 and v.replace("-", "").replace("&", "").isalnum():
+                    out.add(v.upper())
+                elif isinstance(v, (dict, list)):
+                    walk(v, depth + 1)
+        elif isinstance(o, list):
+            for v in o[:400]:
+                walk(v, depth + 1)
+    paper = site.load_json("api/paper.json", {}) or {}
+    walk({k: paper.get(k) for k in ("positions", "open", "holdings") if k in paper})
+    sig = site.load_json("api/signals.json", {}) or {}
+    walk({k: sig.get(k) for k in ("signals", "buys", "candidates") if k in sig})
+    return sorted(out)
+
+
+def write_company_intel(site, offline, notify=True):
+    """Owner / management / governance events from official BSE filings (+ media for flagged names)."""
+    try:
+        prev = site.load_json("api/company_intel.json", {}) or {}
+    except Exception:
+        prev = {}
+    if offline:
+        if not prev:
+            api.write(site.path, "company_intel.json", {**CI.build({}, [], CI.now_ist(), coverage={"bse": {"status": "offline - not fetched"}}), "events": []})
+        return prev
+    try:
+        uni = CI.load_universe(C.UNIVERSE_URL)
+        watch = _watch_symbols(site)
+        out = CI.run(prev, universe=uni, watch=watch, fetch_news=NEWS.fetch)
+        api.write(site.path, "company_intel.json", out)
+        log(f"company intel: {len(out['events'])} events, {out['new_this_run']} new, {len(out['alerts'])} alerts, bse={out['coverage'].get('bse', {}).get('status')}")
+        if notify:
+            n = NOTIFY.Notifier(site.path)
+            for a in [a for a in out["alerts"] if a["severity"] >= 80 or a.get("yours")][:5]:
+                n.push(f"Company alert: {a.get('symbol') or a['company']}", f"{a['reason']} - {a['headline'][:160]} ({a['source']})",
+                       key="ci-" + a["id"], tags=("warning",), priority=4 if a.get("yours") else 3, click=a.get("pdf") or a.get("link"))
+            n.save()
+        return out
+    except Exception as e:  # noqa
+        log("company intel failed:", e)
+        if prev:
+            prev.setdefault("coverage", {})["bse"] = {**prev.get("coverage", {}).get("bse", {}), "status": f"FAILED this run: {str(e)[:120]} - showing previous data"}
+            api.write(site.path, "company_intel.json", {k: v for k, v in prev.items() if k not in ("generated_at", "engine_version", "mode")})
+        return prev
 
 
 def write_feeds(site, offline):
@@ -845,6 +900,7 @@ def job_intraday(site, offline=False, minutes=None, every=None):
 
 def job_premarket(site, offline=False):
     """08:15 IST: US/Asia closes are in -> next-day forecast with complete overnight data + pre-market report + push."""
+    write_company_intel(site, offline)  # overnight filings (BSE publishes many after 18:00)
     M = load_market(site, offline, universe_limit=0) if offline else None
     if not offline:
         master = INS.master()
