@@ -31,7 +31,7 @@ p.sub{color:var(--muted);font-size:14px;margin:0 0 12px}
 .bd.open{background:#0F3D2C;color:var(--up);border-color:#1F6A4A}.bd.closed{background:#232A38;color:#C9D3E0}.bd.paper{background:#3A2E16;color:var(--warnink);border-color:#7A5A1A}
 .bd.off{background:#4A1620;color:#FFB4B4}.bd.ok{background:#0F3D2C;color:var(--up)}.bd.warn{background:#4A3A10;color:var(--flat)}.bd.bad{background:#4A1620;color:#FFB4B4}
 .wrap{display:grid;grid-template-columns:230px 1fr;min-height:calc(100vh - 60px)}
-nav.side{border-right:1px solid var(--line);padding:12px 8px;position:sticky;top:60px;height:calc(100vh - 60px);overflow:auto;background:var(--bg2)}
+nav.side{border-right:1px solid var(--line);padding:12px 8px;position:sticky;top:var(--toph,60px);height:calc(100vh - var(--toph,60px));overflow:auto;background:var(--bg2)}
 nav.side button{display:flex;align-items:center;gap:10px;width:100%;text-align:left;border:0;background:none;color:var(--muted);padding:10px 12px;border-radius:10px;font-weight:700;font-size:14px}
 nav.side button .n{width:22px;height:22px;border-radius:6px;background:var(--card2);display:grid;place-items:center;font-size:11px;color:var(--cy)}
 nav.side button[aria-selected="true"]{background:linear-gradient(90deg,#1B3A6B,#132239);color:#fff}
@@ -133,6 +133,27 @@ body.navcol nav.side{width:58px}body.navcol nav.side .lb,body.navcol nav.side .n
 @media(max-width:900px){.wrap{grid-template-columns:1fr!important}nav.side,body.navcol nav.side{width:auto;flex-direction:row;justify-content:space-around;overflow:hidden;gap:0;padding:4px 2px calc(4px + env(safe-area-inset-bottom,0))}
  nav.side button,body.navcol nav.side button{flex:1 1 0;min-width:0;padding:8px 0;justify-content:center}nav.side .lb,nav.side .n,nav.side .colbtn{display:none!important}nav.side button .ic{font-size:18px;width:auto}
  .subnav{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none}.subnav button{flex:none}}
+
+/* real-time status bar + command center */
+.rtbar{flex-basis:100%;display:flex;gap:6px;align-items:center;flex-wrap:wrap;padding:4px 0 0;font-size:12px;border-radius:8px}
+.rtbar.bad{background:rgba(74,22,32,.75);padding:4px 6px}.rtbar.warn{background:rgba(58,46,22,.75);padding:4px 6px}
+.rt{white-space:nowrap;padding:3px 8px;border-radius:7px;border:1px solid var(--line);background:var(--card)}.rt small{color:var(--muted);font-weight:800;letter-spacing:.05em;font-size:10px}
+.rt.mode{font-weight:800}.rt.mode.bad{background:#4A1620;color:#FFB4B4}.rt.mode.warn{background:#3A2E16;color:var(--warnink)}
+.cmdgrid{display:grid;grid-template-columns:minmax(0,1fr) 390px;gap:12px;align-items:start}.cmdgrid>*{min-width:0}
+.cmdgrid aside{max-height:calc(100vh - var(--toph,60px) - 20px);overflow:auto;position:sticky;top:calc(var(--toph,60px) + 10px)}
+.card.side{padding:12px;margin-bottom:10px}.card.side h3{margin:0 0 6px;font-size:15px}
+table.kv td{padding:4px 4px;font-size:13px}table.kv td:first-child{color:var(--muted)}
+.legend{display:flex;gap:10px;flex-wrap:wrap;font-size:12px;margin-top:6px;font-weight:700}
+.feed{max-height:260px;overflow:auto}.feed li{font-size:12px}.ev-SIGNAL_REJECTED,.ev-SIGNAL_INVALIDATED,.ev-DATA_STALE,.ev-DATA_CONNECTION_LOST,.ev-ORDER_REJECTED,.ev-POSITION_MISMATCH{color:#FFB4B4}
+.ev-POSITION_OPENED,.ev-ORDER_FILLED,.ev-TARGET,.ev-RESYNC_COMPLETE,.ev-DATA_RESTORED{color:var(--up)}
+.bar{height:8px;border-radius:6px;background:var(--bg2);overflow:hidden;margin-top:6px}.bar i{display:block;height:100%}
+#cmdChart{position:relative}
+.modal{position:fixed;inset:0;z-index:60;background:rgba(0,0,0,.6);display:grid;place-items:center;padding:16px}.modal[hidden]{display:none}
+.modal .mbox{background:var(--card);border:1px solid var(--line);border-radius:14px;max-width:820px;width:100%;max-height:88vh;overflow:auto;padding:16px;position:relative}.modal .mx{position:sticky;top:0;float:right}
+@media(max-width:1100px){.cmdgrid{grid-template-columns:minmax(0,1fr)}.cmdgrid aside{max-height:none;position:static}}
+@media(max-width:900px){.rtbar{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none}.modal{padding:0}.modal .mbox{max-height:100vh;height:100vh;border-radius:0}}
+.money{display:grid;grid-template-columns:repeat(6,minmax(0,1fr)) auto;gap:8px;align-items:stretch;margin-bottom:12px}.mtile{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:8px 10px}.mtile span{display:block;font-size:10px;font-weight:800;letter-spacing:.06em;color:var(--muted)}.mtile b{font-size:18px}.mtile small{display:block;font-size:11px;color:var(--muted)}.mtile.g{border-color:rgba(56,225,255,.4)}.mtile.c{border-color:rgba(255,92,122,.4)}.mtile b *{font-size:inherit}.mtile.n{border-color:rgba(47,227,154,.6);background:rgba(15,61,44,.35)}
+@media(max-width:1100px){.money{grid-template-columns:repeat(3,minmax(0,1fr))}}@media(max-width:600px){.money{grid-template-columns:repeat(2,minmax(0,1fr))}}
 </style>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet">
 </head>
@@ -142,6 +163,7 @@ body.navcol nav.side{width:58px}body.navcol nav.side .lb,body.navcol nav.side .n
  <div class="badges" id="badges"><span class="bd">loading…</span></div>
  <button class="btn sm" id="installBtn" hidden title="Install as an app on this device">⬇ Install app</button>
  <button class="btn sm grey" id="refreshBtn" title="Reload data from the engine">↻ Refresh</button>
+<div id="rtbar" class="rtbar"><span class="mut">connecting to 16VITAWS LIVE on this laptop…</span></div>
 </div>
 <div class="wrap">
 <nav class="side" id="nav"></nav>
@@ -221,12 +243,12 @@ async function candles(id,interval='1d'){const sub=interval==='1d'?'candles':'ca
 const SECTIONS=[
  ['home','Today','⌂'],['algo','Algo Cockpit','🤖'],['overview','Full Dashboard','🗂'],['terminal','Live Terminal','📡'],['markets','Global Markets','🌐'],['charts','Charts','📈'],['scanner','AI Scanner','🔍'],['intel','Intelligence','🧠'],['flows','Big-Money Flows','🐋'],['funds','Mutual Funds','🏦'],['value','Long-Term Value','💎'],['lab','Strategy Lab','🧪'],
  ['paper','Paper Trading','📝'],['live','Live Desk','⚡'],['portfolio','Portfolio & Growth','💹'],['plan','Small-Budget Plan','💰'],['options','Options','⛓'],['news','News & Events','📰'],
- ['research','Research & Backtests','📚'],['ipos','IPOs','🆕'],['brokers','Broker Desk','🏦'],['alerts','Alerts','🔔'],['data','Data Center','🗄'],['diag','Data Health','🩺'],['engine','Engine & Health','⚙'],['settings','Settings · Other devices','🔐'],['real','💰 Real Money','💰'],['chain','🎯 AI Option Chain','🎯']];
+ ['research','Research & Backtests','📚'],['ipos','IPOs','🆕'],['brokers','Broker Desk','🏦'],['alerts','Alerts','🔔'],['data','Data Center','🗄'],['diag','Data Health','🩺'],['engine','Engine & Health','⚙'],['settings','Settings · Other devices','🔐'],['real','💰 Real Money','💰'],['chain','🎯 AI Option Chain','🎯'],['cmd','🧠 Command Center','🧠']];
 const R={};  // renderers
 /* ---------- navigation: 10 modules, each existing screen lives in exactly one module (as a tab) ---------- */
 const MODULES=[
  ['today','Today','🏠',['home','overview']],
- ['trading','Trading','⚡',['algo','real','chain','terminal','paper','live','options','brokers']],
+ ['trading','Trading','⚡',['cmd','algo','real','chain','terminal','paper','live','options','brokers']],
  ['mkts','Markets','🌍',['markets','charts']],
  ['ai','AI & Scanner','🧠',['scanner','intel','flows','news']],
  ['rsch','Research','🔬',['research','lab','value']],
@@ -319,7 +341,15 @@ function charges(value,side,seg='delivery',brokerId='groww',currency='INR'){
   const total=brokerage+stt+stamp+exch+sebi+dp+gst;return {brokerage:+brokerage.toFixed(2),stt:+stt.toFixed(2),stamp:+stamp.toFixed(2),exch:+exch.toFixed(2),sebi:+sebi.toFixed(2),dp,gst:+gst.toFixed(2),total:+total.toFixed(2),verification:ver}}
 
 /* ---------- quotes helpers ---------- */
-const Q=id=>API.quotes?.quotes?.[id];
+/* every portal page uses these live exchange prices instead of the engine's ~15-min-delayed quotes while the laptop streams */
+const LAPQ={};let LAP_RENDER=0,LAP_BADGE=0;
+const Q=id=>{const l=LAPQ[id];if(l&&Date.now()-l._at<60000)return l;return API.quotes?.quotes?.[id]};
+function hubOverlay(L){let n=0;for(const x of L.quotes||[]){const age=x.age_ms??(x.age!=null?x.age*1000:null);if(!x.p||age==null||age>120000||x.src==='portal-delayed')continue;const old=API.quotes?.quotes?.[x.sym]||{};
+  LAPQ[x.sym]={...old,sym:x.sym,p:x.p,pc:x.pc??old.pc,chg_pct:x.pc?(x.p/x.pc-1)*100:old.chg_pct,day_o:x.o??old.day_o,day_h:x.h??old.day_h,day_l:x.l??old.day_l,
+   t:new Date(x.exch_ts?x.exch_ts*1000:Date.now()-age).toISOString(),d:new Date().toISOString().slice(0,10),ex:old.ex||'NSE',src:'shoonya (live)',delay_min:0,status:'REALTIME',intraday:true,_at:Date.now()};n++}
+ if(!n||document.hidden)return;if(Date.now()-LAP_BADGE>1000){LAP_BADGE=Date.now();const e=$('#dbadge');if(e)e.outerHTML=dataBadge()}
+ if(Date.now()-LAP_RENDER>15000){LAP_RENDER=Date.now();softRender()}}
+
 const qname=id=>Q(id)?.name||API.instruments?.instruments?.find(i=>i.id===id)?.name||id;
 function quoteTile(id,label){const q=Q(id);if(!q)return `<div class="kpi"><b class="mut">—</b><span>${esc(label||id)}</span><small>no data</small></div>`;
   return `<div class="kpi"><b>${fmt(q.p,q.p>1000?0:2)} <span class="${cls(q.chg_pct)}" style="font-size:14px">${pct(q.chg_pct)}</span></b><span>${esc(label||q.name||id)}</span><small>${tag(q.status)} ${esc(q.d)}${q.intraday?' · '+new Date(q.t).toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'}):''}</small></div>`}
@@ -501,7 +531,7 @@ function liveRender(L){const b=$('#liveBox');if(!b)return;
 let CHAIN_TIMER=null,CHAIN_U=null;
 R.chain=function(){chainPoll();clearInterval(CHAIN_TIMER);CHAIN_TIMER=setInterval(chainPoll,3000)};
 async function chainPoll(){if((location.hash||'').slice(1)!=='chain'){clearInterval(CHAIN_TIMER);CHAIN_TIMER=null;return}if(document.hidden&&CHAIN_U!==null)return;
- const L=await laptopState();chainRender(L)}
+ const L=hubFresh()||await laptopState();chainRender(L)}
 function chainRender(L){const el=$('#s-chain');if(!el)return;const head=`<h1>🎯 AI Option Chain <span class="tag PAPER">MODE: PAPER</span></h1><p class="sub">The algorithm finds today's NIFTY / BANKNIFTY contracts by itself (from Shoonya's official contract list), reads live CE and PE prices, decides the market direction first, then scores every contract and picks the best one - or says NO TRADE. Trades here are paper only.</p>`;
  if(!L){el.innerHTML=head+`<div class="danger">16VITAWS LIVE is not running on this laptop. Start <b>16VITAWS-LIVE</b> from the Desktop.</div>`;return}
  const C=L.chain;if(!C){el.innerHTML=head+`<div class="warn">This laptop runs an older 16VITAWS LIVE. Restart the laptop (or close 16VITAWS LIVE and start it again from the Desktop) to get the option-chain engine.</div>`;return}
@@ -573,7 +603,7 @@ function realMoneyCard(L){const H=L.broker_health||{},O=L.options||{},rb=L.real_
    ${ck(!has(ob,'options_real'),'Options real mode switched on','in settings.env: OPTIONS_MODE=REAL and OPTIONS_REAL=yes')}</ul></div></div>
   <p class="help"><b>Where to switch it on:</b> on this laptop open <code>%USERPROFILE%\\vision_live\\settings.env</code> in Notepad, change the lines shown above, save, and restart 16VITAWS-LIVE. Until the paper record lines are green it stays in paper mode even if you change the settings - that is on purpose. Trading can lose money; nothing here is investment advice.</p></div>`}
 let LIVE_MISS=0,LIVE_BUSY=false,LIVE_SEEN=false;
-async function livePoll(){if((location.hash||'').slice(1)!=='algo'){clearInterval(LIVE_TIMER);LIVE_TIMER=null;return}if((document.hidden&&LIVE_SEEN)||LIVE_BUSY)return;LIVE_BUSY=true;try{const L=await laptopState();if(L){LIVE_MISS=0;LIVE_SEEN=true;liveRender(L)}else if(++LIVE_MISS>=3)liveRender(null);else{const b=$('#liveBox .mut');if(b)b.textContent='connecting to 16VITAWS LIVE on this laptop…'}}finally{LIVE_BUSY=false}}
+async function livePoll(){if((location.hash||'').slice(1)!=='algo'){clearInterval(LIVE_TIMER);LIVE_TIMER=null;return}if((document.hidden&&LIVE_SEEN)||LIVE_BUSY)return;LIVE_BUSY=true;try{const L=hubFresh()||await laptopState();if(L){LIVE_MISS=0;LIVE_SEEN=true;liveRender(L)}else if(++LIVE_MISS>=3)liveRender(null);else{const b=$('#liveBox .mut');if(b)b.textContent='connecting to 16VITAWS LIVE on this laptop…'}}finally{LIVE_BUSY=false}}
 async function algoStop(){if(!confirm('Stop the laptop algorithm now? No new orders will be placed until you resume.'))return;toast(await laptopCmd('/kill')?'Live algorithm STOPPED':'16VITAWS LIVE is not running on this laptop');livePoll()}
 async function algoResume(){if(prompt('Type RESUME to let the laptop algorithm trade again')!=='RESUME')return;toast(await laptopCmd('/resume')?'Live algorithm resumed':'16VITAWS LIVE is not running on this laptop');livePoll()}
 
@@ -1429,6 +1459,256 @@ function devicesCard(){const url=location.origin+location.pathname.replace(/inde
   <p class="help">The engine, auto paper accounts, signals, options, flows, funds and live proposals are the same on every device automatically. Things <i>you</i> type in (manual paper book, logged real holdings, watchlist, your alerts) are saved per browser: press <b>Export</b> below on this device and <b>Import</b> on the other to bring them along.</p>
   <div class="row"><button class="btn sm" onclick="exportData()">Export my data</button><label class="btn sm grey" style="margin:0">Import data<input type="file" accept=".json" style="display:none" onchange="importData(this)"></label><button class="btn sm grey" onclick="navigator.clipboard.writeText('${esc(url)}').then(()=>toast('Link copied'))">Copy portal link</button></div></div>
   <div style="text-align:center"><div style="background:#fff;border-radius:12px;padding:10px;display:inline-block;width:190px"><img src="qr.svg" alt="QR code to open 16VITAWS" style="width:170px;height:170px"></div><p class="help">Scan with your phone camera</p></div></div></div>`}
+/* ===================== REAL-TIME HUB: ONE connection to 16VITAWS LIVE on this laptop, shared by every screen =====================
+   Event stream (pushed on every tick, max 4 updates/s for the screen) with automatic fallback to polling. Every screen reads the
+   same state object - the chart, the algorithm panel, positions and P&L can never show different versions of the data. */
+const HUB={S:null,at:0,via:'—',es:null,fails:0,poll:null,offline:false,subs:[],lag:null,n:0};
+function hubFresh(ms=4000){return HUB.S&&Date.now()-HUB.at<ms?HUB.S:null}
+function hubStart(){if(HUB.es)return;let es;try{es=new EventSource(LIVE_URL+'/stream')}catch(e){return hubPoll()}HUB.es=es;
+ es.onmessage=m=>{try{hubSet(JSON.parse(m.data),'stream')}catch(e){}};
+ es.onerror=()=>{if(++HUB.fails>=2){es.close();HUB.es=null;hubPoll();setTimeout(hubStart,20000)}}}
+function hubPoll(){if(HUB.poll)return;const run=async()=>{if(HUB.es&&Date.now()-HUB.at<3000){clearTimeout(HUB.poll);HUB.poll=null;return}
+  const L=document.hidden?null:await laptopState();if(L)hubSet(L,'poll');else if(!document.hidden){HUB.offline=Date.now()-HUB.at>8000}
+  HUB.poll=setTimeout(run,HUB.offline?8000:1000)};HUB.poll=setTimeout(run,0)}
+function hubSet(S,via){HUB.S=S;HUB.at=Date.now();HUB.via=via;HUB.fails=0;HUB.offline=false;HUB.n++;
+ HUB.lag=S.served_at_ms?Math.max(0,Date.now()-S.served_at_ms):null;                 // algorithm -> this screen (same computer clock)
+ hubOverlay(S);if(document.hidden)return;for(const f of HUB.subs)try{f(S)}catch(e){console.error(e)}}
+/* ---------- permanent real-time status bar (top of every page) ---------- */
+const DOT={ok:'🟢',warn:'🟡',bad:'🔴',off:'⚪'};
+function msTxt(ms){return ms==null?'N/A':ms<1000?Math.round(ms)+' ms':(ms/1000).toFixed(1)+' s'}
+function liveAge(S){const d=S?.data;if(!d||d.age_ms==null)return null;return d.age_ms+(Date.now()-HUB.at)+(HUB.lag||0)}   // age NOW, not when it was sent
+function dataLevel(S){const d=S?.data;if(!d)return ['bad','NO DATA'];if(['LOST','UNAVAILABLE'].includes(d.status))return ['bad',d.label];if(d.status==='RESYNC')return ['warn',d.label];
+ if(d.status==='MARKET CLOSED')return ['off','MARKET CLOSED'];const a=liveAge(S);if(a==null)return ['bad','STALE'];return a<=d.live_ms?['ok','LIVE']:a<=d.stale_ms?['warn','DELAYED']:['bad','STALE']}
+function rtbar(){const el=$('#rtbar');if(!el)return;const th=$('.top')?.offsetHeight;if(th&&th!==rtbar.h){rtbar.h=th;document.documentElement.style.setProperty('--toph',th+'px')}const S=hubFresh(30000);
+ if(!S){el.className='rtbar bad';el.innerHTML=`<span>${DOT.bad} <b>16VITAWS LIVE not reachable on this laptop</b></span><span class="mut">Prices on this page are the engine's (about 15 minutes delayed). No live trading data. ${HUB.offline?'Start 16VITAWS-LIVE from the Desktop.':'connecting…'}</span>`;return}
+ if(!S.data){el.className='rtbar warn';el.innerHTML=`<span>${DOT.warn} <b>Older 16VITAWS LIVE running</b></span><span class="mut">Double-click <b>16VITAWS-LIVE</b> on the Desktop once to update it - then this bar shows live freshness, latency and sync.</span>`;return}
+ const [lv,lt]=dataLevel(S),B=S.status_bar||{},ui=Date.now()-HUB.at,uiOk=ui<3000,real=S.algo?.mode==='LIVE';
+ const chip=(k,lvl,v,title='')=>`<span class="rt ${lvl}" title="${esc(title)}"><small>${k}</small> ${DOT[lvl]} ${v}</span>`;
+ const al={RUNNING:'ok',WAITING:'warn','MARKET CLOSED':'off',PAUSED:'warn',ERROR:'bad'}[B.algorithm]||'warn';
+ el.className='rtbar '+(lv==='bad'||!uiOk?'bad':'');
+ el.innerHTML=`<span class="rt mode ${real?'bad':'warn'}">${real?'🔴 LIVE TRADING · REAL MONEY':'🟡 PAPER · SIMULATED'}</span>`+
+  chip('DATA',lv,`${lt} · ${msTxt(liveAge(S))}`,`${S.data.source} · last tick ${msTxt(liveAge(S))} ago · live ≤ ${S.data.live_ms} ms, stale > ${S.data.stale_ms} ms`)+
+  chip('ALGORITHM',al,esc(B.algorithm),S.algo?.detail)+chip('BROKER',B.broker==='LIVE'?'ok':B.broker==='NEEDS LOGIN'?'bad':'warn',esc(B.broker))+
+  chip('ORDERS',/^PENDING/.test(B.orders)?'warn':'ok',esc(B.orders))+chip('POSITIONS',B.positions==='MISMATCH'?'bad':'ok',esc(B.positions))+
+  chip('P&L',(B.pnl?.age_ms==null)?'off':(B.pnl.age_ms+(Date.now()-HUB.at))<=S.data.stale_ms?'ok':'warn',B.pnl?.updated?msTxt(B.pnl.age_ms+(Date.now()-HUB.at))+' old':'no open position','P&L based on market data at '+(B.pnl?.updated||'—'))+
+  chip('CLOCK',B.clock==='SYNCED'?'ok':B.clock==='N/A'?'off':'bad',esc(B.clock),S.data.clock?.note)+
+  chip('UI',uiOk?'ok':'bad',uiOk?`LIVE · ${msTxt(HUB.lag)}`:'NOT UPDATING',`screen update via ${HUB.via}; algorithm → screen ${msTxt(HUB.lag)}`)}
+
+/* ---------- small helpers for the command center ---------- */
+const lapPost=async(path,msg)=>{const ok=await laptopCmd(path);toast(ok?msg:'16VITAWS LIVE is not running on this laptop');return ok};
+const NA='<span class="mut" title="not provided by the engine">N/A</span>',nv=(x,f)=>x==null||x===''?NA:(f?f(x):esc(x));
+const rupee=(x,d=0)=>x==null?NA:`<span class="${cls(x)}">${x>0?'+':''}₹${fmt(x,d)}</span>`;
+function modal(html){const m=$('#modal');m.innerHTML=`<div class="mbox"><button class="btn sm grey mx" onclick="$('#modal').hidden=true">✕ Close</button>${html}</div>`;m.hidden=false}
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&$('#modal'))$('#modal').hidden=true});
+const MK={AUTO_BUY:{c:'#2FE39A',s:'arrowUp',p:'belowBar',t:'▲ BUY'},AUTO_SELL:{c:'#FF5C7A',s:'arrowDown',p:'aboveBar',t:'▼ SELL'},EXIT:{c:'#38E1FF',s:'circle',p:'aboveBar',t:'● EXIT'},
+ SL:{c:'#FF5C7A',s:'square',p:'aboveBar',t:'✕ SL'},TARGET:{c:'#FFC857',s:'circle',p:'aboveBar',t:'✓ TARGET'},REJECTED:{c:'#8FA6C2',s:'circle',p:'belowBar',t:'○ SIGNAL'},MANUAL:{c:'#B48CFF',s:'square',p:'aboveBar',t:'◆ MANUAL'}};
+const IST_SHIFT=19800;   // the chart library draws UTC; shifting by +5:30 shows Indian time on the axis
+
+/* ---------- 🧠 ALGORITHM COMMAND CENTER ---------- */
+const CMD={sym:null,chart:null,series:null,lines:[],cd:null,tab:'pos',last:0,dbg:false,fetchAt:0,markers:[]};
+R.cmd=function(){const el=$('#s-cmd');
+ el.innerHTML=`<div id="cmdBanner"></div><div id="cmdMoney"></div>
+ <div class="cmdgrid"><div>
+  <div class="card glow"><div class="row" style="justify-content:space-between;gap:8px"><h3 style="margin:0">📈 <span id="cmdSymName">Chart</span> <small class="mut" id="cmdSrc"></small></h3>
+   <select id="cmdSym" style="width:auto;min-width:230px"></select></div>
+   <div id="cmdChart" class="chart" style="height:430px;margin-top:8px"></div>
+   <div class="legend">${Object.values(MK).map(m=>`<span style="color:${m.c}">${m.t}</span>`).join('')}<span style="color:#2FE39A">— ENTRY</span><span style="color:#FF5C7A">— SL</span><span style="color:#FFC857">— TARGET</span><span class="mut">· click a marker for the full trade · 1-minute candles · IST</span></div></div>
+  <div class="card"><div class="tabs" id="cmdTabs">${[['pos','Positions'],['prof','💹 Profit & charges'],['ord','Orders'],['jr','Trade journal'],['pnl','P&L'],['perf','Strategies'],['risk','Risk'],['sig','Signals'],['ev','Event log'],['rep','Daily report'],['mon','Data monitor']].map(([k,n])=>`<button data-k="${k}" class="${k===CMD.tab?'on':''}">${n}</button>`).join('')}</div><div id="cmdBottom" class="tbl"></div></div>
+ </div>
+ <aside id="cmdSide"></aside></div>`;
+ $('#cmdTabs').onclick=e=>{const b=e.target.closest('button');if(!b)return;CMD.tab=b.dataset.k;$$('#cmdTabs button').forEach(x=>x.classList.toggle('on',x===b));cmdUpdate(HUB.S,true)};
+ $('#cmdSym').onchange=()=>{CMD.sym=$('#cmdSym').value;cmdChart(true)};
+ CMD.chart=null;cmdUpdate(hubFresh(30000),true);loadLwc().then(()=>cmdChart(true))};
+HUB.subs.push(S=>{rtbar();const id=(location.hash||'').slice(1);if(id==='cmd'&&Date.now()-CMD.last>250)cmdUpdate(S);
+ if(id==='algo'&&Date.now()-(window.LIVE_LAST||0)>1000){window.LIVE_LAST=Date.now();liveRender(S)}
+ if(id==='chain'&&Date.now()-(window.CHAIN_LAST||0)>1000){window.CHAIN_LAST=Date.now();chainRender(S)}});
+
+function cmdUpdate(S,force){const el=$('#s-cmd');if(!el||el.hidden||!$('#cmdSide'))return;CMD.last=Date.now();
+ if(!S){$('#cmdBanner').innerHTML=`<div class="danger"><b>🔴 LIVE DATA UNAVAILABLE.</b> 16VITAWS LIVE is not running on this laptop (or not reachable), so nothing here can be shown as current. Start <b>16VITAWS-LIVE</b> from the Desktop. New automatic trades happen only inside that program, and only on fresh data.</div>`;$('#cmdSide').innerHTML='';$('#cmdBottom').innerHTML='';return}
+ if(!S.algo){$('#cmdBanner').innerHTML=`<div class="warn">This laptop runs an older 16VITAWS LIVE without the command center. Double-click <b>16VITAWS-LIVE</b> on the Desktop once (it downloads the new version and restarts).</div>`;return}
+ const A=S.algo,real=A.mode==='LIVE';
+ $('#cmdBanner').innerHTML=real?`<div class="danger" style="font-size:16px"><b>🔴 LIVE TRADING</b> · REAL BROKER ORDERS — REAL MONEY · ${esc(A.broker)}</div>`:`<div class="warn" style="font-size:15px"><b>🟡 PAPER TRADING</b> · SIMULATED ORDERS — NO REAL MONEY${A.mode_requested==='REAL'?' · (REAL requested but still locked)':''}</div>`;
+ if(S.who)$('#cmdBanner').insertAdjacentHTML('beforeend',`<div class="help" style="margin:-6px 0 10px">MY TRADING ACCOUNT · ${esc(S.who.broker)} · ${esc(S.who.account)} · ${esc(S.who.scope)}</div>`);
+ const syms=[...new Set([...(S.trades||[]).filter(t=>t.status==='OPEN').map(t=>t.chart_sym),...(S.quotes||[]).map(q=>q.sym),...(S.trades||[]).map(t=>t.chart_sym)])].filter(Boolean);
+ const sel=$('#cmdSym');if(sel&&sel.options.length!==syms.length){const cur=CMD.sym||syms[0];sel.innerHTML=syms.map(s=>`<option ${s===cur?'selected':''}>${esc(s)}</option>`).join('');if(!CMD.sym){CMD.sym=cur;cmdChart(true)}}
+ $('#cmdMoney').innerHTML=cmdMoneyRow(S);$('#cmdSide').innerHTML=cmdSide(S);if(!(CMD.tab==='prof'&&document.activeElement?.type==='date'))$('#cmdBottom').innerHTML=cmdBottom(S);cmdLive(S);
+ if(Date.now()-CMD.fetchAt>(String(CMD.sym).startsWith('OPT ')?5000:60000))cmdChart(false)}
+
+function cmdSide(S){const A=S.algo,D=S.data,P=S.pnl||{},C=S.capital||{},K=S.risk||{};const [lv,lt]=dataLevel(S);
+ const stc={RUNNING:'pos',WAITING:'',PAUSED:'neg','MARKET CLOSED':'mut',ERROR:'neg'}[A.status]||'';
+ const open=(S.trades||[]).filter(t=>t.status==='OPEN');
+ const latest=(S.journal||[]).slice().reverse().find(e=>e.trade_id);
+ return `<div class="card side">
+  <div class="eyebrow">ALGORITHM STATUS</div><h2 class="${stc}" style="margin:4px 0">● ${esc(A.status)}</h2><div class="help">${esc(A.detail)}</div>
+  <table class="kv">${[['Mode',`<b class="${A.mode==='LIVE'?'neg':''}">${esc(A.mode)}</b>`],['Broker',`${esc(A.broker)} · ${esc(A.broker_state||'—')}`],['Market',esc(A.market)],['Data',`${DOT[lv]} ${lt} · ${msTxt(liveAge(S))}`],
+   ['Last algorithm scan',nv(A.last_scan)],['Last option-chain scan',nv(A.last_chain_scan)],['Next scan',esc(A.next_scan)],['Strategy',`${esc(A.strategy?.name)} v${esc(A.strategy?.version)}`],['Market regime',nv(A.regime)]].map(([a,b])=>`<tr><td>${a}</td><td>${b}</td></tr>`).join('')}</table>
+  <div class="row" style="gap:6px;flex-wrap:wrap;margin-top:8px">${S.paused?`<button class="btn sm buy" onclick="lapPost('/unpause','Algorithm resumed')">▶ RESUME ALGORITHM</button>`:`<button class="btn sm grey" onclick="lapPost('/pause','Algorithm paused - positions still managed')">⏸ PAUSE ALGORITHM</button>`}
+   ${S.killed?`<button class="btn sm buy" onclick="algoResume()">▶ Kill switch OFF</button>`:`<button class="btn sm sell" onclick="algoStop()">■ KILL SWITCH</button>`}
+   <button class="btn sm grey" onclick="cmdCancelAll()">✕ Cancel pending orders</button><button class="btn sm grey" onclick="cmdCloseAll()">⏹ Close all PAPER positions</button></div>
+  <p class="help">Real positions are never closed automatically from here (no emergency market orders). Close real positions in the Shoonya app.</p></div>
+ ${cmdDecision(S)}
+ <div class="card side"><h3>⚙ Execution pipeline ${latest?`<small class="mut">${esc(latest.trade_id)}</small>`:''}</h3>${cmdPipeline(S)}</div>
+ <div class="card side"><h3>⏱ Real-time connection</h3>${cmdLatency(S)}</div>
+ <div class="card side"><h3>📜 Live execution feed</h3><ul class="log feed">${(S.journal||[]).slice(-40).reverse().map(e=>`<li class="ev-${esc(e.type)}"><small class="mut">${esc(e.time_ms||e.time)}</small> <b>${esc(e.type.replace(/_/g,' '))}</b> <span class="tag ${e.mode==='LIVE'?'BEAR':'PAPER'}" style="font-size:9px">${esc(e.mode)}</span><br>${esc(e.msg)}</li>`).join('')||'<li class="mut">No events yet today</li>'}</ul></div>
+ <div class="card side"><h3>💰 Capital</h3><table class="kv">${[['Total capital (paper)',`₹${fmt(C.total,0)}`],['Available capital',`₹${fmt(C.available,0)}`],['Capital invested',`₹${fmt(C.invested,0)}`],['Margin used',`₹${fmt(C.margin_used,0)} <small class="mut">${esc(C.margin_note)}</small>`],['Free margin',`₹${fmt(C.available,0)}`],['Open position value',`₹${fmt(C.position_value,0)}`],['Option premium in use',`₹${fmt(C.option_premium,0)}`],['Equity now',`₹${fmt(C.equity,0)}`]].map(([a,b])=>`<tr><td>${a}</td><td class="num">${b}</td></tr>`).join('')}</table>${C.funds_broker?`<p class="help">Broker funds (Shoonya): cash ₹${esc(C.funds_broker.cash)}</p>`:''}</div>
+ <div class="card side"><h3>📊 Today</h3><div class="grid g2">${[['Realized P&L',rupee(P.realized)],['Unrealized P&L',rupee(P.unrealized)],['Gross profit',rupee(P.gross_profit)],['Gross loss',rupee(P.gross_loss)],['Charges',P.charges?`₹${fmt(P.charges)}`:'₹0'],['Net P&L',rupee(P.net)],['Return',P.return_pct==null?NA:pct(P.return_pct)],['Trades',P.trades],['Winning / losing',`${P.wins} / ${P.losses}`],['Win rate',P.win_rate==null?NA:P.win_rate+'%'],['Average win',rupee(P.avg_win)],['Average loss',rupee(P.avg_loss)],['Largest win',rupee(P.largest_win)],['Largest loss',rupee(P.largest_loss)]].map(([a,b])=>`<div class="stat"><span>${a}</span><b style="font-size:16px">${b}</b></div>`).join('')}</div>
+  <p class="help">P&amp;L based on market data at ${esc(S.status_bar?.pnl?.updated||'—')}. ${open.length?'':'No open position.'}</p></div>
+ <div class="card side"><h3>🛡 Daily risk</h3><table class="kv">${[['Starting equity today',C.total!=null&&K.start_equity_today!=null?`₹${fmt(K.start_equity_today,0)}`:NA],['Current equity',`₹${fmt(C.equity,0)}`],["Today's P&L",rupee(K.today)],['Daily loss limit',`₹${fmt(K.limit,0)}`],['Loss used',K.loss_used_pct+'%'],['Risk status',`<b class="${K.status==='SAFE'?'pos':'neg'}">${K.status==='DAILY LOSS LIMIT REACHED'?'🔴 ':''}${esc(K.status)}</b>`]].map(([a,b])=>`<tr><td>${a}</td><td class="num">${b}</td></tr>`).join('')}</table>
+  <div class="bar"><i style="width:${Math.min(100,K.loss_used_pct||0)}%;background:${(K.loss_used_pct||0)>=100?'var(--down)':(K.loss_used_pct||0)>=50?'var(--flat)':'var(--up)'}"></i></div></div>
+ <div class="card side"><h3>📈 Intraday equity</h3>${cmdCurve(S.curve||[])}</div>
+ <div class="card side"><h3>🧩 Active strategies</h3>${cmdStrategies(S)}</div>
+ <div class="card side"><h3>🩺 Algorithm health</h3><table class="kv">${(A.health||[]).map(h=>`<tr><td>${esc(h.name)}</td><td>${h.ok?'🟢':'🔴'} ${esc(h.status)}</td></tr>`).join('')}</table></div>
+ <div class="card side"><details ${CMD.dbg?'open':''} ontoggle="CMD.dbg=this.open"><summary><b>🔬 Debug / algorithm inspector</b></summary>${cmdInspector(S)}</details></div>`}
+
+function cmdDecision(S){const A=S.algo,W=A.watching||[],ch=A.chain||{};
+ const rows=W.map(w=>{const ok=w.status==='IN POSITION'||w.status==='EXECUTING',rej=w.status==='REJECTED';
+  return `<div class="sig ${ok?'buy':rej?'blk':''}"><div class="row" style="justify-content:space-between"><b>${ok?'🟢 BUY':rej?'⛔ SIGNAL REJECTED':w.status==='DONE'?'✔ DONE TODAY':'⏳ WAITING'} · ${esc(w.sym)}</b><small class="mut">${esc(w.checked)}</small></div>
+   <div style="font-size:13px">Live ${fmt(w.price)} <small class="mut">(${w.age_ms==null?'age N/A':w.age_ms+' ms old'}, ${esc(w.src||'—')})</small> · entry ${fmt(w.entry)} · SL ${fmt(w.stop)} · target ${nv(w.target,x=>fmt(x))}</div>
+   <div style="font-size:13px">Strategy: <b>${esc(w.strategy)}</b> · engine score ${nv(w.score)} <small class="mut">(rule points, not a probability)</small></div>
+   ${(w.why_not||[]).length?`<div class="help" style="color:var(--warnink)">${(w.why_not||[]).map(esc).join('<br>')}</div>`:''}
+   <div class="row" style="gap:6px;margin-top:4px"><button class="btn sm grey" onclick="cmdWhy('${esc(w.sym)}')">WHY?</button>${ok?'':`<button class="btn sm grey" onclick="cmdWhyNot('${esc(w.sym)}')">WHY NOT BUY?</button>`}${w.trade_id?`<button class="btn sm grey" onclick="cmdTrade('${esc(w.trade_id)}')">Trade</button>`:''}</div></div>`}).join('');
+ const crow=Object.entries(ch).map(([u,d])=>{const dc=d.decision||'NO_TRADE',buy=/^BUY/.test(dc),k=d.contract||{};
+  return `<div class="sig ${buy?'buy':d.paused?'blk':''}"><div class="row" style="justify-content:space-between"><b>${buy?'🟢':/^WATCH/.test(dc)?'🟡':'⚪'} ${esc(dc.replace('_',' '))} · ${esc(u)}</b><small class="mut">score ${nv(d.score)}${d.min_score?' / min '+d.min_score:''}</small></div>
+   ${k.tsym?`<div style="font-size:13px">${esc(k.tsym)} · ask ${fmt(k.ask)} · spread ${nv(k.spread_pct)}% · quote ${k.age_s==null?'age N/A':Math.round(k.age_s*1000)+' ms old'}</div>`:''}
+   <div class="help">${(d.reasons||[]).slice(0,3).map(esc).join('<br>')}</div><button class="btn sm grey" onclick="cmdChainWhy('${esc(u)}')">${buy?'WHY?':'WHY NOT?'}</button></div>`}).join('');
+ const blk=(A.engine_blocked||[]).slice(0,6).map(b=>`<li><b>${esc(b.symbol)}</b> score ${esc(b.score)} — ${esc(b.reason)}</li>`).join('');
+ return `<div class="card side"><h3>🎯 Current decisions</h3>${rows||'<div class="mut">No stock BUY signal from the engine today.</div>'}${crow}
+  ${blk?`<details><summary class="mut">Signals the engine rejected today (${(A.engine_blocked||[]).length})</summary><ul class="rules">${blk}</ul></details>`:''}</div>`}
+
+function cmdPipeline(S){const ev=S.journal||[];const last=ev.slice().reverse().find(e=>e.trade_id||e.signal_id);if(!last)return '<div class="mut">No signal has reached the pipeline today. The stages light up when one does.</div>';
+ const key=last.trade_id?'trade_id':'signal_id',id=last[key];const sid=(ev.find(e=>e[key]===id)||{}).signal_id;
+ const mine=ev.filter(e=>(id&&e[key]===id)||(sid&&e.signal_id===sid));const has=t=>mine.find(e=>e.type===t);
+ const st=[['Market data received',S.data.status==='LIVE'||!!has('SIGNAL_GENERATED')],['Signal generated','SIGNAL_GENERATED'],['Risk approved','RISK_APPROVED'],['Position sized','POSITION_SIZED'],['Order created','ORDER_CREATED'],['Order submitted','ORDER_SUBMITTED'],['Order filled','ORDER_FILLED'],['Position active','POSITION_OPENED'],['Exit','POSITION_CLOSED']];
+ const bad=has('SIGNAL_REJECTED')||has('SIGNAL_INVALIDATED');
+ return `<ul class="steps">${st.map(([n,t])=>{const e=typeof t==='string'?has(t):null,ok=typeof t==='boolean'?t:!!e;return `<li><span class="ic ${ok?'ok':'wait'}">${ok?'✓':'·'}</span><div>${n}${e?` <small class="mut">${esc(e.time_ms)}</small>`:''}</div></li>`}).join('')}</ul>${bad?`<div class="help neg">⛔ ${esc(bad.msg)}</div>`:''}`}
+
+function cmdLatency(S){const D=S.data,lvl=ms=>ms==null?'off':ms>3000?'bad':ms>1000?'warn':'ok',a=liveAge(S);
+ const lastOrder=(S.orders||[]).find(o=>o.mode==='LIVE');
+ const rows=[['Market data (last tick)',a,`${D.source}`],['Exchange → this PC (avg)',D.exch_to_server?.avg_ms,D.exch_to_server?.note],['Tick → algorithm (avg)',D.server_to_algo?.avg_ms,`max ${msTxt(D.server_to_algo?.max_ms)} · ${D.server_to_algo?.samples} ticks`],
+  ['Algorithm → this screen',HUB.lag,`via ${HUB.via}`],['P&L',S.status_bar?.pnl?.age_ms==null?null:S.status_bar.pnl.age_ms+(Date.now()-HUB.at),'age of the price behind the open P&L'],['Broker (submit → ack)',lastOrder?.latency?.submit_to_ack_ms??null,lastOrder?'last real order':'N/A - paper mode, no broker orders']];
+ const worst=D.status!=='LIVE'&&D.status!=='MARKET CLOSED';
+ return `<table class="kv">${rows.map(([n,v,t])=>`<tr title="${esc(t)}"><td>${n}</td><td class="num">${DOT[lvl(v)]} ${msTxt(v)}</td></tr>`).join('')}</table>
+  <div class="help">${worst?`<b class="neg">🔴 TRADING PAUSED - ${esc(D.label)}</b>`:rows.some(r=>lvl(r[1])==='warn')?'<b style="color:var(--warnink)">🟡 HIGH LATENCY</b>':'All measured values are real; N/A = not measurable.'} Exchange timestamps come in whole seconds.</div>`}
+
+function cmdCurve(c){if(c.length<2)return '<div class="mut">The intraday equity curve starts with the first 30-second sample in market hours.</div>';
+ const v=c.map(x=>x[1]),lo=Math.min(...v),hi=Math.max(...v),W=320,H=90,sx=i=>i/(c.length-1)*W,sy=x=>H-(hi===lo?H/2:(x-lo)/(hi-lo)*H);
+ let pk=v[0],dd=0;v.forEach(x=>{pk=Math.max(pk,x);dd=Math.max(dd,pk-x)});
+ return `<svg viewBox="0 0 ${W} ${H}" style="width:100%;height:90px"><path d="${v.map((x,i)=>(i?'L':'M')+sx(i).toFixed(1)+' '+sy(x).toFixed(1)).join('')}" fill="none" stroke="${v[v.length-1]>=v[0]?'#2FE39A':'#FF5C7A'}" stroke-width="2"/></svg>
+  <div class="help">Now ₹${fmt(v[v.length-1],0)} · high ₹${fmt(hi,0)} · low ₹${fmt(lo,0)} · max drawdown ₹${fmt(dd,0)} · realized ${rupee(c[c.length-1][2])} · unrealized ${rupee(c[c.length-1][3])}</div>`}
+
+function cmdStrategies(S){const A=S.algo,perf=Object.fromEntries((S.perf||[]).map(p=>[p.strategy,p]));
+ const list=[{n:A.strategy?.name||'Portal BUY signals',st:A.status,last:(S.journal||[]).slice().reverse().find(e=>e.type==='SIGNAL_GENERATED'&&!/Option/.test(e.strategy||''))?.time},{n:'AI Option Chain (CE/PE selection)',st:Object.keys(A.chain||{}).length?'SCANNING':'WAITING FOR CHAIN',last:(S.journal||[]).slice().reverse().find(e=>e.type==='SIGNAL_GENERATED'&&/Option/.test(e.strategy||''))?.time}];
+ return list.map(s=>{const p=perf[s.n]||{};return `<details><summary><b>✓ ${esc(s.n)}</b> <small class="mut">${esc(s.st)}</small></summary><table class="kv">${[['Last signal',nv(s.last)],['Trades today',p.today??0],['Open',p.open??0],['Closed (all time)',p.trades??0],['P&L (all time)',rupee(p.pnl)],['Win rate',p.win_rate==null?NA:p.win_rate+'%'],['Max drawdown',p.max_drawdown==null?NA:'₹'+fmt(p.max_drawdown,0)]].map(([a,b])=>`<tr><td>${a}</td><td class="num">${b}</td></tr>`).join('')}</table></details>`}).join('')}
+
+function cmdInspector(S){const W=S.algo.watching||[];const out=W.map(w=>{const I=w.indicators||{};
+  return `<h4>${esc(w.sym)} · ${esc(w.strategy)}</h4><table class="kv">${[['Live price',fmt(I.live_price)],['Live VWAP',nv(I.live_vwap,x=>fmt(x))],['Bid / Ask',I.bid?fmt(I.bid)+' / '+fmt(I.ask):NA],['RSI(14) daily',nv(I.rsi,x=>fmt(x,1))],['SMA50',nv(I.sma50,x=>fmt(x))],['SMA200',nv(I.sma200,x=>fmt(x))],['Volume ratio',nv(I.vol_ratio,x=>fmt(x,2))],['ATR',nv(I.atr,x=>fmt(x))],['EMA / MACD / ADX',NA+' <small class="mut">(not used by this strategy)</small>']].map(([a,b])=>`<tr><td>${a}</td><td class="num">${b}</td></tr>`).join('')}</table>
+   ${(w.contrib||[]).length?`<b>Signal score breakdown</b><table class="kv">${w.contrib.map(c=>`<tr><td>${esc(c.rule)}</td><td class="num">${c.points>0?'+':''}${esc(c.points)}</td></tr>`).join('')}<tr><td><b>Total</b></td><td class="num"><b>${esc(w.score)}</b></td></tr></table>`:''}
+   ${(w.checks||[]).length?`<b>Conditions at the last evaluation</b><table class="kv">${w.checks.map(c=>`<tr><td>${esc(c.name)}</td><td>${c.ok?'<b class="pos">PASS</b>':'<b class="neg">FAIL</b>'} <small class="mut">${esc(c.detail)}</small></td></tr>`).join('')}</table>`:''}<p>Final: <b>${esc(w.status)}</b></p>`}).join('');
+ const ch=Object.entries(S.algo.chain||{}).map(([u,d])=>{const k=d.contract||{},b=d.bias||{};return `<h4>${esc(u)} option chain</h4><table class="kv">${[['Spot',fmt(d.spot)],['ATM',fmt(d.atm,0)],['Direction',`${esc(b.bias||'—')} (${b.points??'—'} points, ${b.confidence??'—'}%)`],...Object.entries(k.scores||{}).map(([a,v])=>[a+' score',fmt(v,1)]),['Combined score',nv(d.score)],['Final',esc(d.decision)]].map(([a,v])=>`<tr><td>${a}</td><td class="num">${v}</td></tr>`).join('')}</table><ul class="rules">${(b.why||[]).map(w=>`<li>${esc(w)}</li>`).join('')}</ul>`}).join('');
+ return (out||'<p class="mut">No stock signal under evaluation.</p>')+ch}
+
+function cmdBottom(S){const T=S.trades||[],t=CMD.tab,mode=x=>`<span class="tag ${x==='LIVE'?'BEAR':'PAPER'}">${esc(x)}</span>`;
+ if(t==='pos'){const o=T.filter(x=>x.status==='OPEN');return o.length?`<table><tr><th>Instrument</th><th>Mode</th><th class="num">Qty</th><th class="num">Entry</th><th class="num">LTP</th><th class="num">SL</th><th class="num">Target</th><th class="num">Unrealized</th><th class="num">Data age</th></tr>${o.map(x=>`<tr onclick="cmdTrade('${esc(x.id)}')" style="cursor:pointer"><td><b>${esc(x.instrument)}</b><br><small class="mut">${esc(x.strategy)}</small></td><td>${mode(x.mode)}</td><td class="num">${x.qty}</td><td class="num">${fmt(x.fill_price)}</td><td class="num">${fmt(x.ltp)}</td><td class="num">${fmt(x.stop)}</td><td class="num">${nv(x.target,v=>fmt(v))}</td><td class="num"><b>${rupee(x.unrealized)}</b></td><td class="num">${msTxt(x.data_age_ms)}</td></tr>`).join('')}<tr><td colspan=7><b>Total unrealized</b></td><td class="num"><b>${rupee(o.reduce((s,x)=>s+(x.unrealized||0),0))}</b></td><td></td></tr></table>`:'<div class="empty">No open positions.</div>'}
+ if(t==='prof')return profitTab(S);
+ if(t==='ord'){const o=S.orders||[];return o.length?`<table><tr><th>Time</th><th>Mode</th><th>Side</th><th>Symbol</th><th class="num">Qty</th><th class="num">Price</th><th>Status</th><th>Order ID</th><th>Broker message</th></tr>${o.map(x=>`<tr><td>${esc(String(x.time||'').slice(11,19))}</td><td>${mode(x.mode)} <small class="mut">${esc(x.execution)}</small></td><td class="${x.side==='BUY'?'pos':'neg'}">${esc(x.side)}</td><td>${esc(x.symbol)}</td><td class="num">${x.qty}</td><td class="num">${fmt(x.avg||x.price)}</td><td><b>${esc(x.status)}</b></td><td><small>${esc(x.order_id)}</small></td><td><small>${esc(x.broker_msg)}</small></td></tr>`).join('')}</table>`:'<div class="empty">No orders yet.</div>'}
+ if(t==='jr')return `<table><tr><th>Time</th><th>Instrument</th><th>Mode</th><th>Strategy</th><th class="num">Signal</th><th class="num">Order</th><th class="num">Fill</th><th class="num">Qty</th><th class="num">Capital</th><th class="num">SL</th><th class="num">Target</th><th class="num">Exit</th><th class="num">Gross</th><th class="num">Charges</th><th class="num">Net</th><th>Status</th><th>Reason</th></tr>${T.slice().reverse().map(x=>`<tr onclick="cmdTrade('${esc(x.id)}')" style="cursor:pointer"><td>${esc(String(x.entry_time||'').slice(5,16).replace('T',' '))}</td><td><b>${esc(x.instrument)}</b></td><td>${mode(x.mode)}</td><td><small>${esc(x.strategy)}</small></td><td class="num">${nv(x.signal_price,v=>fmt(v))}</td><td class="num">${nv(x.order_price,v=>fmt(v))}</td><td class="num">${fmt(x.fill_price)}</td><td class="num">${x.qty}</td><td class="num">${fmt(x.capital,0)}</td><td class="num">${nv(x.stop,v=>fmt(v))}</td><td class="num">${nv(x.target,v=>fmt(v))}</td><td class="num">${nv(x.exit_price,v=>fmt(v))}</td><td class="num">${nv(x.gross,v=>fmt(v,0))}</td><td class="num">${nv(x.charges,v=>fmt(v,0))}</td><td class="num"><b>${x.status==='OPEN'?rupee(x.unrealized):rupee(x.net)}</b></td><td>${esc(x.status)}</td><td><small>${esc(x.exit_type&&x.exit_type!=='N/A'?x.exit_type+' · ':'')}${esc(x.exit_reason||'')}</small></td></tr>`).join('')||'<tr><td colspan=17 class="mut">No trades yet.</td></tr>'}</table>`;
+ if(t==='pnl'){const P=S.pnl;return `<div class="grid g4">${[['Realized',rupee(P.realized)],['Unrealized',rupee(P.unrealized)],['Total today',rupee(P.total)],['Charges',`₹${fmt(P.charges)}`],['Trades',P.trades],['Win rate',P.win_rate==null?NA:P.win_rate+'%'],['Best trade',nv(P.best)],['Worst trade',nv(P.worst)]].map(([a,b])=>`<div class="stat"><span>${a}</span><b>${b}</b></div>`).join('')}</div><p class="help">One calculation for everything: the chart markers, this table, positions and the journal all read the same trade records. Charges are itemised (brokerage, STT, exchange, SEBI, GST, stamp duty) from charges.json on the laptop - open the 💹 Profit &amp; charges tab.</p>`}
+ if(t==='perf')return `<table><tr><th>Strategy</th><th class="num">Trades</th><th class="num">Wins</th><th class="num">Losses</th><th class="num">Win rate</th><th class="num">P&L</th><th class="num">Avg trade</th><th class="num">Max DD</th><th class="num">Open</th></tr>${(S.perf||[]).map(p=>`<tr><td><b>${esc(p.strategy)}</b></td><td class="num">${p.trades}</td><td class="num">${p.wins}</td><td class="num">${p.losses}</td><td class="num">${p.win_rate==null?'—':p.win_rate+'%'}</td><td class="num">${rupee(p.pnl)}</td><td class="num">${rupee(p.avg_trade)}</td><td class="num">₹${fmt(p.max_drawdown,0)}</td><td class="num">${p.open}</td></tr>`).join('')||'<tr><td colspan=9 class="mut">No closed trades yet.</td></tr>'}</table><p class="help">From the actual trade history only.</p>`;
+ if(t==='risk'){const K=S.risk;return `<table class="kv">${[['Total exposure',`₹${fmt(K.exposure,0)}`],['Capital used',`₹${fmt(S.capital.invested+S.capital.option_premium,0)}`],['Margin used',`₹${fmt(S.capital.margin_used,0)}`],['Available capital',`₹${fmt(S.capital.available,0)}`],['Open risk (to stops)',`₹${fmt(K.open_risk,0)}`],['Largest position',nv(K.largest)],['Number of positions',`${K.positions} (max ${K.max_positions})`],['Orders today',`${K.orders_today} (max ${K.max_orders})`],['Daily loss limit',`₹${fmt(K.limit,0)} · used ${K.loss_used_pct}%`],['Risk per trade (budget)',`₹${fmt(K.risk_per_trade,0)}`],['Max order value',`₹${fmt(K.max_order_value,0)}`]].map(([a,b])=>`<tr><td>${a}</td><td class="num">${b}</td></tr>`).join('')}</table>`}
+ if(t==='sig')return `<table><tr><th>Time</th><th>Symbol</th><th>Signal</th><th>Strategy</th><th class="num">Price</th><th>Result</th><th>Reason</th></tr>${(S.signal_history||[]).map(x=>`<tr onclick="cmdSignal('${esc(x.signal_id)}')" style="cursor:pointer"><td>${esc(x.time)}</td><td><b>${esc(x.symbol)}</b></td><td class="pos">${esc(x.signal)}</td><td><small>${esc(x.strategy)}</small></td><td class="num">${nv(x.price,v=>fmt(v))}</td><td><b class="${x.result==='EXECUTED'?'pos':x.result==='SEEN'?'':'neg'}">${esc(x.result)}</b></td><td><small>${esc(x.reason)}</small></td></tr>`).join('')||'<tr><td colspan=7 class="mut">No signals reached the algorithm today.</td></tr>'}</table>`;
+ if(t==='ev'){return `<ul class="log">${(S.journal||[]).slice().reverse().map(e=>`<li><small class="mut">${esc(e.time_ms)}</small> <b>${esc(e.type)}</b> ${mode(e.mode)} ${e.symbol?'<b>'+esc(e.symbol)+'</b>':''} ${e.trade_id?'<small class="mut">'+esc(e.trade_id)+'</small>':''}<br>${esc(e.msg)} <small class="mut">· ${esc(e.strategy||'')} · ${esc(e.source)}</small></li>`).join('')||'<li class="mut">Empty</li>'}</ul>`}
+ if(t==='rep'){const r=S.report||{};return `<h3>Algorithm daily report · ${esc(r.date)} <span class="tag PAPER">${esc(r.mode)}</span></h3><table class="kv">${[['Starting equity',nv(r.starting_equity,v=>'₹'+fmt(v,0))],['Ending / current equity',nv(r.ending_equity,v=>'₹'+fmt(v,0))],['Capital used today',`₹${fmt(r.capital_used,0)}`],['Trades',r.trades],['Winning / losing',`${r.wins} / ${r.losses}`],['Win rate',r.win_rate==null?NA:r.win_rate+'%'],['Gross profit / loss',`${rupee(r.gross_profit)} / ${rupee(r.gross_loss)}`],['Charges',`₹${fmt(r.charges)}`],['Net P&L',rupee(r.net)],['Return',r.return_pct==null?NA:pct(r.return_pct)],['Max drawdown',nv(r.max_drawdown,v=>'₹'+fmt(v,0))],['Largest win / loss',`${rupee(r.largest_win)} / ${rupee(r.largest_loss)}`],['Average win / loss',`${rupee(r.avg_win)} / ${rupee(r.avg_loss)}`],['Best / worst trade',`${nv(r.best)} / ${nv(r.worst)}`],['Most used strategy',nv(r.most_used)],['Best / worst strategy',`${nv(r.best_strategy)} / ${nv(r.worst_strategy)}`]].map(([a,b])=>`<tr><td>${a}</td><td class="num">${b}</td></tr>`).join('')}</table><p class="help">Saved automatically after 15:31 on the laptop (vision_live/reports) and sent to your phone.</p>`}
+ if(t==='mon'){const D=S.data;return `<div class="grid g4">${[['Market data',`${DOT[dataLevel(S)[0]]} ${esc(dataLevel(S)[1])}`],['Last tick',msTxt(liveAge(S))],['Average tick latency',msTxt(D.exch_to_server?.avg_ms)],['Maximum tick latency',msTxt(D.exch_to_server?.max_ms)],['Ticks received',fmt0(D.ticks)],['Ticks dropped (rejected)',fmt0(D.dropped)],['Duplicates ignored',fmt0(D.duplicates)],['Reconnects',`${D.reconnects}${D.last_reconnect?' · last '+esc(D.last_reconnect):''}`],['WebSocket',esc(D.feed_state)],['Data sequence',esc(D.sequence)],['Exchange time',nv(D.exchange_time)],['Local time (IST)',nv(D.local_time)]].map(([a,b])=>`<div class="stat"><span>${a}</span><b style="font-size:17px">${b}</b></div>`).join('')}</div>
+  <h3>Data quality</h3><table class="kv">${D.quality.map(q=>`<tr><td>${esc(q.name)}</td><td><b class="${q.status==='PASS'?'pos':q.status==='FAIL'?'neg':'mut'}">${esc(q.status)}</b> <small class="mut">${esc(q.detail)}</small></td></tr>`).join('')}</table>
+  <h3>Resync</h3><p><b>${esc(S.resync?.status||'not run')}</b> ${S.resync?.finished?'at '+esc(S.resync.finished):''}</p><ul class="steps">${(S.resync?.steps||[]).map(s=>`<li><span class="ic ${s.ok?'ok':'no'}">${s.ok?'✓':'✕'}</span><div><b>${esc(s.name)}</b> <small class="mut">${esc(s.detail)}</small></div></li>`).join('')}</ul>
+  ${S.recon?.status==='MISMATCH'?`<div class="danger"><b>🔴 POSITION MISMATCH - TRADING PAUSED</b><table>${S.recon.rows.map(r=>`<tr><td>${esc(r.sym)}</td><td>Portal ${r.portal}</td><td>Broker ${r.broker}</td></tr>`).join('')}</table></div>`:''}
+  <h3>Data gaps today</h3>${(D.gaps||[]).length?`<table>${D.gaps.map(g=>`<tr><td>⚠ ${esc(g.status)}</td><td>${esc(g.from)} → ${esc(g.to||'still open')}</td><td>${g.dur_s!=null?g.dur_s+' s':''}</td></tr>`).join('')}</table>`:'<div class="mut">None</div>'}
+  <p class="help">Thresholds (settings.env): LIVE ≤ ${D.live_ms} ms, STALE > ${D.stale_ms} ms, new entry needs the price ≤ ${esc(S.config?.ENTRY_MAX_AGE_MS)} ms old. Source: ${esc(D.source)}.</p>`}
+ return ''}
+
+/* WHY? / WHY NOT? - built only from conditions the engine actually evaluated */
+function cmdWhy(sym){const S=HUB.S,w=(S.algo.watching||[]).find(x=>x.sym===sym);if(!w)return;
+ modal(`<h2>WHY did the algorithm ${w.trade_id?'BUY':'flag'} ${esc(sym)}?</h2><p class="mut">Strategy: ${esc(w.strategy)} · signal ${esc(w.signal_id)}</p>
+  <ol>${(w.contrib||[]).map(c=>`<li>${esc(c.rule)} <b class="${c.points>0?'pos':'neg'}">(${c.points>0?'+':''}${c.points})</b></li>`).join('')||(w.why||[]).map(x=>`<li>${esc(x)}</li>`).join('')||'<li class="mut">The engine did not provide rule details for this signal.</li>'}
+  <li>Live price ${fmt(w.price)} within ±0.5% of the entry ${fmt(w.entry)}</li>${(w.checks||[]).filter(c=>c.ok).map(c=>`<li>${esc(c.name)}: ${esc(c.detail)}</li>`).join('')}</ol>
+  <p>Engine score <b>${nv(w.score)}</b> (rule points). FINAL DECISION: <b>${esc(w.status)}</b></p>`)}
+function cmdWhyNot(sym){const S=HUB.S,w=(S.algo.watching||[]).find(x=>x.sym===sym);if(!w)return;
+ modal(`<h2>WHY NOT BUY ${esc(sym)}?</h2><p>Status: <b>${esc(w.status)}</b> · checked ${esc(w.checked)}</p><ul>${(w.why_not||[]).map(x=>`<li class="neg">❌ ${esc(x)}</li>`).join('')||'<li>Nothing is blocking it.</li>'}</ul>
+  ${(w.checks||[]).length?`<h3>All conditions</h3><table class="kv">${w.checks.map(c=>`<tr><td>${c.ok?'✓':'✗'} ${esc(c.name)}</td><td><small>${esc(c.detail)}</small></td></tr>`).join('')}</table>`:''}`)}
+function cmdChainWhy(u){const d=(HUB.S.algo.chain||{})[u];if(!d)return;const k=d.contract||{},b=d.bias||{};
+ modal(`<h2>${esc(u)}: ${esc(d.decision)}</h2><h3>Stage 1 - market direction: ${esc(b.bias||'—')} (${b.confidence??'—'}%)</h3><ul>${(b.why||[]).map(x=>`<li>${esc(x)}</li>`).join('')}</ul>
+  ${k.tsym?`<h3>Stage 2 - contract ${esc(k.tsym)}</h3><table class="kv">${Object.entries(k.scores||{}).map(([a,v])=>`<tr><td>${esc(a)}</td><td class="num">${fmt(v,1)}/100</td></tr>`).join('')}<tr><td><b>Combined</b></td><td class="num"><b>${nv(d.score)}</b> (min ${nv(d.min_score)})</td></tr></table>`:''}
+  <h3>Reasons</h3><ul>${(d.reasons||[]).map(x=>`<li>${esc(x)}</li>`).join('')}</ul>${(d.warnings||[]).length?`<h3>Warnings</h3><ul>${d.warnings.map(x=>`<li class="neg">${esc(x)}</li>`).join('')}</ul>`:''}`)}
+function cmdSignal(sid){const x=(HUB.S.signal_history||[]).find(r=>r.signal_id===sid);if(!x)return;if(x.trade_id)return cmdTrade(x.trade_id);
+ modal(`<h2>Signal ${esc(x.symbol)} · ${esc(x.result)}</h2><p>${esc(x.time)} · ${esc(x.strategy)} · price ${nv(x.price,v=>fmt(v))}</p>${x.reason?`<div class="danger">${esc(x.reason)}</div>`:''}
+  ${(x.contrib||[]).length?`<table class="kv">${x.contrib.map(c=>`<tr><td>${esc(c.rule)}</td><td class="num">${c.points>0?'+':''}${c.points}</td></tr>`).join('')}</table>`:''}`)}
+function cmdTrade(id){const t=(HUB.S?.trades||[]).find(x=>x.id===id);if(!t)return toast('Trade not found');const L=t.timeline||{},at=L.at||{};
+ if(t.chart_sym&&t.chart_sym!==CMD.sym&&$('#cmdSym')){CMD.sym=t.chart_sym;const s=$('#cmdSym');if([...s.options].some(o=>o.value===t.chart_sym))s.value=t.chart_sym;cmdChart(true)}
+ modal(`<h2>TRADE ${esc(t.id)} · BUY ${esc(t.instrument)}</h2><p><span class="tag ${t.mode==='LIVE'?'BEAR':'PAPER'}">${esc(t.mode)}</span> <span class="tag ${t.execution==='SIMULATED'?'SIMULATED':'LIVE'}">${t.execution==='SIMULATED'?'SIMULATED EXECUTION':'BROKER EXECUTION'}</span> <b>${esc(t.status)}</b></p>
+ <div class="grid g2"><table class="kv">${[['Strategy',esc(t.strategy)],['Signal',nv(at.signal)],['Order',nv(at.submit)],['Fill',nv(at.fill)+(t.fill_model?` <small class="mut">${esc(t.fill_model)}</small>`:'')],['Signal price',nv(t.signal_price,v=>fmt(v))],['Fill price',fmt(t.fill_price)],['Slippage',t.slippage==null?NA:fmt(t.slippage)],['Quantity',t.qty],['Capital',`₹${fmt(t.capital,0)}`]].map(([a,b])=>`<tr><td>${a}</td><td class="num">${b}</td></tr>`).join('')}</table>
+ <table class="kv">${[['Stop loss',nv(t.stop,v=>fmt(v))],['Target',nv(t.target,v=>fmt(v))],['Risk',nv(t.risk,v=>'₹'+fmt(v,0))],['Potential reward',nv(t.reward,v=>'₹'+fmt(v,0))],['Risk / reward',nv(t.rr)],['Current price',nv(t.ltp,v=>fmt(v))],[t.status==='OPEN'?'Unrealized P&L':'Net P&L',t.status==='OPEN'?rupee(t.unrealized):rupee(t.net)],['Exit',t.exit_price?`${fmt(t.exit_price)} · ${esc(t.exit_type)} · ${esc(t.exit_reason)}`:'—'],['Gross / charges',t.gross!=null?`₹${fmt(t.gross,0)} / ₹${fmt(t.charges,0)}`:'—']].map(([a,b])=>`<tr><td>${a}</td><td class="num">${b}</td></tr>`).join('')}</table></div>
+ <h3>Why it bought</h3><ul>${(t.contrib||[]).map(c=>c.rule?`<li>${esc(c.rule)} <b>(${c.points>0?'+':''}${c.points})</b></li>`:'').join('')||''}${(Array.isArray(t.reasons)?t.reasons:[t.reasons]).filter(Boolean).map(r=>`<li>${esc(r)}</li>`).join('')}${t.contrib&&!Array.isArray(t.contrib)?Object.entries(t.contrib).map(([a,v])=>`<li>${esc(a)} score ${fmt(v,1)}/100</li>`).join(''):''}</ul>
+ ${chargeTable(t)}<p class="help">Order ID ${esc(t.order_id||'—')} · ${t.execution==='SIMULATED'?'paper simulator (no broker)':'broker'} · ${esc(t.mode)}</p>
+ ${(t.checks||[]).length?`<h3>Risk checks</h3><table class="kv">${t.checks.map(c=>`<tr><td>${c.ok?'✓':'✗'} ${esc(c.name)}</td><td><small>${esc(c.detail)}</small></td></tr>`).join('')}</table>`:''}
+ <h3>Latency (actual timestamps)</h3><table class="kv">${[['Signal → risk',L.signal_to_risk_ms],['Risk → order',L.risk_to_order_ms],['Order → submit',L.order_to_submit_ms],['Submit → broker ack',L.submit_to_ack_ms],['→ fill',L.ack_to_fill_ms],['Total',L.total_ms]].map(([a,v])=>`<tr><td>${a}</td><td class="num">${v==null?NA:v+' ms'}</td></tr>`).join('')}</table>
+ ${t.mode==='PAPER'?'<p class="help">Simulated fill - this is not a broker fill. No money moved.</p>':''}`)}
+async function cmdCloseAll(){if(prompt('Close ALL PAPER positions at the current bid? Type CLOSE')!=='CLOSE')return;await lapPost('/paper/close_all','Paper positions closed')}
+async function cmdCancelAll(){const live=(HUB.S?.orders||[]).filter(o=>o.mode==='LIVE'&&!['COMPLETE','REJECTED','CANCELLED','FAILED'].includes(o.status));if(!live.length)return toast('No pending real orders (paper orders fill instantly)');
+ if(prompt(`Cancel ${live.length} pending REAL order(s) at the broker? Type CANCEL`)!=='CANCEL')return;await lapPost('/orders/cancel_all','Cancel sent to the broker')}
+
+/* chart: 1-minute candles from the laptop (Shoonya history + the same live ticks the algorithm uses) with every algorithm marker */
+async function cmdChart(reset){const el=$('#cmdChart');if(!el||!CMD.sym)return;CMD.fetchAt=Date.now();let cd;
+ try{const c=new AbortController();setTimeout(()=>c.abort(),8000);const r=await fetch(LIVE_URL+'/api/candles?sym='+encodeURIComponent(CMD.sym),{signal:c.signal});cd=await r.json()}catch(e){if(reset)el.innerHTML='<div class="empty">Chart needs 16VITAWS LIVE on this laptop.</div>';return}
+ CMD.cd=cd;$('#cmdSymName').textContent=CMD.sym;$('#cmdSrc').textContent='· '+cd.source+(cd.note?' · '+cd.note:'');
+ if(!window.LightweightCharts){el.innerHTML='<div class="empty">Chart library not loaded.</div>';return}
+ if(reset||!CMD.chart){el.innerHTML='';CMD.chart=LightweightCharts.createChart(el,{layout:{background:{color:'transparent'},textColor:'#8FA6C2'},grid:{vertLines:{color:'#14233b'},horzLines:{color:'#14233b'}},timeScale:{timeVisible:true,secondsVisible:false},rightPriceScale:{borderColor:'#1B2E4B'},autoSize:true});
+  CMD.series=CMD.chart.addCandlestickSeries({upColor:'#2FE39A',downColor:'#FF5C7A',wickUpColor:'#2FE39A',wickDownColor:'#FF5C7A',borderVisible:false});CMD.lines=[];
+  CMD.chart.subscribeClick(p=>{if(!p.time||!CMD.markers.length)return;const m=CMD.markers.filter(x=>x.time===p.time&&x.trade_id);if(m.length)cmdTrade(m[0].trade_id);else{const r=CMD.markers.find(x=>x.time===p.time&&x.msg);if(r)modal(`<h2>○ Signal not executed</h2><p>${esc(r.msg)}</p>`)}})}
+ const bars=(cd.candles||[]).map(c=>({time:c[0]+IST_SHIFT,open:c[1],high:c[2],low:c[3],close:c[4]}));
+ if(!bars.length){el.querySelector('.empty')||el.insertAdjacentHTML('beforeend','<div class="empty" style="position:absolute;top:40%;left:0;right:0">No live ticks for this symbol yet.</div>');}
+ CMD.series.setData(bars);
+ const times=new Set(bars.map(b=>b.time));
+ CMD.markers=(cd.markers||[]).map(m=>{const t=Math.floor(m.ts/60)*60+IST_SHIFT,k=MK[m.type]||MK.EXIT;return {time:times.has(t)?t:bars.reduce((a,b)=>Math.abs(b.time-t)<Math.abs(a-t)?b.time:a,bars[0]?.time||t),position:k.p,color:k.c,shape:k.s,text:`${k.t}${m.text?' '+m.text:''}`,trade_id:m.trade_id,msg:m.msg}}).sort((a,b)=>a.time-b.time);
+ CMD.series.setMarkers(CMD.markers.map(({time,position,color,shape,text})=>({time,position,color,shape,text})));
+ CMD.lines.forEach(l=>CMD.series.removePriceLine(l));CMD.lines=(cd.lines||[]).map(l=>CMD.series.createPriceLine({price:l.price,color:l.kind==='SL'?'#FF5C7A':l.kind==='TARGET'?'#FFC857':'#2FE39A',lineWidth:1,lineStyle:2,title:`${l.kind} ${fmt(l.price)}`}));
+ if(reset)CMD.chart.timeScale().fitContent()}
+function cmdLive(S){if(!CMD.series||!CMD.cd||!CMD.sym)return;const q=(S.quotes||[]).find(x=>x.sym===CMD.sym);if(!q||!q.p||q.src==='portal-delayed')return;   // same tick -> current candle
+ const ts=(q.exch_ts||q.recv_ts),m=Math.floor(ts/60)*60+IST_SHIFT,c=CMD.cd.candles,last=c[c.length-1];
+ if(last&&last[0]+IST_SHIFT===m){last[2]=Math.max(last[2],q.p);last[3]=Math.min(last[3],q.p);last[4]=q.p}else if(!last||m>last[0]+IST_SHIFT)c.push([m-IST_SHIFT,q.p,q.p,q.p,q.p,null]);else return;
+ const b=c[c.length-1];try{CMD.series.update({time:b[0]+IST_SHIFT,open:b[1],high:b[2],low:b[3],close:b[4]})}catch(e){}}
+
+/* ---------- 💹 PROFIT & CHARGES (from the ONE accounting engine on the laptop: gross, every charge, net) ---------- */
+const CK=[['brokerage','Brokerage'],['stt','STT / CTT'],['exchange','Exchange charges'],['sebi','SEBI charges'],['gst','GST'],['stamp','Stamp duty'],['other','Other (DP etc.)']];
+let PROFIT_PERIOD='today',PROFIT_REP=null;
+function cmdMoneyRow(S){const C=S.capital||{},T=S.profit?.today?.PAPER||{},L=S.profit?.today?.LIVE||{},real=S.algo?.mode==='LIVE',R=real?L:T;
+ return `<div class="money"><div class="mtile"><span>TOTAL CAPITAL</span><b>₹${fmt(C.total,0)}</b></div><div class="mtile"><span>AVAILABLE</span><b>₹${fmt(C.available,0)}</b></div><div class="mtile"><span>INVESTED</span><b>₹${fmt(C.invested+(C.option_premium||0),0)}</b></div>
+  <div class="mtile g"><span>GROSS P&amp;L today</span><b>${rupee(R.gross,0)}</b><small>before any charge</small></div><div class="mtile c"><span>TOTAL CHARGES today</span><b>−₹${fmt(R.charges,2)}</b><small>brokerage ₹${fmt(R.brokerage,2)} · taxes ₹${fmt(R.taxes,2)}</small></div>
+  <div class="mtile n"><span>NET P&amp;L today</span><b>${rupee(R.net,0)}</b><small>after all charges · ${real?'LIVE':'PAPER'}</small></div>
+  <button class="btn sm" onclick="cmdCharges()">VIEW CHARGES</button></div>`}
+function cmdCharges(){const R=HUB.S?.profit?.today||{};const one=(m,x)=>`<h3>${m==='LIVE'?'🔴 LIVE':'🟡 PAPER / SIMULATED'} · today</h3>${x.trades?`<table class="kv">
+  <tr><td><b>GROSS P&amp;L</b> (before charges)</td><td class="num"><b>${rupee(x.gross,2)}</b></td></tr>${CK.map(([k,n])=>`<tr><td>${n}</td><td class="num">₹${fmt(x[k],2)}</td></tr>`).join('')}
+  <tr><td><b>TOTAL CHARGES</b></td><td class="num"><b class="neg">−₹${fmt(x.charges,2)}</b></td></tr><tr><td><b>NET P&amp;L</b> = gross − charges</td><td class="num"><b>${rupee(x.net,2)}</b></td></tr>
+  <tr><td>Slippage (already inside gross - shown, not subtracted twice)</td><td class="num">₹${fmt(x.slippage,2)}</td></tr></table>`:'<div class="mut">No closed trade today.</div>'}`;
+ modal(`<h2>Today's profit &amp; charges</h2>${one('PAPER',R.PAPER||{})}${one('LIVE',R.LIVE||{})}<p class="help">Charges are CALCULATED from the rules in <code>${esc(HUB.S?.profit?.charges_file||'charges.json')}</code> (checked ${esc(HUB.S?.profit?.rules_checked||'—')}; edit it if a rate changes). Shoonya's API does not report the charges it debits, so real-money figures must be compared with your contract note. Not tax advice.</p>`)}
+async function profitLoad(p){PROFIT_PERIOD=p||PROFIT_PERIOD;let q='period='+PROFIT_PERIOD;if(PROFIT_PERIOD==='custom'){const a=$('#pfFrom')?.value,b=$('#pfTo')?.value;if(!a||!b)return toast('Pick both dates');q+=`&from=${a}&to=${b}`}
+ try{const r=await fetch(LIVE_URL+'/api/report?'+q);PROFIT_REP=await r.json()}catch(e){PROFIT_REP=null;toast('16VITAWS LIVE is not running on this laptop')}if(CMD.tab==='prof')$('#cmdBottom').innerHTML=cmdBottom(HUB.S)}
+function profitTab(S){const T=S.trades||[],cl=T.filter(t=>t.status==='CLOSED').slice().reverse(),R=PROFIT_REP;if(!R)setTimeout(()=>profitLoad(),0);
+ const col=(x)=>`<table class="kv">${[['Total trades',x.trades],['Buy / sell orders',`${x.buy_orders} / ${x.sell_orders}`],['Winning / losing',`${x.wins} / ${x.losses}`],['Win rate',x.win_rate==null?NA:x.win_rate+'%'],
+  ['Gross profit',rupee(x.gross_profit,2)],['Gross loss',rupee(x.gross_loss,2)],['<b>GROSS P&amp;L</b>',`<b>${rupee(x.gross,2)}</b>`],...CK.map(([k,n])=>[n,'₹'+fmt(x[k],2)]),['Taxes (STT + GST + stamp)','₹'+fmt(x.taxes,2)],['Regulatory (exchange + SEBI)','₹'+fmt(x.regulatory,2)],
+  ['<b>TOTAL CHARGES</b>',`<b class="neg">−₹${fmt(x.charges,2)}</b>`],['Slippage (inside gross)','₹'+fmt(x.slippage,2)],['<b>NET P&amp;L</b>',`<b>${rupee(x.net,2)}</b>`],['Net profit / net loss',`${rupee(x.net_profit,2)} / ${rupee(x.net_loss,2)}`],['ROI (net / capital used)',x.roi_pct==null?NA:pct(x.roi_pct)],
+  ['Average profit / loss per trade',`${rupee(x.avg_profit,2)} / ${rupee(x.avg_loss,2)}`],['Largest profit / loss',`${rupee(x.largest_profit,2)} / ${rupee(x.largest_loss,2)}`],['Open positions (ESTIMATED net)',`${x.open_positions} · ${rupee(x.unrealized_net_est,2)}`]].map(([a,b])=>`<tr><td>${a}</td><td class="num">${b}</td></tr>`).join('')}</table>${x.incomplete?`<p class="help">${x.incomplete} trade(s) without full charge data (recorded before the charge engine) - DATA UNAVAILABLE, not counted as zero.</p>`:''}`;
+ return `<div class="row" style="gap:6px;flex-wrap:wrap">${[['today','Today'],['yesterday','Yesterday'],['week','This week'],['month','This month']].map(([k,n])=>`<button class="btn sm ${PROFIT_PERIOD===k?'':'grey'}" onclick="profitLoad('${k}')">${n}</button>`).join('')}
+  <input type="date" id="pfFrom" style="width:auto"><input type="date" id="pfTo" style="width:auto"><button class="btn sm grey" onclick="profitLoad('custom')">Custom range</button></div>
+ ${R?`<div class="grid g2" style="margin-top:8px"><div><h3>🟡 PAPER / SIMULATED · ${esc(R.PAPER.from)} → ${esc(R.PAPER.to)}</h3>${col(R.PAPER)}</div><div><h3>🔴 LIVE · real money</h3>${R.LIVE.trades?col(R.LIVE):'<div class="mut">No real-money trades in this period.</div>'}</div></div>`:'<div class="empty">loading…</div>'}
+ <h3>Trade-by-trade</h3><table><tr><th>Exit time</th><th>Instrument</th><th>Mode</th><th>Side</th><th class="num">Qty</th><th class="num">Entry</th><th class="num">Exit</th><th class="num">Turnover</th><th class="num">Gross P&amp;L</th><th class="num">Brokerage</th><th class="num">Taxes</th><th class="num">Other</th><th class="num">Total charges</th><th class="num">Net P&amp;L</th><th>Charges</th></tr>
+ ${cl.map(t=>{const c=t.components||{};return `<tr onclick="cmdTrade('${esc(t.id)}')" style="cursor:pointer"><td>${esc(String(t.exit_time||'').slice(5,16).replace('T',' '))}</td><td><b>${esc(t.instrument)}</b><br><small class="mut">${esc(t.strategy)}</small></td><td><span class="tag ${t.mode==='LIVE'?'BEAR':'PAPER'}">${esc(t.mode)}</span></td><td>BUY→SELL</td><td class="num">${t.qty}</td><td class="num">${fmt(t.fill_price)}</td><td class="num">${fmt(t.exit_price)}</td><td class="num">${fmt(t.turnover,0)}</td><td class="num">${rupee(t.gross,2)}</td><td class="num">${nv(c.brokerage,v=>fmt(v,2))}</td><td class="num">${c.stt==null?NA:fmt(c.stt+c.gst+c.stamp,2)}</td><td class="num">${c.exchange==null?NA:fmt(c.exchange+c.sebi+c.other,2)}</td><td class="num">${nv(t.charges,v=>fmt(v,2))}</td><td class="num"><b>${rupee(t.net,2)}</b></td><td><small>${esc(t.charges_status)}</small></td></tr>`}).join('')||'<tr><td colspan=15 class="mut">No closed trades yet.</td></tr>'}</table>`}
+function chargeTable(t){const b=t.cost_buy||{},s=t.cost_sell||{};if(!t.cost_buy&&!t.cost_sell)return `<p class="mut">Charges: DATA UNAVAILABLE for this trade.</p>`;
+ const row=(n,k)=>`<tr><td>${n}</td><td class="num">${b[k]==null?NA:'₹'+fmt(b[k],2)}</td><td class="num">${s[k]==null?(t.cost_sell?NA:'—'):'₹'+fmt(s[k],2)}</td></tr>`;
+ return `<h3>Trade cost breakdown <small class="mut">${esc(t.charges_status)}</small></h3><table class="kv"><tr><th></th><th class="num">BUY side</th><th class="num">SELL side${t.status==='OPEN'?' (ESTIMATED)':''}</th></tr>
+  <tr><td>Price × qty</td><td class="num">${fmt(b.price)} × ${b.qty??'—'}</td><td class="num">${s.price!=null?fmt(s.price)+' × '+s.qty:'—'}</td></tr>${row('Turnover','turnover')}${CK.map(([k,n])=>row(n,k)).join('')}${row('<b>Total charges</b>','total')}</table>
+  <table class="kv">${(t.status==='OPEN'?[['Unrealized GROSS P&L',rupee(t.gross_unrealized,2)],['Buy charges paid',`₹${fmt(t.charges_paid,2)}`],['ESTIMATED exit charges',`₹${fmt(t.est_exit_charges,2)}`],['<b>ESTIMATED NET P&L</b>',`<b>${rupee(t.est_net,2)}</b>`],['Position value',`₹${fmt(t.position_value,0)}`]]:
+  [['<b>GROSS P&L</b>',`<b>${rupee(t.gross,2)}</b>`],['<b>TOTAL CHARGES</b>',`<b class="neg">−₹${fmt(t.charges,2)}</b>`],['<b>NET P&L</b>',`<b>${rupee(t.net,2)}</b>`],['Slippage cost (inside gross)',t.slippage_cost==null?NA:'₹'+fmt(t.slippage_cost,2)],['Return on capital',t.roi_pct==null?NA:pct(t.roi_pct)],['Holding time',t.holding_min==null?NA:t.holding_min+' min']]).map(([a,v])=>`<tr><td>${a}</td><td class="num">${v}</td></tr>`).join('')}</table>
+  ${t.option?`<p class="help">Option: ${esc(t.option.underlying)} ${esc(t.option.expiry)} ${fmt(t.option.strike,0)} ${esc(t.option.type)} · long (bought to open, sold to close)</p>`:''}`}
 R.settings=function(){const el=$('#s-settings');const wl=store.get('watchlist',[]);
   el.innerHTML=`<h1>Settings & Security</h1>${devicesCard()}
   <div class="grid g2"><div class="card"><h3>Preferences (this device)</h3><label>Broker used for charge estimates<select id="stBrk">${(API.brokers?.brokers||[]).map(b=>`<option value="${b.id}" ${b.id===store.get('broker','groww')?'selected':''}>${esc(b.name)}</option>`).join('')}</select></label><label>Watchlist (comma separated symbols)<input id="stWl" value="${esc(wl.join(', '))}"></label><label>Practice budget (₹)<input id="stBudget" type="number" value="${store.get('budget',10000)}"></label><button class="btn sm" style="margin-top:8px" onclick="saveSettings()">Save</button></div>
@@ -1448,10 +1728,12 @@ async function boot(){pwa();buildNav();await loadAll(CORE);badges();const h=(loc
   $('#refreshBtn').onclick=async()=>{await loadAll();await loadLive().catch(()=>{});badges();markBook();evalAlerts();show((location.hash||'#home').slice(1));toast('Refreshed')};
   setInterval(async()=>{if(document.hidden)return;const before=API.meta?.generated_at;await loadAll(['meta']);if(API.meta?.generated_at!==before){await loadAll();badges();markBook();evalAlerts();softRender();toast('New engine data loaded')}},120000);   // only re-download when the engine published something new
   const liveTick=async()=>{let ch=false;try{ch=await loadLive()}catch(e){OBS.fails++}badges();if(ch){OBS.renders++;markBook();evalAlerts();softRender()}};
-  setInterval(()=>{if(!document.hidden)liveTick()},60000);                       // no network while the app is in the background
+  setInterval(()=>{if(!document.hidden)liveTick()},60000);
+  hubStart();hubPoll();setInterval(()=>{if(!document.hidden)rtbar()},250);   // ONE live connection to this laptop: pushed on every tick   // live Shoonya prices from this laptop                       // no network while the app is in the background
   document.addEventListener('visibilitychange',()=>{if(!document.hidden)liveTick()}); // catch up immediately on return
   setInterval(()=>{const e=$('#dbadge');if(e&&!document.hidden)e.outerHTML=dataBadge();if(!document.hidden&&(location.hash||'').slice(1)==='diag'&&!document.activeElement?.matches('input,select'))R.diag()},5000);
   window.addEventListener('hashchange',()=>{const id=location.hash.slice(1);if(SECTIONS.some(s=>s[0]===id)&&$('#s-'+id)?.hidden)show(id)});}
 boot();
 </script>
+<div id="modal" class="modal" hidden onclick="if(event.target===this)this.hidden=true"></div>
 </body></html>
