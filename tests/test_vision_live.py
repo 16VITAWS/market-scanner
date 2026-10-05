@@ -868,3 +868,13 @@ def test_state_never_contains_secrets(VL, monkeypatch):
     _live(VL, app)
     txt = json.dumps(VL.state_json(app, max_age=0), default=str)
     assert "TOPSECRET987" not in txt and "FA123456" not in txt and "XXXX3456" in txt          # account shown masked only
+
+
+def test_paper_progress_counts_trades_and_explains_why_none(VL, monkeypatch, tmp_path):
+    app = _app(VL, monkeypatch)
+    app.trader.set_signals({"buys": [], "sells": [], "regime": {"state": "BEAR"}, "data_status": "OK"})
+    P = VL.paper_progress(app)
+    assert P["stocks"]["closed"] == 0 and P["stocks"]["need"] == 30 and P["unit"].startswith("closed trades")
+    assert any("0 BUY signals" in w and "BEAR" in w for w in P["why_none_today"])
+    app.chain_tr.s["trades"] = [{"pnl": 120.0, "entry_time": "2026-10-01T10:00:00"}, {"pnl": -40.0, "entry_time": "2026-10-01T11:00:00"}]
+    assert VL.paper_progress(app)["options"]["closed"] == 2                              # AI option-chain trades count for the options test
