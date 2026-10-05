@@ -49,6 +49,7 @@ RULES = [
     (r"resign\w*.{0,80}(company secretary|compliance officer)|(company secretary|compliance officer).{0,60}resign", "MANAGEMENT_CHANGE", 30, "company secretary resigned"),
     (r"resign\w*.{0,60}\bdirector|\bdirector.{0,60}resign", "MANAGEMENT_CHANGE", 45, "director resigned"),
     (r"cessation", "MANAGEMENT_CHANGE", 30, "cessation of a director / officer"),
+    (r"change in directors/kmp", "MANAGEMENT_CHANGE", 25, "director / KMP / auditor change (details in the filing)"),
     (r"auditor", "AUDITOR", 15, "auditor appointment / change"),
     (r"reclassification.{0,80}promoter", "OWNERSHIP_CHANGE", 35, "promoter reclassified to public"),
     (r"encumbrance|pledg|invocation|31\s?\(1\)\s?(and|&)\s?31\s?\(2\)", "PLEDGE", 55, "promoter shares pledged / encumbrance changed"),
@@ -174,6 +175,175 @@ def load_universe(url, session=None):
         return [], f"universe list failed: {str(e)[:80]}"
 
 
+# ---------------------------------------------------------------- NSE (official RSS feeds on the nsearchives CDN)
+NSE_RSS = "https://nsearchives.nseindia.com/content/RSS/"
+NSE_FEEDS = {  # feed -> (default category, severity, reason) or None = classify by subject
+    "Online_announcements": None,
+    "InsiderTrading": ("INSIDER_TRADE", 30, "insider / promoter trade disclosed"),
+    "Sast_Regulation29": ("OWNERSHIP_CHANGE", 35, "stake of 5% or more acquired / changed (SAST Reg. 29)"),
+    "Sast_Regulation31": ("PLEDGE", 55, "promoter encumbrance / pledge disclosure (SAST Reg. 31)"),
+    "Sast_ReasonForEncumbrance": ("PLEDGE", 50, "promoter explained a large encumbrance / pledge"),
+}
+NSE_HDR = {"User-Agent": HDR["User-Agent"], "Accept": "application/rss+xml, application/xml, text/xml, */*", "Referer": "https://www.nseindia.com/"}
+
+
+def _nse_time(t):
+    for f in ("%d-%b-%Y %H:%M:%S", "%d-%b-%Y %H:%M", "%a, %d %b %Y %H:%M:%S %z"):
+        try:
+            x = dt.datetime.strptime((t or "").strip(), f)
+            if x.tzinfo:
+                x = x.astimezone(IST).replace(tzinfo=None)
+            return x.strftime("%Y-%m-%dT%H:%M:%S")
+        except Exception:
+            pass
+    return (t or "")[:19]
+
+
+def fetch_nse_feed(name, session=None):
+    """Returns (items, status). items: dicts title/description/pubDate/link."""
+    import xml.etree.ElementTree as ET
+    s = session or requests.Session()
+    try:
+        r = s.get(NSE_RSS + name + ".xml", headers=NSE_HDR, timeout=30)
+        r.raise_for_status()
+        root = ET.fromstring(r.content)
+    except Exception as e:
+        return [], f"failed: {str(e)[:120]}"
+    items = [{k: (it.findtext(k) or "").strip() for k in ("title", "description", "pubDate", "link")} for it in root.iter("item")]
+    oldest = _nse_time(items[-1]["pubDate"]) if items else None
+    return items, f"ok ({len(items)} items{', back to ' + oldest[:16].replace('T', ' ') if oldest else ''})"
+
+
+def insider_details(xml_text):
+    """Structured insider trades from NSE's XBRL file: one dict per disclosure (person, category, BUY/SELL, shares, value, mode)."""
+    import xml.etree.ElementTree as ET
+    try:
+        root = ET.fromstring(xml_text)
+    except Exception:
+        return [], {}
+    by, main = {}, {}
+    for el in root.iter():
+        tag = el.tag.split("}")[-1]
+        txt = (el.text or "").strip()
+        if not txt or len(el):
+            continue
+        ctx = el.get("contextRef") or ""
+        if ctx.startswith("Disclosure"):
+            by.setdefault(ctx, {})[tag] = txt
+        elif tag in ("Symbol", "NameOfTheCompany", "DateOfFiling", "DisclosureUnderRegulation"):
+            main[tag] = txt
+    out = []
+    num = lambda v: float(v) if v not in (None, "") and re.match(r"^-?[\d.]+$", v) else None
+    for k in sorted(by, key=lambda x: int(re.sub(r"\D", "", x) or 0)):
+        d = by[k]
+        pre = num(d.get("SecuritiesHeldPriorToAcquisitionOrDisposalPercentageOfShareholding"))
+        post = num(d.get("SecuritiesHeldPostAcquistionOrDisposalPercentageOfShareholding"))
+        out.append({"person": d.get("NameOfThePerson"), "category": d.get("CategoryOfPerson"),
+                    "type": (d.get("SecuritiesAcquiredOrDisposedTransactionType") or "").upper() or None,
+                    "shares": num(d.get("SecuritiesAcquiredOrDisposedNumberOfSecurity")),
+                    "value_inr": num(d.get("SecuritiesAcquiredOrDisposedValueOfSecurity")),
+                    "mode": d.get("ModeOfAcquisitionOrDisposal"), "instrument": d.get("TypeOfInstrument"),
+                    "pct_before": round(pre * 100, 4) if pre is not None and pre <= 1 else pre,
+                    "pct_after": round(post * 100, 4) if post is not None and post <= 1 else post,
+                    "from": d.get("DateOfAllotmentAdviceOrAcquisitionOfSharesOrSaleOfSharesSpecifyFromDat") or d.get("DateOfAllotmentAdviceOrAcquisitionOfSharesOrSaleOfSharesSpecifyFromDate"),
+                    "to": d.get("DateOfAllotmentAdviceOrAcquisitionOfSharesOrSaleOfSharesSpecifyToDate")})
+    return out, main
+
+
+def insider_severity(trades):
+    """Selling by promoters / directors / KMP in the market matters most; gifts, ESOPs, inheritance least."""
+    sev, why = 20, "insider / promoter trade disclosed"
+    for t in trades:
+        cat = (t.get("category") or "").lower()
+        mode = (t.get("mode") or "").lower()
+        big = any(w in cat for w in ("promoter", "director", "kmp", "key managerial"))
+        if re.search(r"pledge|invocation|encumb", mode):
+            return 55, "promoter shares pledged / pledge invoked"
+        if re.search(r"gift|inherit|esop|transmission|off market", mode):
+            s_, w_ = 10, "insider transfer (gift / ESOP / inheritance)"
+        elif t.get("type") == "SELL":
+            s_, w_ = (45, "promoter / director / KMP SOLD shares") if big else (30, "insider sold shares")
+        elif t.get("type") == "BUY":
+            s_, w_ = (25, "promoter / director / KMP BOUGHT shares") if big else (15, "insider bought shares")
+        else:
+            continue
+        if s_ > sev or why.startswith("insider / promoter trade disclosed"):
+            sev, why = s_, w_
+    return sev, why
+
+
+def _fmt_trades(trades):
+    parts = []
+    for t in trades[:4]:
+        sh = f"{t['shares']:,.0f} sh" if t.get("shares") is not None else "? sh"
+        val = f", Rs {t['value_inr']:,.0f}" if t.get("value_inr") else ""
+        pct = f", holding {t['pct_before']}% -> {t['pct_after']}%" if t.get("pct_before") is not None and t.get("pct_after") is not None else ""
+        parts.append(f"{t.get('person') or '?'} ({t.get('category') or '?'}) {t.get('type') or '?'} {sh}{val} via {t.get('mode') or '?'}{pct}")
+    return "; ".join(parts) + (f"; +{len(trades) - 4} more" if len(trades) > 4 else "")
+
+
+def nse_events(feed, items, universe_idx, session=None, max_xbrl=60):
+    s = session or requests.Session()
+    out, fetched = [], 0
+    for it in items:
+        title, desc, link = it.get("title", ""), re.sub(r"\s+", " ", it.get("description", "")), it.get("link", "")
+        t = _nse_time(it.get("pubDate"))
+        sym, trades = None, []
+        if feed == "Online_announcements":
+            subj = desc.split("SUBJECT:")[-1].strip() if "SUBJECT:" in desc else ""
+            c = classify("", subj, desc)
+            if not c:
+                continue
+            cat, sev, why = c
+            head = desc.split("|SUBJECT:")[0].strip()
+        elif feed == "InsiderTrading":
+            f = desc.split("|")
+            sym = f[0].strip().upper() if f and re.match(r"^[A-Z0-9&-]{2,20}$", f[0].strip()) else None
+            cat, sev, why = NSE_FEEDS[feed]
+            head = "Insider trading disclosure (SEBI PIT Reg. 7(2))"
+            if link.endswith(".xml") and fetched < max_xbrl:
+                fetched += 1
+                try:
+                    r = s.get(link, headers=NSE_HDR, timeout=20)
+                    if r.ok:
+                        trades, _ = insider_details(r.text)
+                except Exception:
+                    trades = []
+                if trades:
+                    sev, why = insider_severity(trades)
+                    head = _fmt_trades(trades)
+        else:
+            cat, sev, why = NSE_FEEDS[feed]
+            head = desc.strip(" |")[:300] or title
+        if sym is None or (universe_idx.get("sym") and sym not in universe_idx["sym"]):
+            msym, conf = map_symbol(title, sym or "", universe_idx)
+        else:
+            msym, conf = sym, "exact"
+        if not msym and sym:
+            msym, conf = None, "none"
+        ev = {"id": "nse-" + hashlib.sha1((link + t + head[:60]).encode()).hexdigest()[:16], "time": t, "company": title.strip(),
+              "symbol": msym, "nse_symbol": sym, "symbol_match": conf, "bse_code": None, "category": cat, "severity": sev, "reason": why,
+              "headline": head[:400], "filing_type": f"NSE {feed.replace('_', ' ')}", "source": "NSE filing",
+              "verified": "OFFICIAL EXCHANGE FILING", "pdf": link if re.search(r"\.(pdf|zip)$", link, re.I) else None,
+              "link": link or None}
+        if trades:
+            ev["trades"] = trades[:10]
+            ev["direction"] = "SELL" if any(x.get("type") == "SELL" for x in trades) else "BUY" if any(x.get("type") == "BUY" for x in trades) else None
+        out.append(ev)
+    return out
+
+
+def fetch_nse_all(universe_idx, session=None, feeds=None):
+    s = session or requests.Session()
+    events, status = [], {}
+    for feed in (feeds or NSE_FEEDS):
+        items, st = fetch_nse_feed(feed, s)
+        status[feed] = st
+        if items:
+            events += nse_events(feed, items, universe_idx, s)
+    return events, status
+
+
 def media_news(companies, fetch_fn, limit_q=20):
     """Google News for flagged / held companies, owner & management keywords only. Marked unverified."""
     out, status = [], {}
@@ -227,10 +397,14 @@ def clusters(evs, now):
     return out
 
 
+def ekey(e):
+    return e.get("symbol") or ("CO:" + (norm_name(e.get("company")) or str(e.get("bse_code"))))
+
+
 def company_profiles(events, now):
     by = {}
     for e in events:
-        k = e.get("symbol") or ("BSE:" + str(e.get("bse_code") or e["company"]))
+        k = ekey(e)
         by.setdefault(k, []).append(e)
     profiles = []
     for k, evs in by.items():
@@ -238,7 +412,7 @@ def company_profiles(events, now):
         # score: severity decayed by age (half-life 30 days), official filings full weight, media half
         raw, parts, top1 = 0.0, {}, 0.0
         for e in evs:
-            w = 0.5 ** (_age_days(e["time"], now) / 30) * (1.0 if e["source"] == "BSE filing" else 0.5)
+            w = 0.5 ** (_age_days(e["time"], now) / 30) * (1.0 if e["source"] in ("BSE filing", "NSE filing") else 0.5)
             v = e["severity"] * w
             raw += v
             top1 = max(top1, v)
@@ -271,6 +445,26 @@ def build(prev, new_events, now, watch=(), coverage=None):
         k = (e.get("company"), (e.get("time") or "")[:10], re.sub(r"[^a-z0-9]", "", (e.get("headline") or "").lower())[:80])
         if k not in best or e["severity"] > best[k]["severity"]:
             best[k] = e
+    # the same disclosure filed on both exchanges: keep one per company / day / category / source-mix, prefer NSE (structured)
+    grp = {}
+    for e in best.values():
+        grp.setdefault((ekey(e), (e.get("time") or "")[:10], e["category"]), []).append(e)
+    best = {}
+    for g in grp.values():
+        srcs = {x["source"] for x in g}
+        if len(srcs) > 1 and srcs <= {"BSE filing", "NSE filing"}:
+            pick = [x for x in g if x["source"] == "NSE filing"] if any(x.get("trades") for x in g) or sum(x["source"] == "NSE filing" for x in g) >= sum(x["source"] == "BSE filing" for x in g) else [x for x in g if x["source"] == "BSE filing"]
+            other = [x for x in g if x not in pick]
+            for x in pick:
+                x = dict(x)
+                x["also_filed"] = [{"source": o["source"], "link": o.get("pdf") or o.get("link")} for o in other][:3]
+                x["severity"] = max([x["severity"]] + [o["severity"] for o in other])
+                best[x["id"]] = x
+        else:
+            for x in g:
+                best[x["id"]] = x
+    for e in best.values():
+        e["key"] = ekey(e)
     fresh_ids = {e["id"] for e in best.values()}
     fresh = [e for e in fresh if e["id"] in fresh_ids]
     events = sorted(best.values(), key=lambda e: e["time"], reverse=True)[:MAX_EVENTS]
@@ -296,8 +490,9 @@ METHOD = ("Rule-based: each filing's type and headline are matched against fixed
           "or 80% of the single most serious event if that is higher, capped at 100. "
           "HIGH >= 50, WATCH >= 20. This is a reading aid, not a legal or investment judgement.")
 LIMITS = [
-    "Only BSE filings are read automatically. NSE-only filings and company websites are not read (NSE blocks automated cloud access).",
-    "PDF attachments are linked but not read - the number of shares, buy/sell direction, person and price inside an insider-trade PDF are NOT extracted.",
+    "Sources: NSE's official RSS feeds (announcements, insider trading, SAST 29 / 31, pledge reasons) and BSE announcements. Company websites are not read. BSE blocks cloud servers, so BSE may show FAILED - NSE then still covers dual-listed companies.",
+    "NSE feeds are rolling lists of recent filings. They are read about every 25 minutes during market and US-session hours and at 08:15 / 16:20 / 18:45 IST; a filing that appears and drops out between two reads can be missed.",
+    "Insider trades filed on NSE are read in detail (person, category, buy/sell, shares, value, holding before/after). PDF / ZIP attachments (BSE filings, SAST forms) are linked but not read.",
     "Salary / compensation figures come only from annual reports, which are not parsed. Only ESOP allotments and remuneration filings are flagged.",
     "Court cases, police or agency investigations that the company has not disclosed to the exchange are not known.",
     "News items are media reports matched by keywords and can be wrong or about a different company with a similar name.",
@@ -307,7 +502,7 @@ LIMITS = [
 ]
 
 
-def run(prev, now=None, universe=None, watch=(), fetch_news=None, session=None, days=None, flagged_news=True):
+def run(prev, now=None, universe=None, watch=(), fetch_news=None, session=None, days=None, flagged_news=True, nse=True, bse=True):
     """One refresh. prev = previously stored JSON (or {}). Returns new JSON."""
     now = now or now_ist()
     s = session or requests.Session()
@@ -315,10 +510,19 @@ def run(prev, now=None, universe=None, watch=(), fetch_news=None, session=None, 
     idx = universe_index(uni_rows)
     if days is None:
         days = 2 if (prev or {}).get("events") else 10
-    cov = {"bse": {"name": "BSE corporate announcements (official)", "days": {}, "status": "ok"},
+    pc = (prev or {}).get("coverage", {})
+    cov = {"bse": {"name": "BSE corporate announcements (official)", "days": {}, "status": "ok" if bse else "not run this time"},
+           "nse": {"name": "NSE official RSS feeds", "feeds": {}, "status": "not run this time", "last_success": (pc.get("nse") or {}).get("last_success")},
            "universe": uni_status, "news": {"name": "Google News RSS (media, unverified)", "status": "not run"}}
     new = []
-    for i in range(days):
+    if nse:
+        ev_n, st_n = fetch_nse_all(idx, s)
+        new += ev_n
+        ok = sum(1 for v in st_n.values() if v.startswith("ok"))
+        cov["nse"].update(feeds=st_n, status="ok" if ok == len(st_n) else ("PARTIAL" if ok else "FAILED - no NSE data this run"))
+        if ok:
+            cov["nse"]["last_success"] = now.isoformat(timespec="seconds")
+    for i in range(days if bse else 0):
         d = (now - dt.timedelta(days=i)).date()
         if d.weekday() >= 5 and i > 0:
             cov["bse"]["days"][d.isoformat()] = "weekend - skipped"
@@ -331,9 +535,11 @@ def run(prev, now=None, universe=None, watch=(), fetch_news=None, session=None, 
             e = bse_event(x, idx)
             if e:
                 new.append(e)
-    if not any(v.startswith("ok") for v in cov["bse"]["days"].values()):
+    if bse and not any(v.startswith("ok") for v in cov["bse"]["days"].values()):
         cov["bse"]["status"] = "FAILED - no BSE data this run; older history kept"
-    cov["bse"]["last_success"] = now.isoformat(timespec="seconds") if cov["bse"]["status"] == "ok" else (prev or {}).get("coverage", {}).get("bse", {}).get("last_success")
+    if not bse:
+        cov["bse"] = {**(pc.get("bse") or {}), "status": (pc.get("bse") or {}).get("status", "not run yet"), "note": "BSE is read only in the full runs (08:15, 16:20, 18:45 IST)"}
+    cov["bse"]["last_success"] = now.isoformat(timespec="seconds") if cov["bse"].get("status") == "ok" and bse else (pc.get("bse") or {}).get("last_success")
     if fetch_news and flagged_news:
         tmp = build(prev, new, now, watch)
         pick = [(p["company"], p["symbol"]) for p in tmp["profiles"] if p["level"] != "LOW" and p["symbol"]][:12]

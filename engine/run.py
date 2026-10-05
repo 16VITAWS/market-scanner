@@ -617,8 +617,9 @@ def _watch_symbols(site):
     return sorted(out)
 
 
-def write_company_intel(site, offline, notify=True):
-    """Owner / management / governance events from official BSE filings (+ media for flagged names)."""
+def write_company_intel(site, offline, notify=True, light=False):
+    """Owner / management / governance events from official NSE + BSE filings (+ media for flagged names).
+    light=True (live sessions, every ~25 min): only the small NSE feeds, no BSE paging, no news searches."""
     try:
         prev = site.load_json("api/company_intel.json", {}) or {}
     except Exception:
@@ -630,9 +631,9 @@ def write_company_intel(site, offline, notify=True):
     try:
         uni = CI.load_universe(C.UNIVERSE_URL)
         watch = _watch_symbols(site)
-        out = CI.run(prev, universe=uni, watch=watch, fetch_news=NEWS.fetch)
+        out = CI.run(prev, universe=uni, watch=watch, fetch_news=None if light else NEWS.fetch, bse=not light)
         api.write(site.path, "company_intel.json", out)
-        log(f"company intel: {len(out['events'])} events, {out['new_this_run']} new, {len(out['alerts'])} alerts, bse={out['coverage'].get('bse', {}).get('status')}")
+        log(f"company intel: {len(out['events'])} events, {out['new_this_run']} new, {len(out['alerts'])} alerts, nse={out['coverage'].get('nse', {}).get('status')}, bse={out['coverage'].get('bse', {}).get('status')}")
         if notify:
             n = NOTIFY.Notifier(site.path)
             for a in [a for a in out["alerts"] if a["severity"] >= 80 or a.get("yours")][:5]:
@@ -643,7 +644,7 @@ def write_company_intel(site, offline, notify=True):
     except Exception as e:  # noqa
         log("company intel failed:", e)
         if prev:
-            prev.setdefault("coverage", {})["bse"] = {**prev.get("coverage", {}).get("bse", {}), "status": f"FAILED this run: {str(e)[:120]} - showing previous data"}
+            prev.setdefault("coverage", {})["error"] = f"FAILED this run: {str(e)[:120]} - showing previous data"
             api.write(site.path, "company_intel.json", {k: v for k, v in prev.items() if k not in ("generated_at", "engine_version", "mode")})
         return prev
 
@@ -753,6 +754,11 @@ def job_intraday(site, offline=False, minutes=None, every=None):
     while True:
         cycles += 1
         t0 = time.time()
+        if cycles == 1:
+            try:
+                write_company_intel(site, offline, light=True)   # NSE filings feeds are rolling lists: read them every session
+            except Exception as e:  # noqa
+                log("company intel (light) failed:", e)
         st = cal.all_status()
         open_mk = {k for k in ("NSE", "US") if st.get(k, {}).get("state") == "OPEN"}
         q = site.load_json("api/quotes.json", {"quotes": {}})
