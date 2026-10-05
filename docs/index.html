@@ -343,10 +343,12 @@ function charges(value,side,seg='delivery',brokerId='groww',currency='INR'){
 /* ---------- quotes helpers ---------- */
 /* every portal page uses these live exchange prices instead of the engine's ~15-min-delayed quotes while the laptop streams */
 const LAPQ={};let LAP_RENDER=0,LAP_BADGE=0;
-const Q=id=>{const l=LAPQ[id];if(l&&Date.now()-l._at<60000)return l;return API.quotes?.quotes?.[id]};
-function hubOverlay(L){let n=0;for(const x of L.quotes||[]){const age=x.age_ms??(x.age!=null?x.age*1000:null);if(!x.p||age==null||age>120000||x.src==='portal-delayed')continue;const old=API.quotes?.quotes?.[x.sym]||{};
+const Q=id=>{const l=LAPQ[id];if(l&&Date.now()-l._at<(l.status==='CLOSED'?6*3600e3:60000))return l;return API.quotes?.quotes?.[id]};
+function hubOverlay(L){let n=0;const closed=L.market&&L.market!=='OPEN';for(const x of L.quotes||[]){const age=x.age_ms??(x.age!=null?x.age*1000:null);
+  // market open: only ticks from the last 2 minutes. Market closed: the last real exchange tick of today (= closing price) beats the engine's delayed copy
+  if(!x.p||age==null||x.src==='portal-delayed'||!/shoonya|angel/.test(x.src||'')||age>(closed?18*3600e3:120000))continue;const old=API.quotes?.quotes?.[x.sym]||{};
   LAPQ[x.sym]={...old,sym:x.sym,p:x.p,pc:x.pc??old.pc,chg_pct:x.pc?(x.p/x.pc-1)*100:old.chg_pct,day_o:x.o??old.day_o,day_h:x.h??old.day_h,day_l:x.l??old.day_l,
-   t:new Date(x.exch_ts?x.exch_ts*1000:Date.now()-age).toISOString(),d:new Date().toISOString().slice(0,10),ex:old.ex||'NSE',src:'shoonya (live)',delay_min:0,status:'REALTIME',intraday:true,_at:Date.now()};n++}
+   t:new Date(x.exch_ts?x.exch_ts*1000:Date.now()-age).toISOString(),d:new Date().toISOString().slice(0,10),ex:old.ex||'NSE',src:closed?'shoonya (last tick)':'shoonya (live)',delay_min:0,status:closed?'CLOSED':'REALTIME',intraday:true,_at:Date.now()};n++}
  if(!n||document.hidden)return;if(Date.now()-LAP_BADGE>1000){LAP_BADGE=Date.now();const e=$('#dbadge');if(e)e.outerHTML=dataBadge()}
  if(Date.now()-LAP_RENDER>15000){LAP_RENDER=Date.now();softRender()}}
 
@@ -1468,7 +1470,7 @@ function hubStart(){if(HUB.es)return;let es;try{es=new EventSource(LIVE_URL+'/st
  es.onmessage=m=>{try{hubSet(JSON.parse(m.data),'stream')}catch(e){}};
  es.onerror=()=>{if(++HUB.fails>=2){es.close();HUB.es=null;hubPoll();setTimeout(hubStart,20000)}}}
 function hubPoll(){if(HUB.poll)return;const run=async()=>{if(HUB.es&&Date.now()-HUB.at<3000){clearTimeout(HUB.poll);HUB.poll=null;return}
-  const L=document.hidden?null:await laptopState();if(L)hubSet(L,'poll');else if(!document.hidden){HUB.offline=Date.now()-HUB.at>8000}
+  const L=(document.hidden&&HUB.S)?null:await laptopState();if(L)hubSet(L,'poll');else if(!document.hidden){HUB.offline=Date.now()-HUB.at>8000}
   HUB.poll=setTimeout(run,HUB.offline?8000:1000)};HUB.poll=setTimeout(run,0)}
 function hubSet(S,via){HUB.S=S;HUB.at=Date.now();HUB.via=via;HUB.fails=0;HUB.offline=false;HUB.n++;
  HUB.lag=S.served_at_ms?Math.max(0,Date.now()-S.served_at_ms):null;                 // algorithm -> this screen (same computer clock)
