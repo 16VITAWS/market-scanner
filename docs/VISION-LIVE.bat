@@ -48,6 +48,7 @@ rem start automatically (minimized) every time Windows starts - the portal then 
 set "SU=%APPDATA%\Microsoft\Windows\Start Menu\Programs\Startup\16VITAWS-LIVE-autostart.bat"
 > "%SU%" echo @echo off
 >> "%SU%" echo cd /d "%VL%"
+>> "%SU%" echo powershell -NoProfile -Command "try { Invoke-WebRequest -UseBasicParsing '%RAW%/vision_live.py' -OutFile 'vision_live.new' -TimeoutSec 40; Move-Item -Force 'vision_live.new' 'vision_live.py' } catch { }"
 >> "%SU%" echo start "16VITAWS LIVE" /min "!PYEXE!" vision_live.py
 echo  16VITAWS LIVE will now also start by itself whenever Windows starts.
 start "" https://16vitaws.github.io/market-scanner/#algo
