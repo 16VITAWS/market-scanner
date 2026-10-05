@@ -503,7 +503,8 @@ def build(prev, new_events, now, watch=(), coverage=None):
         if e["severity"] >= 65 or (mine and e["severity"] >= 30):
             alerts.append({**e, "yours": mine})
     stats = {c: sum(1 for e in events if e["category"] == c) for c in CATS}
-    first = events[-1]["time"][:10] if events else None
+    times = [e["time"] for e in events if e.get("time")]
+    first = min(times)[:10] if times else None
     return {"as_of": now.isoformat(timespec="seconds"), "categories": CATS, "events": events, "profiles": profiles[:600],
             "alerts": alerts[:100], "new_this_run": len(fresh), "stats": stats, "history_from": first,
             "watch": sorted(watch), "coverage": coverage or {}, "method": METHOD, "limits": LIMITS}
