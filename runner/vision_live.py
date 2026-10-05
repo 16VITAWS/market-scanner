@@ -1260,8 +1260,10 @@ class OptionsTrader:
             return "PAPER"
         return m if m in ("PAPER", "ALERT", "REAL") else "PAPER"
 
+    extra_trades = None                                    # App: the AI option-chain paper trades also count toward the options test
+
     def record(self):
-        tr = self.s["trades"]
+        tr = list(self.s["trades"]) + list(self.extra_trades() if self.extra_trades else [])
         wins = sum(t["pnl"] for t in tr if t["pnl"] > 0); losses = -sum(t["pnl"] for t in tr if t["pnl"] < 0)
         pf = (wins / losses) if losses else (None if not wins else float("inf"))
         n = int(self.cfg.get("OPTIONS_MIN_TRADES") or 20)
@@ -2563,6 +2565,46 @@ def candles_json(app, sym):
             "note": note, "last_tick": ist_ms(app.book.get(sym).get("recv"))}
 
 
+def paper_progress(app):
+    """How far the paper test is, in trades (not days), and - honestly - why nothing was counted today."""
+    st, op = app.paper.record(), app.opt.record()
+    n_st = len(app.paper.s["trades"])
+    first = min([t.get("opened") or "" for t in app.paper.s["trades"]] + [t.get("entry_time") or "" for t in app.chain_tr.s.get("trades") or []]
+                + [t.get("opened") or "" for t in app.opt.s.get("trades") or []] or [""]) or None
+    why = []
+    sig = app.trader.signals or {}
+    if app.market != "OPEN":
+        why.append(f"market is {app.market} - trades are only counted in market hours (Mon-Fri 09:15-15:30, not holidays)")
+    if not sig.get("buys"):
+        why.append(f"stocks: the engine gave 0 BUY signals today" + (f" (market regime {sig.get('regime')} - the strategy does not buy in a falling market)" if sig.get("regime") == "BEAR" else ""))
+    else:
+        w = [f"{x['sym']}: {x.get('status')} - {'; '.join(x.get('why_not') or []) or 'ok'}" for x in app.trader.watching.values()]
+        why.append("stocks: " + (" | ".join(w) if w else f"{len(sig['buys'])} BUY signal(s) waiting for a live price near their entry"))
+    a = app.opt.active or {}
+    if a.get("action") != "BUY":
+        why.append("options spread: no spread signal from the engine today")
+    elif app.opt.sig and (dt.date.fromisoformat(app.opt.sig["expiry"]) - now().date()).days <= app.opt.P["exit_dte"]:
+        why.append(f"options spread: {a.get('name')} expires in {(dt.date.fromisoformat(app.opt.sig['expiry']) - now().date()).days} day(s) - too close to expiry to open")
+    elif not app.opt.values():
+        why.append("options spread: waiting for live prices of both legs (needs the Shoonya login)")
+    for u, d in (getattr(app, "decisions", {}) or {}).items():
+        if not str(d.get("decision", "")).startswith("BUY"):
+            why.append(f"option chain {u}: {d.get('decision')} - {(d.get('reasons') or ['-'])[0]}")
+    if not getattr(app, "decisions", None):
+        why.append("option chain: not built yet (needs the Shoonya login and live index prices)")
+    D = data_state(app)
+    if D["status"] not in ("LIVE", "MARKET CLOSED"):
+        why.append(f"live data: {D['label']} - no paper entry is allowed without fresh live prices")
+    return {"unit": "closed trades (not days)", "first_trade": first,
+            "stocks": {"closed": n_st, "need": GATE["min_closed"], "passed": st["passed"], "checks": st["checks"],
+                       "open": len(app.paper.s["pos"])},
+            "options": {"closed": op["closed"], "need": op["need"], "passed": op["passed"], "pf": op["pf"],
+                        "spreads": len(app.opt.s.get("trades") or []), "chain": len(app.chain_tr.s.get("trades") or []),
+                        "open": int(bool(app.opt.s.get("open"))) + int(bool(app.chain_tr.s.get("open")))},
+            "not_counted": "Cloud autopilot trades (GitHub, ~15-min delayed prices) are practice only and do not count - the real-money test uses live laptop trades.",
+            "why_none_today": why}
+
+
 def state_json(app, max_age=0.2):
     """Everything the screens show, built from ONE snapshot of the central state (cached 200 ms so many screens share one build)."""
     with _STATE_CACHE["lock"]:
@@ -2671,7 +2713,7 @@ def _build_state(app):
                      "max_orders": int(float(app.cfg.get("MAX_ORDERS_PER_DAY") or 3))},
             "curve": curve[-800:], "perf": strategy_perf(trades), "journal": app.journal.tail(250), "signal_history": signal_history(app.journal),
             "report": getattr(app, "report", None) or daily_report(app, trades),
-            "config": {k: cfgv(app.cfg, k) for k in DATA_DEFAULTS}}
+            "config": {k: cfgv(app.cfg, k) for k in DATA_DEFAULTS}, "paper_progress": paper_progress(app)}
 
 
 def broker_health(app):
@@ -2865,6 +2907,7 @@ class App:
         self.delayed = None
         self.chain_tr = ChainTrader(cfg, self.book, self.notify, journal=self.journal)
         self.chain_tr.rules, self.chain_tr.broker = self.charges, self.broker
+        self.opt.extra_trades = lambda: [{"pnl": t["pnl"]} for t in self.chain_tr.s.get("trades") or [] if t.get("pnl") is not None]
         self.chains, self.decisions, self.nfo, self.nfo_day, self.last_decide = {}, {}, None, None, 0.0
         self._chain_lock = threading.Lock()
 
