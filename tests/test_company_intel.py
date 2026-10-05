@@ -181,3 +181,20 @@ def test_run_reports_bse_blocked_but_nse_ok():
     assert out["events"] and out["coverage"]["nse"]["last_success"]
     light = CI.run(out, now=NOW, universe=UNI, session=FakeNSE(), bse=False)
     assert "full runs" in light["coverage"]["bse"]["note"] and light["new_this_run"] == 0
+
+
+def test_pledge_release_is_not_a_red_flag_and_large_offmarket_sale_is():
+    assert CI.insider_severity([{"category": "Promoter", "type": "PLEDGE REVOKE", "mode": "Pledge Release", "shares": 7731000}])[0] == 15
+    sev, why = CI.insider_severity([{"category": "Promoter", "type": "SELL", "mode": "Off Market", "shares": 3668036,
+                                     "value_inr": 1507562796, "pct_before": 15.9, "pct_after": 10.8}])
+    assert sev >= 55 and "off-market" in why and "large" in why
+
+
+def test_generic_nse_duplicate_dropped_when_specific_item_exists():
+    base = {"company": "Acme Widgets Limited", "symbol": "ACME", "source": "NSE filing", "time": "2026-10-05T18:00:00", "category": "MANAGEMENT_CHANGE",
+            "verified": "OFFICIAL EXCHANGE FILING", "pdf": None, "link": None}
+    ev = [dict(base, id="a", severity=25, reason="director / KMP / auditor change (details in the filing)", headline="Change in Directors/KMP/SMP/Auditor/RTA"),
+          dict(base, id="b", severity=20, reason="management / board appointment", headline="change in Management"),
+          dict(base, id="c", severity=45, reason="director resigned", headline="Resignation of Mr Z as Director")]
+    out = CI.build({}, ev, NOW)
+    assert [e["id"] for e in out["events"]] == ["c"]
