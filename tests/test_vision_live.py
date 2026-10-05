@@ -66,6 +66,7 @@ def test_limits_kill_switch_and_closed_market(VL):
     t, book, paper, _ = _trader(VL, {"MAX_ORDER_VALUE": "1000"})
     book.update("TCS", {"p": 3400.0, "t": 1.0}); t.on_tick("TCS")
     assert not paper.s["pos"]                                                                         # < 1 share within value limit
+    os.remove(VL.PAPER_FILE)                                                                          # fresh paper book (today's rejection is remembered)
     t2, book2, paper2, _ = _trader(VL)
     open(VL.KILL_FILE, "w").write("x")
     book2.update("TCS", {"p": 3400.0, "t": 1.0}); t2.on_tick("TCS")
@@ -502,7 +503,11 @@ def test_delayed_portal_prices_keep_paper_working_and_never_trade_real(VL):
     assert f.pull() == 1 and book.get("TCS")["src"] == "portal-delayed"
     assert f.pull() == 0                                                           # same quote again: nothing new
     t.on_tick("TCS")
-    assert paper.s["pos"]["TCS"]["qty"] == 7                                       # PAPER still trades, on delayed prices
+    assert not paper.s["pos"] and t.watching["TCS"]["status"] == "REJECTED"         # default: no new entry on ~15-min-old prices
+    assert any("DELAYED" in w for w in t.watching["TCS"]["why_not"])
+    t, book, paper, _ = _trader(VL, {"PAPER_ON_DELAYED": "yes"})                   # opt-in: PAPER may practise on delayed prices
+    book.update("TCS", {"p": 3405.0, "t": 5.0, "src": "portal-delayed"}); t.on_tick("TCS")
+    assert paper.s["pos"]["TCS"]["qty"] == 7
     calls = []
     class Trap:
         def place_limit(self, *a, **k): calls.append(a)
@@ -604,7 +609,8 @@ def test_chain_paper_trader_entry_duplicate_trailing_stop_and_never_a_broker(VL,
     d = VL.decide(book, ch, {"OPT_MIN_SCORE": "60"}, "BULL", "OPEN", ts)
     tr.on_decision(d)
     o = tr.s["open"]
-    assert o and o["qty"] == 65 and o["entry"] == d["contract"]["ask"]
+    assert o and o["qty"] == 65 and o["signal_price"] == d["contract"]["ask"]
+    assert o["entry"] == round(d["contract"]["ask"] * 1.0005, 2) and o["execution"] == "SIMULATED"     # realistic: ask + 5 bps
     sym = o["sym"]
     book.q[sym].update(p=o["entry"] * 1.35, bid=o["entry"] * 1.35)                # +1.17R: stop to break-even
     tr.manage()
@@ -618,3 +624,247 @@ def test_chain_paper_trader_entry_duplicate_trailing_stop_and_never_a_broker(VL,
     assert not tr.s["open"] and "stop" in t["why"] and t["pnl"] > 0
     tr.on_decision(d)
     assert not tr.s["open"]                                                          # same signal again: no duplicate entry
+
+
+# ---------------- real-time synchronisation + algorithm transparency: acceptance tests A-R ----------------
+class _LiveFeed:                                               # test double for the broker stream (never a real broker)
+    def __init__(self): self.state, self.orders, self.pos, self.ob = "LIVE", [], [], []
+    def health(self): return {"state": self.state, "reconnects": 0, "method": "WebSocket (touchline)"}
+    def place_limit(self, sym, side, qty, limit): self.orders.append((sym, side, qty, limit)); return f"OID{len(self.orders)}"
+    def order_book(self): return self.ob
+    def positions(self): return self.pos
+    def limits(self): return {"stat": "Ok", "cash": "50000"}
+
+
+def _app(VL, monkeypatch, cfg=None):
+    monkeypatch.setattr(VL, "OPT_FILE", os.path.join(VL.HOME, "o.json"))
+    app = VL.App({"BROKER": "SHOONYA", "MODE": "PAPER", "MAX_ORDER_VALUE": "25000", "MAX_DAILY_LOSS": "2000", "MAX_ORDERS_PER_DAY": "3",
+                  "MAX_OPEN_POSITIONS": "3", **(cfg or {})})
+    app.market, app.watch, app.tokens = "OPEN", ["NIFTY", "TCS"], {"26000": "NIFTY", "11536": "TCS"}
+    app.feed = _LiveFeed(); app.trader.feed = app.feed
+    app.refresh_chain = lambda: None
+    app.trader.set_signals({"buys": [{"symbol": "TCS", "entry": 3400.0, "stop": 3330.0, "target": 3540.0, "score": 5, "signal_id": "tb|TCS|2026-10-01",
+                                      "contrib": [{"points": 2, "rule": "Uptrend"}, {"points": 3, "rule": "Breakout"}], "why": ["Uptrend", "Breakout"], "rsi": 61.0}],
+                            "sells": [], "data_status": "OK", "strategy": {"id": "tb", "name": "Trend + Breakout Swing", "version": "1.1.0"}})
+    return app
+
+
+def _tick(app, sym, p, **kw):
+    return app.book.update(sym, {"p": p, "t": time.time(), "src": "shoonya-ws", **kw})
+
+
+def _live(VL, app):
+    _tick(app, "NIFTY", 25000.0)
+    VL.watchdog(app)                                           # LIVE -> resync thread; run it synchronously for the test
+    VL.resync(app)
+    assert app.resync["status"] == "COMPLETE"
+
+
+def test_A_B_tick_updates_central_state_candle_and_strategy_view(VL, monkeypatch):
+    app = _app(VL, monkeypatch)
+    _tick(app, "TCS", 3450.0, v=1000); _tick(app, "TCS", 3460.0, v=1300)
+    q = app.book.get("TCS")
+    assert q["seq"] == 2 and q["recv"] and q["t"] and q["src"] == "shoonya-ws"           # timestamped single state
+    c = app.book.candles("TCS")[-1]
+    assert c[1] == 3450.0 and c[2] == 3460.0 and c[4] == 3460.0 and c[5] == 300            # A: same tick -> chart candle (o,h,c, volume)
+    _live(VL, app)
+    app.trader.on_tick("TCS", "OPEN")
+    w = app.trader.watching["TCS"]
+    assert w["status"] == "WAITING" and "never chases" in w["why_not"][0] and w["indicators"]["rsi"] == 61.0   # B/C: strategy evaluated, WHY NOT shown
+    cj = VL.candles_json(app, "TCS")
+    assert cj["candles"][-1][4] == 3460.0 and "live ticks" in cj["source"]
+
+
+def test_C_to_J_full_pipeline_signal_risk_order_fill_position_pnl_exit(VL, monkeypatch):
+    app = _app(VL, monkeypatch)
+    _live(VL, app)
+    _tick(app, "TCS", 3402.0, bid=3401.5, ask=3402.5); app.trader.on_tick("TCS", "OPEN")
+    types = [e["type"] for e in app.journal.ev]
+    for t in ("SIGNAL_GENERATED", "RISK_APPROVED", "POSITION_SIZED", "ORDER_CREATED", "ORDER_SUBMITTED", "ORDER_FILLED", "POSITION_OPENED"):
+        assert t in types                                                                   # C, D, E, F: every stage is an event
+    tr = [t for t in VL.ledger(app) if t["status"] == "OPEN"][0]
+    assert tr["fill_price"] == round(3402.5 * 1.0005, 2) and tr["signal_price"] == 3402.0 and tr["execution"] == "SIMULATED"   # H
+    assert tr["strategy"] == "Trend + Breakout Swing" and tr["contrib"][1]["rule"] == "Breakout" and tr["timeline"]["total_ms"] is not None
+    assert any(o["execution"] == "SIMULATED" and o["side"] == "BUY" for o in VL.orders_view(app))                         # F: order panel
+    u1 = tr["unrealized"]
+    _tick(app, "TCS", 3450.0, bid=3449.5, ask=3450.5); app.trader.on_tick("TCS", "OPEN")
+    assert [t for t in VL.ledger(app) if t["status"] == "OPEN"][0]["unrealized"] > u1                                     # I: P&L follows price
+    _tick(app, "TCS", 3541.0, bid=3540.5, ask=3541.5); app.trader.on_tick("TCS", "OPEN")
+    t = [t for t in VL.ledger(app) if t["status"] == "CLOSED"][0]
+    assert t["exit_type"] == "TARGET" and t["net"] == VL.pnl_today(VL.ledger(app), 100000)["realized"] and t["charges"] > 0   # J
+    cj = VL.candles_json(app, "TCS")
+    assert {m["type"] for m in cj["markers"]} >= {"AUTO_BUY", "TARGET"}                                                   # markers from the same record
+    S = VL.state_json(app, max_age=0)
+    json.dumps(S, default=str)
+    assert S["perf"][0]["strategy"] == "Trend + Breakout Swing" and S["perf"][0]["wins"] == 1 and S["signal_history"][0]["result"] == "EXECUTED"
+
+
+def test_E_price_revalidated_before_order_signal_invalidated(VL, monkeypatch):
+    app = _app(VL, monkeypatch)
+    _live(VL, app)
+    calls = {"n": 0}
+    real = app.trader.data_check
+    def flip(sym):
+        calls["n"] += 1
+        out = real(sym)
+        return out if calls["n"] == 1 else [{"name": "Market data LIVE", "ok": False, "detail": "STALE"}]   # data went stale after the signal
+    app.trader.data_check = flip
+    _tick(app, "TCS", 3401.0); app.trader.on_tick("TCS", "OPEN")
+    assert not app.paper.s["pos"] and app.journal.ev[-1]["type"] == "SIGNAL_INVALIDATED"
+
+
+def test_G_broker_status_updates_and_rejection_never_faked(VL, monkeypatch):
+    app = _app(VL, monkeypatch, {"MODE": "REAL"})
+    json.dump([{"time": "2026-10-01T10:30:00+05:30", "side": "BUY", "sym": "TCS", "qty": 7, "limit": 3419.05, "order_id": "111", "status": "SUBMITTED", "filled": 0},
+               {"time": "2026-10-01T10:31:00+05:30", "side": "BUY", "sym": "INFY", "qty": 5, "limit": 1500.0, "order_id": "222", "status": "SUBMITTED", "filled": 0}],
+              open(VL.REAL_FILE, "w"))
+    app.feed.ob = [{"norenordno": "111", "status": "COMPLETE", "fillshares": "7", "avgprc": "3410.10"},
+                   {"norenordno": "222", "status": "REJECTED", "fillshares": "0", "rejreason": "RMS: insufficient funds"}]
+    app.feed.pos = [{"tsym": "TCS-EQ", "daybuyqty": "7", "daysellqty": "0"}]
+    assert VL.sync_orders(app) == 2
+    r = {x["order_id"]: x for x in VL.load_real()}
+    assert r["111"]["status"] == "COMPLETE" and r["111"]["avg"] == 3410.10
+    assert r["222"]["status"] == "REJECTED" and r["222"]["filled"] == 0 and "insufficient" in r["222"]["broker_msg"]
+    types = [e["type"] for e in app.journal.ev]
+    assert "ORDER_FILLED" in types and "ORDER_REJECTED" in types and app.recon["status"] == "OK"
+
+
+def test_K_N_stale_or_lost_data_blocks_new_entries(VL, monkeypatch):
+    app = _app(VL, monkeypatch)
+    _live(VL, app)
+    app.feed.state = "RECONNECTING"
+    assert VL.data_state(app)["status"] == "LOST"
+    VL.watchdog(app)
+    assert app.journal.ev[-1]["type"] == "DATA_CONNECTION_LOST"
+    _tick(app, "TCS", 3401.0); app.trader.on_tick("TCS", "OPEN")
+    assert not app.paper.s["pos"] and any("Market data LIVE" in w for w in app.trader.watching["TCS"]["why_not"])    # K
+    app.feed.state = "LIVE"
+    app.book.stats["last_live_recv"] = time.time() - 9                                    # socket "open" but no tick for 9 s
+    assert VL.data_state(app)["status"] == "STALE"                                        # N: never called LIVE just because connected
+    app.book.q["TCS"]["recv"] = time.time() - 9
+    checks = app.trader.data_check("TCS")
+    assert not all(c["ok"] for c in checks)
+    app.trader.on_tick("TCS", "OPEN")
+    assert not app.paper.s["pos"]
+
+
+def test_L_reconnect_requires_fresh_data_then_resync(VL, monkeypatch):
+    app = _app(VL, monkeypatch)
+    _live(VL, app)
+    app.feed.state = "RECONNECTING"; VL.watchdog(app)
+    app.feed.state = "RESYNCING"                                                          # socket back, no data yet
+    assert VL.data_state(app)["status"] == "RESYNC"
+    app.feed.state = "LIVE"; _tick(app, "NIFTY", 25010.0)
+    VL.watchdog(app)
+    for _ in range(50):
+        if app.resync.get("status") in ("COMPLETE", "FAILED"):
+            break
+        time.sleep(0.05)
+    assert app.resync["status"] == "COMPLETE" and [s["name"] for s in app.resync["steps"]][:2] == ["Market subscriptions", "Latest quotes"]
+    assert any(e["type"] == "DATA_RESTORED" for e in app.journal.ev)
+
+
+def test_M_broker_position_mismatch_pauses_real_entries(VL, monkeypatch):
+    app = _app(VL, monkeypatch, {"MODE": "REAL"})
+    json.dump([{"time": "2026-10-01T10:30:00+05:30", "side": "BUY", "sym": "TCS", "qty": 75, "order_id": "1", "status": "COMPLETE", "filled": 75}], open(VL.REAL_FILE, "w"))
+    app.feed.pos = []                                                                     # broker shows nothing
+    r = VL.reconcile(app)
+    assert r["status"] == "MISMATCH" and r["rows"] == [{"sym": "TCS", "portal": 75, "broker": 0}]
+    assert not [c for c in VL.real_check(app) if c["name"].startswith("Positions")][0]["ok"]
+    assert app.journal.ev[-1]["type"] == "POSITION_MISMATCH"
+
+
+def test_O_P_restart_restores_state_and_never_duplicates_an_order(VL, monkeypatch):
+    app = _app(VL, monkeypatch)
+    _live(VL, app)
+    _tick(app, "TCS", 3401.0); app.trader.on_tick("TCS", "OPEN")
+    assert len(app.paper.s["pos"]) == 1
+    app.feed.state = "RECONNECTING"; VL.watchdog(app); app.feed.state = "LIVE"            # reconnect in the middle
+    _tick(app, "TCS", 3401.5); VL.watchdog(app); VL.resync(app)
+    app.trader.on_tick("TCS", "OPEN")
+    app2 = _app(VL, monkeypatch)                                                          # restart / browser refresh
+    _live(VL, app2)
+    assert "TCS" in app2.paper.s["pos"] and any(e["type"] == "POSITION_OPENED" for e in app2.journal.ev)   # O: restored from disk
+    app2.paper.s["pos"].clear()                                                           # even if the position were gone...
+    _tick(app2, "TCS", 3401.2); app2.trader.on_tick("TCS", "OPEN")
+    assert not app2.paper.s["pos"] and app2.trader.watching["TCS"]["status"] == "DONE"     # ...the same signal is never executed twice
+    assert sum(1 for e in app2.journal.ev if e["type"] == "POSITION_OPENED") == 1          # P
+
+
+def test_Q_paper_never_reaches_the_broker_and_is_labelled(VL, monkeypatch):
+    app = _app(VL, monkeypatch, {"MODE": "REAL", "CONSENT": "no"})                        # REAL requested but locked
+    _live(VL, app)
+    _tick(app, "TCS", 3401.0); app.trader.on_tick("TCS", "OPEN")
+    assert app.trader.mode() == "PAPER" and app.feed.orders == []
+    assert all(e["mode"] == "PAPER" for e in app.journal.ev if e.get("trade_id"))
+    assert all(o["mode"] == "PAPER" and o["execution"] == "SIMULATED" for o in VL.orders_view(app))
+    S = VL.state_json(app, max_age=0)
+    assert S["algo"]["mode"] == "PAPER" and S["status_bar"]["orders"].startswith("SYNCED")
+
+
+def test_R_timestamps_utc_inside_ist_on_screen(VL, monkeypatch):
+    ts = dt.datetime(2026, 10, 1, 4, 54, 31, 120000, tzinfo=dt.timezone.utc).timestamp()
+    assert VL.ist_ms(ts) == "10:24:31.120"
+    tl = VL.timeline({"signal": ts, "risk": ts + 0.015, "order": ts + 0.022, "submit": ts + 0.038, "ack": ts + 0.090, "fill": ts + 0.167})
+    assert tl["signal_to_risk_ms"] == 15.0 and tl["total_ms"] == 167.0 and tl["at"]["fill"] == "10:24:31.287"
+    assert VL.timeline({"signal": ts})["submit_to_ack_ms"] is None                        # missing stage -> N/A, never invented
+    app = _app(VL, monkeypatch)
+    _tick(app, "NIFTY", 25000.0)
+    D = VL.data_state(app)
+    assert D["clock"]["status"] == "SYNCED" and D["exch_to_server"]["samples"] == 1 and D["sequence"].startswith("N/A")
+
+
+# ---------------- trade accounting: itemised charges, gross vs net, estimated vs calculated ----------------
+def test_charge_engine_itemised_options_and_no_double_count(VL):
+    r = VL.DEFAULT_CHARGES
+    tc = VL.trade_costs(r, "SHOONYA", "OPT", 120.0, 150.0, 75, "2026-10-05")
+    assert tc["gross"] == 2250.0 and tc["buy"]["turnover"] == 9000.0 and tc["sell"]["turnover"] == 11250.0
+    assert tc["buy"]["stt"] == 0 and tc["sell"]["stt"] == round(11250 * 0.0015, 2)          # STT 0.15% on the SELL premium only
+    assert tc["buy"]["stamp"] == round(9000 * 0.00003, 2) and tc["sell"]["stamp"] == 0       # stamp duty on the BUY side only
+    assert tc["components"]["brokerage"] == 10.0                                            # ₹5 per executed order x 2
+    assert tc["charges"] == round(tc["buy"]["total"] + tc["sell"]["total"], 2) and tc["net"] == round(2250 - tc["charges"], 2)
+    assert tc["status"] == "CALCULATED" and "not broker-confirmed" in tc["label"]
+    old = VL.trade_costs(r, "SHOONYA", "OPT", 120.0, 150.0, 75, "2026-03-31")              # before the 1 Apr 2026 rules
+    assert old["status"] != "CALCULATED" and old["net"] is None                             # no rule -> DATA UNAVAILABLE, never a guess
+    unk = VL.trade_costs(r, "ANGEL", "OPT", 120.0, 150.0, 75, "2026-10-05")
+    assert unk["components"]["brokerage"] is None and unk["status"] == "INCOMPLETE"         # broker rule missing -> not invented
+
+
+def test_paper_trade_accounting_single_source_and_period_report(VL, monkeypatch):
+    app = _app(VL, monkeypatch)
+    _live(VL, app)
+    _tick(app, "TCS", 3402.0, bid=3401.5, ask=3402.5); app.trader.on_tick("TCS", "OPEN")
+    o = [t for t in VL.ledger(app) if t["status"] == "OPEN"][0]
+    assert o["charges_status"].startswith("ESTIMATED") and o["est_exit_charges"] > 0 and o["est_net"] < o["gross_unrealized"]
+    _tick(app, "TCS", 3541.0, bid=3540.5, ask=3541.5); app.trader.on_tick("TCS", "OPEN")
+    t = [t for t in VL.ledger(app) if t["status"] == "CLOSED"][0]
+    comp = t["components"]
+    assert round(sum(comp.values()), 2) == t["charges"] and t["net"] == round(t["gross"] - t["charges"], 2)   # NET = GROSS - CHARGES
+    assert comp["stt"] > 0 and comp["stamp"] > 0 and comp["other"] > 0 and comp["brokerage"] == 0       # delivery: STT both sides, DP charge
+    assert t["slippage_cost"] is not None and t["charges_status"].startswith("CALCULATED") and "SIMULATED" in t["charges_status"]
+    cash = app.paper.s["cash"]
+    assert round(cash - 100000, 2) == round(t["net"], 2)                                    # the paper account moved by exactly NET
+    R = VL.period_report(VL.ledger(app), *VL.period_bounds("today"))
+    assert R["PAPER"]["trades"] == 1 and R["PAPER"]["net"] == t["net"] and R["PAPER"]["charges"] == t["charges"]
+    assert R["LIVE"]["trades"] == 0 and R["LIVE"]["net"] == 0                               # never mixed with LIVE
+    assert VL.period_report(VL.ledger(app), *VL.period_bounds("yesterday"))["PAPER"]["trades"] == 0
+    S = VL.state_json(app, max_age=0)
+    assert S["profit"]["today"]["PAPER"]["net"] == t["net"] and S["who"]["account"] in ("not set",)
+
+
+def test_option_paper_trade_uses_itemised_option_charges(VL, tmp_path, monkeypatch):
+    ch = _chain_fixture(VL); book = VL.Book(); ts = time.time()
+    _quote_chain(VL, book, ch, ts, bull=True)
+    tr = VL.ChainTrader({}, book, lambda a, b: None, path=str(tmp_path / "c.json"))
+    tr.on_decision(VL.decide(book, ch, {"OPT_MIN_SCORE": "60"}, "BULL", "OPEN", ts))
+    o = tr.s["open"]; book.q[o["sym"]].update(p=o["entry"] * 1.7, bid=o["entry"] * 1.7)
+    tr.manage()
+    t = tr.s["trades"][-1]
+    assert t["costs"]["sell"]["stt"] > 0 and t["costs"]["buy"]["stt"] == 0 and t["pnl"] == round(t["gross"] - t["charges"], 2)
+
+
+def test_state_never_contains_secrets(VL, monkeypatch):
+    app = _app(VL, monkeypatch, {"SHOONYA_SECRET": "TOPSECRET987", "SHOONYA_UID": "FA123456", "SHOONYA_CLIENT_ID": "FA123456_U"})
+    _live(VL, app)
+    txt = json.dumps(VL.state_json(app, max_age=0), default=str)
+    assert "TOPSECRET987" not in txt and "FA123456" not in txt and "XXXX3456" in txt          # account shown masked only
