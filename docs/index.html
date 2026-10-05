@@ -573,7 +573,7 @@ R.real=async function(){const el=$('#s-real');el.innerHTML=`<h1>💰 Real-money 
  const intro=`<h1>💰 Real-money trading ${L?(L.mode==='REAL'||(L.options||{}).mode==='REAL'?'<span class="tag BEAR">ON</span>':'<span class="tag STALE">LOCKED - paper first</span>'):''}</h1>
   <p class="sub">Here the VISION AI algorithm trades with <b>your real money</b> through your Shoonya account - stocks and NIFTY options, LIMIT orders only, with daily loss limits and the STOP button. It opens only after the same algorithm has proven itself with practice money, so the chance of losing is lower. You get a phone message the moment that happens.</p>`;
  if(!L){el.innerHTML=intro+`<div class="danger">16VITAWS LIVE is not running on this laptop, so the real-money status cannot be shown. Start <b>16VITAWS-LIVE</b> from the Desktop (it also starts by itself with Windows), then open this tab again.</div>`;return}
- el.innerHTML=intro+realMoneyCard(L)+`<div class="card"><h3>Steps, in order</h3><ul class="steps">
+ el.innerHTML=intro+paperProgress(L)+realMoneyCard(L)+`<div class="card"><h3>Steps, in order</h3><ul class="steps">
   <li><span class="ic ${(L.broker_health||{}).auth==='LOGGED IN'?'ok':'wait'}">1</span><div><b>Shoonya login</b> each morning: Trading → Algo Cockpit → 🔑 Login to Shoonya.</div></li>
   <li><span class="ic ${(L.gate||{}).passed?'ok':'wait'}">2</span><div><b>Paper test</b> runs by itself on live prices (30 trades for stocks, 20 for options, profit factor 1.2+, profit after costs). Wait for the phone message <b>"ready for real money"</b>.</div></li>
   <li><span class="ic wait">3</span><div><b>Switch on</b>: open <code>%USERPROFILE%\\vision_live\\settings.env</code> in Notepad, set <code>CONSENT=I ACCEPT REAL MONEY RISK</code>, <code>STATIC_IP_REGISTERED=yes</code>, <code>MODE=REAL</code> (options: <code>OPTIONS_MODE=REAL</code>, <code>OPTIONS_REAL=yes</code>), save, restart 16VITAWS-LIVE.</div></li>
@@ -1546,6 +1546,7 @@ function cmdSide(S){const A=S.algo,D=S.data,P=S.pnl||{},C=S.capital||{},K=S.risk
    ${S.killed?`<button class="btn sm buy" onclick="algoResume()">▶ Kill switch OFF</button>`:`<button class="btn sm sell" onclick="algoStop()">■ KILL SWITCH</button>`}
    <button class="btn sm grey" onclick="cmdCancelAll()">✕ Cancel pending orders</button><button class="btn sm grey" onclick="cmdCloseAll()">⏹ Close all PAPER positions</button></div>
   <p class="help">Real positions are never closed automatically from here (no emergency market orders). Close real positions in the Shoonya app.</p></div>
+ ${paperProgress(S)}
  ${cmdDecision(S)}
  <div class="card side"><h3>⚙ Execution pipeline ${latest?`<small class="mut">${esc(latest.trade_id)}</small>`:''}</h3>${cmdPipeline(S)}</div>
  <div class="card side"><h3>⏱ Real-time connection</h3>${cmdLatency(S)}</div>
@@ -1560,6 +1561,12 @@ function cmdSide(S){const A=S.algo,D=S.data,P=S.pnl||{},C=S.capital||{},K=S.risk
  <div class="card side"><h3>🩺 Algorithm health</h3><table class="kv">${(A.health||[]).map(h=>`<tr><td>${esc(h.name)}</td><td>${h.ok?'🟢':'🔴'} ${esc(h.status)}</td></tr>`).join('')}</table></div>
  <div class="card side"><details ${CMD.dbg?'open':''} ontoggle="CMD.dbg=this.open"><summary><b>🔬 Debug / algorithm inspector</b></summary>${cmdInspector(S)}</details></div>`}
 
+function paperProgress(S){const P=S?.paper_progress;if(!P)return '';const bar=(a,b)=>`<div class="bar"><i style="width:${Math.min(100,a/b*100)}%;background:var(--up)"></i></div>`;
+ return `<div class="card side"><h3>🧪 Paper test for real money</h3><p class="help">Counted in <b>closed trades</b>, not days. ${P.first_trade?'First trade '+esc(String(P.first_trade).slice(0,10))+'.':'No paper trade has closed yet.'}</p>
+  <table class="kv"><tr><td>Stocks</td><td class="num"><b>${P.stocks.closed} / ${P.stocks.need}</b> ${P.stocks.passed?'<b class="pos">PASSED</b>':''}</td></tr><tr><td colspan=2>${bar(P.stocks.closed,P.stocks.need)}</td></tr>
+  <tr><td>Options (spreads ${P.options.spreads} + AI chain ${P.options.chain})</td><td class="num"><b>${P.options.closed} / ${P.options.need}</b> ${P.options.passed?'<b class="pos">PASSED</b>':''}</td></tr><tr><td colspan=2>${bar(P.options.closed,P.options.need)}</td></tr></table>
+  <b style="font-size:13px">Why nothing was counted today</b><ul class="rules" style="font-size:12.5px">${(P.why_none_today||[]).map(w=>`<li>${esc(w)}</li>`).join('')||'<li>Trades are happening - they count when they close.</li>'}</ul>
+  <p class="help">${esc(P.not_counted)}</p></div>`}
 function cmdDecision(S){const A=S.algo,W=A.watching||[],ch=A.chain||{};
  const rows=W.map(w=>{const ok=w.status==='IN POSITION'||w.status==='EXECUTING',rej=w.status==='REJECTED';
   return `<div class="sig ${ok?'buy':rej?'blk':''}"><div class="row" style="justify-content:space-between"><b>${ok?'🟢 BUY':rej?'⛔ SIGNAL REJECTED':w.status==='DONE'?'✔ DONE TODAY':'⏳ WAITING'} · ${esc(w.sym)}</b><small class="mut">${esc(w.checked)}</small></div>
