@@ -37,7 +37,8 @@ CATS = {
 _R = r"(?:reg\.?|regulation)\s?"
 RULES = [
     (r"\bfraud|forensic|misappropriat|siphon|embezzl", "LEGAL_REGULATORY", 90, "fraud / forensic audit mentioned"),
-    (r"quarterly disclosures? by listed entities of defaults", "LEGAL_REGULATORY", 35, "quarterly default disclosure (may be NIL - open the PDF)"),
+    (r"quarterly disclosures? by listed entities of defaults|disclosures? on defaults|disclosures? (by .{0,100})?of defaults on payment|defaults on payment.{0,30}(qly|qtrly|quarter)", "LEGAL_REGULATORY", 35, "quarterly default disclosure (may be NIL - open the filing)"),
+    (r"voluntary (liquidation|winding)|solvent (liquidation|winding)|members.? voluntary|voluntary.{0,20}solvency", "GOVERNANCE", 20, "voluntary closure of a (usually subsidiary) entity"),
     (r"corporate insolvency|\bcirp\b|insolvency resolution|resolution professional|liquidat", "LEGAL_REGULATORY", 85, "insolvency proceedings"),
     (r"default(s)? (on|in) (payment|repayment)|non-payment of (interest|principal)|delay in (payment|servicing) of", "LEGAL_REGULATORY", 80, "loan / interest default disclosed"),
     (r"\bsearch\b.{0,40}(income tax|enforcement|gst)|\braid|enforcement directorate|\bcbi\b|\bsfio\b|serious fraud", "LEGAL_REGULATORY", 80, "search / investigation by an agency"),
@@ -45,8 +46,9 @@ RULES = [
     (r"casual vacancy.{0,60}auditor|auditor.{0,80}casual vacancy", "AUDITOR", 50, "new auditor to fill a casual vacancy (previous auditor left)"),
     (r"(sebi|securities and exchange board).{0,80}(order|penalt|show cause|adjudicat|settlement)|show[- ]cause|adjudication order|interim order|ministry of corporate affairs|registrar of companies", "LEGAL_REGULATORY", 60, "SEBI / MCA / regulator action"),
     (r"penalt|fine imposed|demand order|tax demand|gst demand|income tax (demand|order)|litigation|legal proceeding|writ petition|arbitration award|court order|\bnclt\b", "LEGAL_REGULATORY", 45, "penalty, tax demand or litigation"),
-    (r"resign\w*\b.{0,80}\b(ceo|cfo|managing director|chief executive|chief financial|whole[- ]time director|chairman)\b|\b(ceo|cfo|managing director|chief executive|chief financial)\b.{0,60}(resign|step(s|ped)? down)", "MANAGEMENT_CHANGE", 70, "MD / CEO / CFO / chairman resigned"),
+    (r"(resign|cessation)\w*\b.{0,80}\b(ceo|cfo|managing director|chief executive|chief financial|whole[- ]time director|chairman)\b|\b(ceo|cfo|managing director|chief executive|chief financial)\b.{0,60}(resign|step(s|ped)? down)", "MANAGEMENT_CHANGE", 70, "MD / CEO / CFO / chairman resigned"),
     (r"resign\w*.{0,80}(company secretary|compliance officer)|(company secretary|compliance officer).{0,60}resign", "MANAGEMENT_CHANGE", 30, "company secretary resigned"),
+    (r"resignation of director/kmp/smp", "MANAGEMENT_CHANGE", 40, "director / KMP / senior manager resigned (see filing)"),
     (r"resign\w*.{0,60}\bdirector|\bdirector.{0,60}resign", "MANAGEMENT_CHANGE", 45, "director resigned"),
     (r"cessation", "MANAGEMENT_CHANGE", 30, "cessation of a director / officer"),
     (r"change in directors/kmp", "MANAGEMENT_CHANGE", 25, "director / KMP / auditor change (details in the filing)"),
@@ -181,8 +183,8 @@ NSE_FEEDS = {  # feed -> (default category, severity, reason) or None = classify
     "Online_announcements": None,
     "InsiderTrading": ("INSIDER_TRADE", 30, "insider / promoter trade disclosed"),
     "Sast_Regulation29": ("OWNERSHIP_CHANGE", 35, "stake of 5% or more acquired / changed (SAST Reg. 29)"),
-    "Sast_Regulation31": ("PLEDGE", 55, "promoter encumbrance / pledge disclosure (SAST Reg. 31)"),
-    "Sast_ReasonForEncumbrance": ("PLEDGE", 50, "promoter explained a large encumbrance / pledge"),
+    "Sast_Regulation31": ("PLEDGE", 40, "promoter pledge created / released / invoked - direction is in the filing (SAST Reg. 31)"),
+    "Sast_ReasonForEncumbrance": ("PLEDGE", 45, "promoter explained a large encumbrance / pledge"),
 }
 NSE_HDR = {"User-Agent": HDR["User-Agent"], "Accept": "application/rss+xml, application/xml, text/xml, */*", "Referer": "https://www.nseindia.com/"}
 
@@ -257,16 +259,25 @@ def insider_severity(trades):
         cat = (t.get("category") or "").lower()
         mode = (t.get("mode") or "").lower()
         big = any(w in cat for w in ("promoter", "director", "kmp", "key managerial"))
-        if re.search(r"pledge|invocation|encumb", mode):
-            return 55, "promoter shares pledged / pledge invoked"
-        if re.search(r"gift|inherit|esop|transmission|off market", mode):
+        typ = (t.get("type") or "").upper()
+        large = (t.get("value_inr") or 0) >= 1e8 or (t.get("pct_before") is not None and t.get("pct_after") is not None and abs(t["pct_after"] - t["pct_before"]) >= 1)
+        off = " (off-market)" if "off market" in mode else ""
+        if re.search(r"release|revoke", mode + " " + typ.lower()):
+            s_, w_ = 15, "promoter pledge RELEASED"
+        elif re.search(r"invocation|invoke", mode + " " + typ.lower()):
+            s_, w_ = 70, "lender INVOKED a promoter pledge (shares taken)"
+        elif re.search(r"pledge|encumb", mode + " " + typ.lower()):
+            s_, w_ = (55, "promoter shares PLEDGED") if (t.get("shares") or 0) > 0 else (10, "pledge disclosure (no shares)")
+        elif re.search(r"gift|inherit|esop|transmission", mode):
             s_, w_ = 10, "insider transfer (gift / ESOP / inheritance)"
-        elif t.get("type") == "SELL":
-            s_, w_ = (45, "promoter / director / KMP SOLD shares") if big else (30, "insider sold shares")
-        elif t.get("type") == "BUY":
-            s_, w_ = (25, "promoter / director / KMP BOUGHT shares") if big else (15, "insider bought shares")
+        elif typ == "SELL":
+            s_, w_ = (45, "promoter / director / KMP SOLD shares" + off) if big else (30, "insider sold shares" + off)
+        elif typ == "BUY":
+            s_, w_ = (25, "promoter / director / KMP BOUGHT shares" + off) if big else (15, "insider bought shares" + off)
         else:
             continue
+        if large and s_ >= 15:
+            s_, w_ = s_ + 15, w_ + " - large (Rs 10 cr+ or 1%+ of the company)"
         if s_ > sev or why.startswith("insider / promoter trade disclosed"):
             sev, why = s_, w_
     return sev, why
@@ -328,7 +339,9 @@ def nse_events(feed, items, universe_idx, session=None, max_xbrl=60):
               "link": link or None}
         if trades:
             ev["trades"] = trades[:10]
-            ev["direction"] = "SELL" if any(x.get("type") == "SELL" for x in trades) else "BUY" if any(x.get("type") == "BUY" for x in trades) else None
+            ty = [(x.get("type") or "").upper() + " " + (x.get("mode") or "").upper() for x in trades]
+            ev["direction"] = ("SELL" if any(t_.startswith("SELL") for t_ in ty) else "BUY" if any(t_.startswith("BUY") for t_ in ty)
+                               else "PLEDGE RELEASED" if any(re.search(r"RELEASE|REVOKE", t_) for t_ in ty) else "PLEDGED" if any("PLEDGE" in t_ for t_ in ty) else None)
         out.append(ev)
     return out
 
@@ -385,14 +398,16 @@ def clusters(evs, now):
     aud = [e for e in recent if e["category"] == "AUDITOR" and e["severity"] >= 60]
     if aud and mg:
         out.append({"type": "AUDITOR_AND_MANAGEMENT", "text": "Auditor resignation together with management exits", "severity": 90})
+    days = lambda xs: len({x["time"][:10] for x in xs})
     pl = [e for e in recent if e["category"] == "PLEDGE"]
-    if len(pl) >= 2:
-        out.append({"type": "REPEATED_PLEDGE", "text": f"{len(pl)} pledge / encumbrance filings in 30 days", "severity": 60})
+    if days(pl) >= 2:
+        out.append({"type": "REPEATED_PLEDGE", "text": f"pledge / encumbrance filings on {days(pl)} different days in 30 days ({len(pl)} filings)", "severity": 50})
     ins = [e for e in recent if e["category"] in ("INSIDER_TRADE", "OWNERSHIP_CHANGE")]
-    if len(ins) >= 3:
-        out.append({"type": "INSIDER_ACTIVITY", "text": f"{len(ins)} insider / stake-change filings in 30 days (direction is inside the PDFs)", "severity": 40})
-    lg = [e for e in recent if e["category"] == "LEGAL_REGULATORY"]
-    if len(lg) >= 2:
+    if days(ins) >= 3:
+        sells = sum(1 for e in ins if e.get("direction") == "SELL")
+        out.append({"type": "INSIDER_ACTIVITY", "text": f"insider / stake-change filings on {days(ins)} different days in 30 days" + (f", {sells} with sales" if sells else ""), "severity": 40 + (15 if sells >= 2 else 0)})
+    lg = [e for e in recent if e["category"] == "LEGAL_REGULATORY" and e["severity"] >= 45]
+    if days(lg) >= 2:
         out.append({"type": "LEGAL_PILEUP", "text": f"{len(lg)} legal / regulatory items in 30 days", "severity": 70})
     return out
 
@@ -445,6 +460,16 @@ def build(prev, new_events, now, watch=(), coverage=None):
         k = (e.get("company"), (e.get("time") or "")[:10], re.sub(r"[^a-z0-9]", "", (e.get("headline") or "").lower())[:80])
         if k not in best or e["severity"] > best[k]["severity"]:
             best[k] = e
+    # NSE posts a generic "Change in Directors/KMP..." / "change in Management" item next to the specific one: drop the generic copy
+    generic = lambda e: e["reason"].startswith("director / KMP / auditor change") or re.fullmatch(r"\W*change in (senior )?management\W*", (e.get("headline") or "").lower().strip()) is not None
+    g2 = {}
+    for e in best.values():
+        g2.setdefault((ekey(e), (e.get("time") or "")[:10], e["category"], e["source"]), []).append(e)
+    best = {}
+    for g in g2.values():
+        spec = [x for x in g if not generic(x)]
+        for x in (spec or g[:1]):
+            best[x["id"]] = x
     # the same disclosure filed on both exchanges: keep one per company / day / category / source-mix, prefer NSE (structured)
     grp = {}
     for e in best.values():
