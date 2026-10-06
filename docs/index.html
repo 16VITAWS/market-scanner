@@ -148,6 +148,9 @@ table.kv td{padding:4px 4px;font-size:13px}table.kv td:first-child{color:var(--m
 .ev-POSITION_OPENED,.ev-ORDER_FILLED,.ev-TARGET,.ev-RESYNC_COMPLETE,.ev-DATA_RESTORED{color:var(--up)}
 .bar{height:8px;border-radius:6px;background:var(--bg2);overflow:hidden;margin-top:6px}.bar i{display:block;height:100%}
 #cmdChart{position:relative}
+.lockscr{position:fixed;inset:0;z-index:90;background:radial-gradient(circle at 30% 20%,#10264A,var(--bg) 60%);display:grid;place-items:center;padding:16px}.lockscr[hidden]{display:none}
+.lockscr .lbox{background:var(--card);border:1px solid var(--line);border-radius:16px;max-width:420px;width:100%;padding:22px}
+.lockscr .lerr{color:var(--down);font-size:14px;min-height:20px;margin-top:8px}.lockscr .chk{display:flex;gap:8px;align-items:center;font-size:14px;color:var(--ink);margin-top:12px}.lockscr .chk input{width:auto}
 .modal{position:fixed;inset:0;z-index:60;background:rgba(0,0,0,.6);display:grid;place-items:center;padding:16px}.modal[hidden]{display:none}
 .modal .mbox{background:var(--card);border:1px solid var(--line);border-radius:14px;max-width:820px;width:100%;max-height:88vh;overflow:auto;padding:16px;position:relative}.modal .mx{position:sticky;top:0;float:right}
 @media(max-width:1100px){.cmdgrid{grid-template-columns:minmax(0,1fr)}.cmdgrid aside{max-height:none;position:static}}
@@ -167,11 +170,22 @@ table.kv td{padding:4px 4px;font-size:13px}table.kv td:first-child{color:var(--m
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet">
 </head>
 <body>
+<div id="lockScr" class="lockscr" hidden><form class="lbox" id="lockForm" autocomplete="on" onsubmit="event.preventDefault();vaultTry()">
+ <div class="brand" style="font-size:22px">16VITAWS</div><h1 style="margin-top:6px">Sign in</h1>
+ <p class="sub">Your accounts, trades, alerts and approvals are encrypted. Enter your portal pass-phrase to open them. Market prices and signals stay public.</p>
+ <input type="text" name="username" value="16vitaws-owner" autocomplete="username" hidden>
+ <label>Pass-phrase<input type="password" id="lockPw" autocomplete="current-password" required minlength="12" placeholder="your pass-phrase"></label>
+ <label class="chk"><input type="checkbox" id="lockTrust"> Trust this device for 30 days (only on your own phone / laptop)</label>
+ <button class="btn" style="width:100%;margin-top:14px" id="lockGo">Unlock</button>
+ <div class="lerr" id="lockErr"></div>
+ <p class="help" style="margin-top:10px">The pass-phrase never leaves this device: it unlocks the files here, inside your browser. Forgot it? Set a new one in GitHub (Settings &gt; Secrets &gt; PORTAL_KEY) and keep the old one as PORTAL_KEY_OLD for one run.</p>
+</form></div>
 <div class="top">
  <span class="brand">16VITAWS</span>
  <div class="badges" id="badges"><span class="bd">loading…</span></div>
  <button class="btn sm" id="installBtn" hidden title="Install as an app on this device">⬇<span class="lbl"> Install app</span></button>
  <button class="btn sm grey" id="refreshBtn" title="Reload data from the engine">↻<span class="lbl"> Refresh</span></button>
+ <button class="btn sm grey" id="lockBtn" hidden title="Sign out on this device" onclick="vaultSignOut()">🔒<span class="lbl"> Sign out</span></button>
 <div id="rtbar" class="rtbar"><span class="mut">connecting to 16VITAWS LIVE on this laptop…</span></div>
 </div>
 <div class="wrap">
@@ -213,16 +227,58 @@ const jparse=t=>JSON.parse(t.replace(/(?<=[:,\[]\s*)-?(?:NaN|Infinity)(?=\s*[,}\
 const RAW_SITE='https://raw.githubusercontent.com/16VITAWS/market-scanner/gh-pages/';let USE_RAW=false;
 async function siteFetch(path,opt){if(!USE_RAW){try{const r=await fetch(path,opt);if(r.ok||r.status!==404)return r}catch(e){}}
   const r=await fetch(RAW_SITE+path.split('?')[0]+'?t='+Math.floor(Date.now()/60000),{cache:'no-store'});if(r.ok)USE_RAW=true;return r}
+/* ---------- owner sign-in: private files are AES-256-GCM sealed by the engine (engine/vault.py) ----------
+   The pass-phrase is stretched here with PBKDF2-SHA256 (same salt + rounds as the engine) into a key that cannot be
+   exported from this browser. "Trust this device" keeps that key in this browser's IndexedDB for 30 days. */
+const VAULT={on:false,meta:null,key:null,trusted:null,locked:0};
+const b64d=s=>Uint8Array.from(atob(s),c=>c.charCodeAt(0));
+const TE=new TextEncoder(),TD=new TextDecoder();
+function vdb(){return new Promise((res,rej)=>{const r=indexedDB.open('vault16',1);r.onupgradeneeded=()=>r.result.createObjectStore('k');r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error)})}
+async function vdbGet(){try{const db=await vdb();return await new Promise(res=>{const q=db.transaction('k').objectStore('k').get('owner');q.onsuccess=()=>res(q.result||null);q.onerror=()=>res(null)})}catch(e){return null}}
+async function vdbPut(v){try{const db=await vdb();await new Promise(res=>{const t=db.transaction('k','readwrite');v?t.objectStore('k').put(v,'owner'):t.objectStore('k').delete('owner');t.oncomplete=res;t.onerror=res})}catch(e){}}
+async function vDerive(pw,m){const base=await crypto.subtle.importKey('raw',TE.encode(pw),'PBKDF2',false,['deriveKey']);
+  return crypto.subtle.deriveKey({name:'PBKDF2',salt:b64d(m.salt),iterations:m.iter,hash:'SHA-256'},base,{name:'AES-GCM',length:256},false,['decrypt'])}
+async function vDecrypt(env,key){return TD.decode(await crypto.subtle.decrypt({name:'AES-GCM',iv:b64d(env.iv),additionalData:TE.encode(env.aad||'')},key,b64d(env.ct)))}
+async function vCheck(key){try{return await vDecrypt(VAULT.meta.check,key)==='16VITAWS-VAULT-OK'}catch(e){return false}}
+/* open a sealed file; public files pass straight through; a sealed file without the key becomes null (never fake data) */
+async function vopen(v,rel){if(!v||v.vault!==1||!v.ct)return v;if(!VAULT.key){VAULT.locked++;return null}
+  if(v.aad!==rel){console.warn('vault: file name mismatch',rel);return null}
+  try{return jparse(await vDecrypt(v,VAULT.key))}catch(e){console.warn('vault: cannot open',rel);return null}}
+async function vaultInit(){try{const r=await siteFetch('api/vault.json?v='+Date.now(),{cache:'no-store'});if(r.ok)VAULT.meta=await r.json()}catch(e){}
+  VAULT.on=!!(VAULT.meta&&VAULT.meta.enabled&&VAULT.meta.salt&&VAULT.meta.check);if(!VAULT.on)return;
+  $('#lockBtn').hidden=false;
+  const t=await vdbGet();
+  if(t&&t.key&&Date.now()-t.at<30*86400000&&await vCheck(t.key)){VAULT.key=t.key;VAULT.trusted=t;return}
+  if(t)await vdbPut(null);                          // expired, or the pass-phrase was changed
+  $('#lockScr').hidden=false;setTimeout(()=>$('#lockPw')?.focus(),50);
+  await new Promise(res=>{VAULT._done=res})}
+let VFAIL=0;
+async function vaultTry(){const pw=$('#lockPw').value,btn=$('#lockGo'),err=$('#lockErr');if(pw.length<12){err.textContent='The pass-phrase has at least 12 characters.';return}
+  btn.disabled=true;btn.textContent='Checking…';err.textContent='';
+  try{const k=await vDerive(pw,VAULT.meta);
+    if(await vCheck(k)){VAULT.key=k;$('#lockPw').value='';
+      if($('#lockTrust').checked){VAULT.trusted={key:k,at:Date.now(),ua:navigator.userAgent.slice(0,120)};await vdbPut(VAULT.trusted)}
+      $('#lockScr').hidden=true;VFAIL=0;VAULT._done&&VAULT._done();return}
+    VFAIL++;err.textContent='That pass-phrase does not open your files.'+(VFAIL>=3?' Wait '+(VFAIL*5)+' s before trying again.':'');
+    if(VFAIL>=3)await new Promise(r=>setTimeout(r,VFAIL*5000))}
+  catch(e){err.textContent='This browser cannot do the decryption ('+e.message+'). Use a current Chrome, Edge, Safari or Firefox.'}
+  finally{btn.disabled=false;btn.textContent='Unlock'}}
+async function vaultSignOut(){await vdbPut(null);VAULT.key=null;VAULT.trusted=null;location.reload()}
+function vaultCard(){if(!VAULT.on)return `<div class="card"><h3>🔒 Private sign-in: OFF</h3><p class="help">Your paper accounts and trades are readable by anyone who has the link. To make them private, add a pass-phrase (at least 12 characters, e.g. 4-5 words) as the GitHub secret <b>PORTAL_KEY</b>: GitHub &gt; market-scanner &gt; Settings &gt; Secrets and variables &gt; Actions &gt; New repository secret. From the next engine run the portal asks for it.</p></div>`;
+  const t=VAULT.trusted;return `<div class="card"><h3>🔒 Private sign-in: ON</h3><p class="help">Encrypted with AES-256-GCM: ${(VAULT.meta.private||[]).map(esc).join(', ')}. Public: market prices, signals, calendar, kill switch.</p>
+  <p>This device: <b>${t?'trusted until '+new Date(t.at+30*86400000).toLocaleDateString('en-IN'):'signed in for this visit only'}</b></p>
+  <button class="btn sm grey" onclick="vaultSignOut()">${t?'Forget this device and sign out':'Sign out'}</button>
+  <p class="help" style="margin-top:8px">Lost a phone? Change PORTAL_KEY in GitHub (keep the old one as PORTAL_KEY_OLD for one run): every trusted device must sign in again.</p></div>`}
 const CORE=['meta','calendar','signals','signals_us','paper','snapshot','live_control','options_model','live_status','health'];
 async function loadAll(list=FILES){
-  const res=await Promise.allSettled(list.map(f=>siteFetch(`api/${f}.json`,{cache:'no-cache'}).then(r=>{if(!r.ok)throw new Error(r.status);return r.text()}).then(jparse)));
+  const res=await Promise.allSettled(list.map(f=>siteFetch(`api/${f}.json`,{cache:'no-cache'}).then(r=>{if(!r.ok)throw new Error(r.status);return r.text()}).then(jparse).then(v=>vopen(v,`api/${f}.json`))));
   let fails=0;res.forEach((r,i)=>{if(r.status==='fulfilled'){const v=r.value,c=API[list[i]];if(!c||!c.generated_at||!v||!v.generated_at||v.generated_at>=c.generated_at)API[list[i]]=v}else{fails++;API[list[i]]=API[list[i]]||null}});
   if(list===FILES||list===CORE){$('#offline').hidden=fails<list.length; LOADED=fails<list.length}
 }
 /* ---------- LIVE overlay: small files the engine pushes every ~2 min during market hours (branch live-data) ---------- */
 const LIVE_BASE='https://raw.githubusercontent.com/16VITAWS/market-scanner/live-data/api/';
 const LIVE_FILES=['quotes','paper','snapshot','notifications','live_status','pipeline'];
-async function loadLive(){const res=await Promise.allSettled(LIVE_FILES.map(f=>fetch(LIVE_BASE+f+'.json?t='+Date.now(),{cache:'no-store'}).then(r=>{if(!r.ok)throw new Error(r.status);return r.text()}).then(jparse)));
+async function loadLive(){const res=await Promise.allSettled(LIVE_FILES.map(f=>fetch(LIVE_BASE+f+'.json?t='+Date.now(),{cache:'no-store'}).then(r=>{if(!r.ok)throw new Error(r.status);return r.text()}).then(jparse).then(v=>vopen(v,'api/'+f+'.json'))));
   let changed=false;OBS.loads++;OBS.last_try=new Date().toISOString();if(res.every(r=>r.status!=='fulfilled')){OBS.fails++;OBS.fail_streak++}else{if(OBS.fail_streak)OBS.recovered++;OBS.fail_streak=0;OBS.last_ok=OBS.last_try}
   res.forEach((r,i)=>{if(r.status!=='fulfilled')return;const f=LIVE_FILES[i],v=r.value,c=API[f];if(v&&v.generated_at&&(!c||!c.generated_at||v.generated_at>c.generated_at)){API[f]=v;changed=true;if(f==='live_status')OBS.status_changes++}});
   const n=Q('NIFTY');if(n?.t)OBS.nifty_t.add(n.t);return changed}
@@ -460,7 +516,9 @@ const STRAT_INFO={
  value_longterm:{icon:'💎',name:'Long-term Value',what:'Buys good-quality companies when they trade below a conservative estimate of their worth, and holds for years.',rules:['Needs: top-quartile value + quality score, 20%+ margin of safety, F-score 6+, ROIC 12%+ (ROE 14%+ for banks)','Reviewed monthly; sells when the rating falls to AVOID or quality breaks (F-score 4 or less)']}};
 const LIVE_URL='http://127.0.0.1:8765';
 async function laptopState(){try{const c=new AbortController();setTimeout(()=>c.abort(),6000);const r=await fetch(LIVE_URL+'/api/state',{signal:c.signal});return r.ok?await r.json():null}catch(e){return null}}
-async function laptopCmd(path){try{const r=await fetch(LIVE_URL+path,{method:'POST',headers:{'X-Vision':'1'}});return r.ok}catch(e){return false}}
+async function laptopCmd(path,body){try{const r=await fetch(LIVE_URL+path,{method:'POST',headers:{'X-Vision':'1','Content-Type':'application/json'},body:JSON.stringify(body||{})});
+  if(r.status===401&&path==='/resume'){const j=await r.json().catch(()=>({}));const c=prompt((j.msg&&j.msg!=='ok'&&body?j.msg+'\n':'')+'2-step is ON: type the 6-digit code from your authenticator app to switch the kill switch off');if(!c)return false;return laptopCmd(path,{code:c})}
+  return r.ok}catch(e){return false}}
 function countUp(el){const to=+el.dataset.to,dec=+(el.dataset.dec||0),pre=el.dataset.pre||'',suf=el.dataset.suf||'',t0=performance.now();const f=t=>{const k=Math.min(1,(t-t0)/900),e=1-Math.pow(1-k,3),v=to*e;el.textContent=pre+(v<0?'-':'')+Math.abs(v).toLocaleString('en-IN',{minimumFractionDigits:dec,maximumFractionDigits:dec})+suf;if(k<1)requestAnimationFrame(f)};requestAnimationFrame(f)}
 R.algo=async function(){const el=$('#s-algo'),P=API.paper||{},M=API.meta||{};
  const auto=(P.accounts||[]).filter(a=>(a.strategies||[]).length),inr=auto.filter(a=>a.currency!=='USD');
@@ -1095,7 +1153,7 @@ const BR={d:null,at:0,cap:null,show:'trade'};
 const brR=x=>x==null?'—':'₹'+Number(x).toLocaleString('en-IN',{maximumFractionDigits:0});
 const brP=(x,d=1)=>x==null?'—':(+x).toFixed(d)+'%';
 const brDec=d=>`<span class="tag" style="background:${d==='TRADE'?'#2FE39A':d==='WAIT'?'#FFB347':'#5A6478'};color:#0B1424">${d}</span>`;
-async function brLoad(){if(BR.d&&Date.now()-BR.at<300000)return BR.d;try{const r=await siteFetch('api/brain.json?v='+Date.now(),{cache:'no-store'});if(!r.ok)throw new Error('HTTP '+r.status);BR.d=await r.json();BR.at=Date.now()}catch(e){BR.err=e.message}return BR.d}
+async function brLoad(){if(BR.d&&Date.now()-BR.at<300000)return BR.d;try{const r=await siteFetch('api/brain.json?v='+Date.now(),{cache:'no-store'});if(!r.ok)throw new Error('HTTP '+r.status);BR.d=await vopen(await r.json(),'api/brain.json');BR.at=Date.now()}catch(e){BR.err=e.message}return BR.d}
 function brCard(c){const p=c.plan,e=c.ev||{},pr=c.probability||{};
  return `<div class="card" style="border-color:${c.decision==='TRADE'?'rgba(47,227,154,.6)':c.decision==='WAIT'?'rgba(255,179,71,.5)':'var(--line)'}">
  <div style="display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap"><h3 style="margin:0">#${c.rank} ${esc(c.symbol)} · ${esc(c.strategy)} ${brDec(c.decision)}</h3><span class="help">${esc(c.regime)} · ${esc(c.date)}${c.sector?' · '+esc(c.sector):''}</span></div>
@@ -1415,7 +1473,7 @@ function termPaper(side){const sym=TERM.sym.split(':').pop();const q=Q(sym);show
 
 /* ===================== LIVE DESK ===================== */
 R.live=async function(){const C=API.live_control||{},PR=API.live_proposals||{},LR=API.live_results||{},S=API.signals,el=$('#s-live');
-  let appr={items:[]};try{appr=await siteFetch('data/approvals.json?v='+Date.now()).then(r=>r.ok?r.json():{items:[]})}catch(e){}
+  let appr={items:[]};try{appr=await siteFetch('data/approvals.json?v='+Date.now()).then(r=>r.ok?r.json():{items:[]}).then(v=>vopen(v,'data/approvals.json')).then(v=>v||{items:[]})}catch(e){}
   const apprMap=Object.fromEntries((appr.items||[]).map(a=>[a.id,a]));const cap=store.get('liveCap',100000);const b=book();
   const mode=C.mode||'OFF';const GH='https://github.com/16VITAWS/market-scanner';
   const tickets=(S?.buys||[]).map(s=>{const lim=Math.floor(s.entry*1.005*20)/20;const q=Math.max(0,Math.min(Math.floor(cap*0.01/Math.max(lim-s.stop,0.01)),Math.floor(cap*0.25/lim)));return {...s,lim,q}});
@@ -1846,9 +1904,9 @@ function chargeTable(t){const b=t.cost_buy||{},s=t.cost_sell||{};if(!t.cost_buy&
   [['<b>GROSS P&L</b>',`<b>${rupee(t.gross,2)}</b>`],['<b>TOTAL CHARGES</b>',`<b class="neg">−₹${fmt(t.charges,2)}</b>`],['<b>NET P&L</b>',`<b>${rupee(t.net,2)}</b>`],['Slippage cost (inside gross)',t.slippage_cost==null?NA:'₹'+fmt(t.slippage_cost,2)],['Return on capital',t.roi_pct==null?NA:pct(t.roi_pct)],['Holding time',t.holding_min==null?NA:t.holding_min+' min']]).map(([a,v])=>`<tr><td>${a}</td><td class="num">${v}</td></tr>`).join('')}</table>
   ${t.option?`<p class="help">Option: ${esc(t.option.underlying)} ${esc(t.option.expiry)} ${fmt(t.option.strike,0)} ${esc(t.option.type)} · long (bought to open, sold to close)</p>`:''}`}
 R.settings=function(){const el=$('#s-settings');const wl=store.get('watchlist',[]);
-  el.innerHTML=`<h1>Settings & Security</h1>${devicesCard()}
+  el.innerHTML=`<h1>Settings & Security</h1>${vaultCard()}${devicesCard()}
   <div class="grid g2"><div class="card"><h3>Preferences (this device)</h3><label>Broker used for charge estimates<select id="stBrk">${(API.brokers?.brokers||[]).map(b=>`<option value="${b.id}" ${b.id===store.get('broker','groww')?'selected':''}>${esc(b.name)}</option>`).join('')}</select></label><label>Watchlist (comma separated symbols)<input id="stWl" value="${esc(wl.join(', '))}"></label><label>Practice budget (₹)<input id="stBudget" type="number" value="${store.get('budget',10000)}"></label><button class="btn sm" style="margin-top:8px" onclick="saveSettings()">Save</button></div>
-  <div class="card"><h3>Security model</h3><ul class="steps"><li><span class="ic ok">✓</span><div>No passwords, API keys or tokens are ever entered in this page. Broker logins open the broker's own site.</div></li><li><span class="ic ok">✓</span><div>Engine secrets live only in GitHub Actions Secrets (encrypted); the code reads them from the environment.</div></li><li><span class="ic ok">✓</span><div>Your manual paper book and holdings stay in this browser; export/import is your choice. Nothing is uploaded.</div></li><li><span class="ic ok">✓</span><div>The engine's state (paper ledger, runs) is public in the repo — it contains simulated money only. Do not put real account numbers anywhere in it.</div></li><li><span class="ic wait">!</span><div>Account-based multi-device sync is not built: it needs a server with authentication. Until then: export on one device, import on another.</div></li><li><span class="ic ok">✓</span><div>Paper trading and live trading are separate: the paper engine never sends real orders. Real orders happen only when you place them yourself (Live Desk, without API) or through the runner on your own static-IP machine after your approval / the gated auto mode (with API).</div></li></ul></div></div>
+  <div class="card"><h3>Security model</h3><ul class="steps"><li><span class="ic ok">✓</span><div>No passwords, API keys or tokens are ever entered in this page. Broker logins open the broker's own site.</div></li><li><span class="ic ok">✓</span><div>Engine secrets live only in GitHub Actions Secrets (encrypted); the code reads them from the environment.</div></li><li><span class="ic ok">✓</span><div>Your manual paper book and holdings stay in this browser; export/import is your choice. Nothing is uploaded.</div></li><li><span class="ic ${VAULT.on?'ok':'wait'}">${VAULT.on?'✓':'!'}</span><div>${VAULT.on?'The engine state (paper ledger, runs, alerts, approvals) is encrypted with your pass-phrase before it is published.':'The engine state (paper ledger, runs) is public until you set PORTAL_KEY - simulated money only. Do not put real account numbers anywhere in it.'}</div></li><li><span class="ic wait">!</span><div>Account-based multi-device sync is not built: it needs a server with authentication. Until then: export on one device, import on another.</div></li><li><span class="ic ok">✓</span><div>Paper trading and live trading are separate: the paper engine never sends real orders. Real orders happen only when you place them yourself (Live Desk, without API) or through the runner on your own static-IP machine after your approval / the gated auto mode (with API).</div></li></ul></div></div>
   <div class="card"><h3>About this build</h3><p class="help">16VITAWS v2 · engine ${esc(API.meta?.engine_version||'')} · portal reads only api/*.json · legacy v1 portal and engine preserved in the repo's legacy/ folder · Not investment advice. Charts by TradingView Lightweight Charts (Apache-2.0).</p></div>`};
 function saveSettings(){store.set('broker',$('#stBrk').value);store.set('watchlist',$('#stWl').value.split(',').map(s=>s.trim().toUpperCase()).filter(Boolean));store.set('budget',+$('#stBudget').value||10000);toast('Saved')}
 
@@ -1858,7 +1916,7 @@ let deferredInstall=null;
 window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();deferredInstall=e;const b=$('#installBtn');if(b)b.hidden=false});
 function pwa(){if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js').catch(e=>console.warn('sw',e));
   const b=$('#installBtn');if(b)b.onclick=async()=>{if(!deferredInstall){toast('Use the browser menu: Add to Home screen / Install app');return}deferredInstall.prompt();await deferredInstall.userChoice;deferredInstall=null;b.hidden=true}}
-async function boot(){pwa();buildNav();await loadAll(CORE);badges();const h=(location.hash||'#home').slice(1);show(SECTIONS.some(s=>s[0]===h)?h:'home');
+async function boot(){pwa();buildNav();await vaultInit();await loadAll(CORE);badges();const h=(location.hash||'#home').slice(1);show(SECTIONS.some(s=>s[0]===h)?h:'home');
   loadLwc();                                                   // chart library loads in the background, never blocks the first screen
   await loadLive().catch(()=>{});await loadAll(FILES.filter(f=>!CORE.includes(f)));badges();markBook();evalAlerts();{const cur=(location.hash||'#home').slice(1);if(SAFE_RERENDER.includes(cur))softRender();else if(cur!=='algo'&&R[cur]&&!document.activeElement?.matches('input,select,textarea'))try{R[cur]()}catch(e){}}
   $('#refreshBtn').onclick=async()=>{await loadAll();await loadLive().catch(()=>{});badges();markBook();evalAlerts();show((location.hash||'#home').slice(1));toast('Refreshed')};

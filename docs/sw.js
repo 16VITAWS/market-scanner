@@ -1,6 +1,6 @@
 /* VISION AI service worker: app shell cached for offline start; data always network-first
    (falls back to the last copy only when offline, and the portal shows each file's own timestamp). */
-const SHELL = 'vision-shell-v2.4';
+const SHELL = 'vision-shell-v2.5';
 const SHELL_FILES = ['./', './index.html', './manifest.webmanifest', './icon.svg', './icon-192.png', './icon-512.png'];
 self.addEventListener('install', e => { e.waitUntil(caches.open(SHELL).then(c => c.addAll(SHELL_FILES)).then(() => self.skipWaiting())); });
 self.addEventListener('activate', e => { e.waitUntil(caches.keys().then(ks => Promise.all(ks.filter(k => k !== SHELL && k !== 'vision-data').map(k => caches.delete(k)))).then(() => self.clients.claim())); });
