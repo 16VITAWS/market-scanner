@@ -1039,10 +1039,18 @@ def main(argv=None):
     ap.add_argument("--limit", type=int, default=None, help="limit universe size (testing)")
     ap.add_argument("--no-news", action="store_true")
     a = ap.parse_args(argv)
-    site = Site(a.site)
-    tel = TEL.get(site.path)
-    with tel.job(a.job, provider="yahoo" + ("+angelone" if a.job == "intraday" and provider("angelone").configured() else "")):
-        _dispatch(a, site)
+    from . import vault
+    try:
+        vault.unlock(a.site)                     # private files (accounts, trades, alerts) are sealed between runs
+    except vault.VaultError as e:
+        sys.exit(f"VAULT: {e}")
+    try:
+        site = Site(a.site)
+        tel = TEL.get(site.path)
+        with tel.job(a.job, provider="yahoo" + ("+angelone" if a.job == "intraday" and provider("angelone").configured() else "")):
+            _dispatch(a, site)
+    finally:
+        vault.lock(a.site)                       # sealed again before anything is published (no-op without PORTAL_KEY)
 
 
 def _dispatch(a, site):

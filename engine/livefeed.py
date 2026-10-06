@@ -129,6 +129,8 @@ def publish(site_path, token, repo, branch="live-data"):
             src = os.path.join(site_path, "api", f)
             if os.path.exists(src):
                 shutil.copy(src, os.path.join(tmp, "api", f))
+        from . import vault
+        vault.seal_copy(site_path, tmp)          # your paper account / alerts never leave unencrypted when PORTAL_KEY is set
         run = lambda *c: subprocess.run(c, cwd=tmp, check=True, capture_output=True, text=True)
         run("git", "init", "-q"); run("git", "checkout", "-q", "-b", branch)
         run("git", "-c", "user.name=vision-ai-bot", "-c", "user.email=vision-ai-bot@users.noreply.github.com", "add", "-A")
