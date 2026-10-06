@@ -200,6 +200,7 @@ def test_end_to_end_cards_have_full_audit_trail():
             assert c["qty"] >= 1 and c["ev"]["expected_net"] > 0 and all(s["pass"] for s in c["stages"])
     assert len(out["capital_scenarios"]) == 10 and "split" in out["daybook"]
     assert PA.ACCOUNT["id"] in L.state["accounts"]
+    assert out["benchmark"]["nifty_return_pct_over_span"] is not None      # tz-aware index: the NIFTY comparison is filled
 
 
 def test_falling_market_means_no_new_longs():
