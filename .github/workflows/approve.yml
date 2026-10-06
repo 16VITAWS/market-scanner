@@ -30,12 +30,15 @@ jobs:
           cp -r docs/. site/
       - uses: actions/setup-python@v5
         with: { python-version: "3.11" }
+      - run: pip install "cryptography>=41"
       - name: Record decision
         env:
           PID: ${{ inputs.proposal_id }}
           DECISION: ${{ inputs.decision }}
           CONFIRM: ${{ inputs.confirm }}
           ACTOR: ${{ github.actor }}
+          PORTAL_KEY: ${{ secrets.PORTAL_KEY }}
+          PORTAL_KEY_OLD: ${{ secrets.PORTAL_KEY_OLD }}
         run: python -m engine.live.approve --site site
       - run: rm -rf site/.git
       - uses: actions/configure-pages@v5

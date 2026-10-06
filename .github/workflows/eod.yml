@@ -45,6 +45,8 @@ jobs:
       - name: Run engine (EOD)
         env:
           TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
+          PORTAL_KEY: ${{ secrets.PORTAL_KEY }}
+          PORTAL_KEY_OLD: ${{ secrets.PORTAL_KEY_OLD }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
           ANGEL_API_KEY: ${{ secrets.ANGEL_API_KEY }}
           TWELVEDATA_API_KEY: ${{ secrets.TWELVEDATA_API_KEY }}

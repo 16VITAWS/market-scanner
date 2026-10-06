@@ -38,6 +38,8 @@ jobs:
           LIVE_CAPITAL: ${{ vars.LIVE_CAPITAL }}
           ALERT_RULES: ${{ vars.ALERT_RULES }}
           TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
+          PORTAL_KEY: ${{ secrets.PORTAL_KEY }}
+          PORTAL_KEY_OLD: ${{ secrets.PORTAL_KEY_OLD }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
           VISION_MODE: ${{ vars.VISION_MODE }}
         run: python -m engine.run weekend --site site
