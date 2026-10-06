@@ -275,6 +275,14 @@ def job_eod(site, offline=False, universe_limit=None, fetch_news=True, weekend=F
         today = pd.Timestamp(bar_date).date()
         hol = list(cal.CALENDARS["NSE"]["holidays"].keys())
         actions["IN-OPTIONS"], opt_sig = OPT.run(L, "IN-OPTIONS", clean if "NIFTY" in clean else frames, reg, today, bar_date, hol)
+    # ---- Trading Brain: multi-strategy, regime-aware, cost-aware decisions + IN-BRAIN paper account
+    if stocks:
+        try:
+            brain_out = run_brain(site, L, stocks, idx, clean, M["sectors"], bar_date, data_status, master, ev, offline)
+            actions["IN-BRAIN"] = brain_out.get("paper_actions", [])
+        except Exception as e:  # noqa
+            log("brain failed:", e, traceback.format_exc()[-800:])
+            api.write(site.path, "brain.json", {"error": f"{type(e).__name__}: {e}", "as_of": str(bar_date)})
     L.save()
     # ---- notifications (phone / PC push)
     try:
@@ -593,6 +601,36 @@ def write_common(site, M, clean, rejected, dqrep, reg, scan, L, actions, data_st
     api.write(site.path, "reports.json", rep)
     api.write(site.path, "meta.json", {"data_status": data_status, "data_date": reg["date"], "regime": reg["state"], "offline": offline,
               "portal_note": "All numbers come from api/*.json written by the engine; the portal never invents data."})
+
+
+def _intel_flags(site, days=10):
+    """Serious owner / governance filings from the company-intelligence file -> event flags per NSE symbol."""
+    out = {}
+    try:
+        ci = site.load_json("api/company_intel.json", {}) or {}
+        cut = (dt.datetime.now(IST) - dt.timedelta(days=days)).strftime("%Y-%m-%d")
+        for e in ci.get("events", []):
+            if e.get("symbol") and e.get("severity", 0) >= 65 and (e.get("time") or "") >= cut:
+                out.setdefault(e["symbol"], []).append(f"filing: {e['reason']} ({e['time'][:10]})")
+    except Exception:
+        pass
+    return out
+
+
+def run_brain(site, L, stocks, idx, clean, sectors, bar_date, data_status, master, ev, offline):
+    from .brain import engine as BRAIN
+
+    def event_check(syms):
+        if offline or not syms:
+            return {}
+        ymap = {k: master.loc[k, "yahoo"] for k in syms if k in master.index}
+        chk = EV.check(syms, pd.Timestamp(bar_date).date(), ymap, ev.get("ban") or {"symbols": []})
+        return {k: ([v["block"]] if v.get("block") else []) for k, v in chk.items() if v.get("block")}
+    out = BRAIN.run(L, stocks, idx, clean, sectors, bar_date, data_ok=(data_status == "OK" and C.PAPER_ON), event_check=event_check,
+                    intel_flags=_intel_flags(site), trade=(data_status == "OK" and C.PAPER_ON))
+    api.write(site.path, "brain.json", out)
+    log(f"brain: {out['headline']} | regime {out['regime']['state']} | {out['history']['trades_simulated']} historical trades | {out['generated_in_s']}")
+    return out
 
 
 def _watch_symbols(site):
