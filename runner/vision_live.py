@@ -164,6 +164,113 @@ def totp(secret_b32, t=None, step=30, digits=6):
     return str((struct.unpack(">I", h[o:o + 4])[0] & 0x7FFFFFFF) % (10 ** digits)).zfill(digits)
 
 
+class TwoFA:
+    """2-step verification for REAL money with an authenticator app (Google Authenticator, Microsoft Authenticator,
+    Authy...): standard 6-digit time codes (RFC 6238), checked HERE on this laptop - nothing is sent anywhere.
+    - Set up once on the local screen (QR code). The secret is kept in ~/vision_live/2fa.json (owner-only file).
+    - REAL orders stay locked each day until you type a fresh code ("unlock for today"; ends at midnight IST or
+      when the program restarts).
+    - Switching the kill switch OFF also needs a code once 2-step is set up.
+    - 5 wrong codes -> 5 minutes lock-out. A code can be used only once. Every attempt is written to audit.jsonl.
+    Lost the phone? Close the program, delete ~/vision_live/2fa.json, start again and set it up anew (REAL stays
+    locked until you do)."""
+    MAX_FAILS, LOCK_S, STEP = 5, 300, 30
+
+    def __init__(self, path=None, clock=None):
+        self.path = path or os.path.join(HOME, "2fa.json")
+        self.clock = clock or time.time
+        self.pending, self.unlocked_until, self.fails, self.locked_until, self.last_step = None, None, 0, 0.0, -1
+        try:
+            self.data = json.load(open(self.path)) if os.path.exists(self.path) else {}
+        except (OSError, ValueError):
+            self.data = {}
+
+    def enabled(self):
+        return bool(self.data.get("secret"))
+
+    def unlocked(self):
+        return bool(self.unlocked_until and now() < self.unlocked_until)
+
+    def status(self):
+        left = max(0, int(self.locked_until - self.clock()))
+        return {"enabled": self.enabled(), "unlocked": self.unlocked(), "since": self.data.get("created"),
+                "unlocked_until": self.unlocked_until.isoformat(timespec="minutes") if self.unlocked() else None,
+                "lockout_s": left, "setup_pending": bool(self.pending)}
+
+    def _verify(self, secret, code, purpose):
+        code = "".join(ch for ch in str(code or "") if ch.isdigit())
+        t = self.clock()
+        if t < self.locked_until:
+            audit("2fa_refused", purpose=purpose, reason="locked out")
+            return False, f"Too many wrong codes - wait {int(self.locked_until - t)} s."
+        if len(code) != 6:
+            return False, "Type the 6-digit code from your authenticator app."
+        base = int(t // self.STEP)
+        for d in (0, -1, 1):                                    # +/- 30 s for small clock differences
+            st = base + d
+            if hmac.compare_digest(totp(secret, st * self.STEP), code):
+                if st <= self.last_step:
+                    audit("2fa_refused", purpose=purpose, reason="code already used")
+                    return False, "That code was already used - wait for the next one."
+                self.last_step, self.fails = st, 0
+                audit("2fa_ok", purpose=purpose)
+                return True, "ok"
+        self.fails += 1
+        if self.fails >= self.MAX_FAILS:
+            self.locked_until, self.fails = t + self.LOCK_S, 0
+        audit("2fa_wrong", purpose=purpose, fails=self.fails)
+        return False, "Wrong code. Check the time on this laptop and your phone are both correct."
+
+    def setup_start(self):
+        if self.enabled():
+            return {"ok": False, "msg": "2-step is already set up. To start again, close the program and delete 2fa.json."}
+        self.pending = base64.b32encode(os.urandom(20)).decode().rstrip("=")
+        audit("2fa_setup_started")
+        return {"ok": True, "secret": self.pending,
+                "uri": f"otpauth://totp/16VITAWS:LIVE?secret={self.pending}&issuer=16VITAWS&algorithm=SHA1&digits=6&period=30"}
+
+    def setup_confirm(self, code):
+        if not self.pending:
+            return {"ok": False, "msg": "Press 'Set up' first."}
+        ok, msg = self._verify(self.pending, code, "setup")
+        if not ok:
+            return {"ok": False, "msg": msg}
+        data = {"secret": self.pending, "created": now().isoformat(timespec="seconds")}
+        tmp = self.path + ".tmp"
+        fd = os.open(tmp, os.O_WRONLY | os.O_CREAT | os.O_TRUNC, 0o600)
+        with os.fdopen(fd, "w") as f:
+            json.dump(data, f)
+        os.replace(tmp, self.path)
+        self.data, self.pending = data, None
+        audit("2fa_enabled")
+        return {"ok": True, "msg": "2-step verification is ON. Unlock REAL money each day with a fresh code."}
+
+    def check(self, code, purpose):
+        if not self.enabled():
+            return False, "2-step verification is not set up."
+        return self._verify(self.data["secret"], code, purpose)
+
+    def unlock(self, code):
+        ok, msg = self.check(code, "unlock_real")
+        if ok:
+            n = now()
+            self.unlocked_until = n.replace(hour=23, minute=59, second=59, microsecond=0)
+            audit("2fa_real_unlocked", until=self.unlocked_until.isoformat(timespec="minutes"))
+            msg = "REAL money unlocked until midnight (other safety gates still apply)."
+        return {"ok": ok, "msg": msg}
+
+    def lock(self):
+        self.unlocked_until = None
+        audit("2fa_real_locked")
+
+    def blocker(self):
+        if not self.enabled():
+            return "2-step verification not set up (authenticator app) - set it up on this laptop's screen"
+        if not self.unlocked():
+            return "2-step code not entered today - unlock REAL money on this laptop's screen"
+        return None
+
+
 def tick_round(x, up):
     """NSE equity tick size 0.05."""
     n = x / 0.05
@@ -1646,10 +1753,11 @@ class Paper:
 
 
 class Safety:
-    def __init__(self, cfg):
+    def __init__(self, cfg, twofa=None):
         self.cfg = cfg
         self.site_kill = False
         self.orders_today, self.day = 0, now().date()
+        self.twofa = twofa or TwoFA()
 
     def killed(self):
         return os.path.exists(KILL_FILE) or self.site_kill
@@ -1665,13 +1773,16 @@ class Safety:
             b.append("static IP not registered with your broker (SEBI rule)")
         if self.killed():
             b.append("kill switch ON")
+        tf = self.twofa.blocker()
+        if tf:
+            b.append(tf)
         return b
 
     def real_blockers(self, paper):
         b = []
         if self.cfg.get("MODE", "PAPER").upper() != "REAL":
             b.append("MODE is not REAL")
-        b += [x for x in self.real_blockers_base() if x != "kill switch ON"]
+        b += [x for x in self.real_blockers_base() if x != "kill switch ON"]   # kill is appended last (below)
         if not paper.record()["passed"]:
             b.append("live-paper track record gate not passed")
         if self.killed():
@@ -1990,12 +2101,13 @@ table{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums}td,t
 th{color:var(--mut);font-weight:500}.num{text-align:right}.up{color:var(--up)}.dn{color:var(--dn)}.mut{color:var(--mut)}
 button{background:#8B1E2E;color:#fff;border:0;border-radius:8px;padding:8px 14px;font-weight:600;cursor:pointer}button.g{background:#1F3A6B}
 .flash{animation:f .6s}@keyframes f{from{background:#23406b}to{background:transparent}}ul{margin:0;padding-left:18px}li{margin:3px 0;font-size:13px}
-</style></head><body><header><b class="brand">16VITAWS LIVE</b><span id="feed" class="chip">…</span><span id="mode" class="chip">…</span><span id="mkt" class="chip">…</span>
+</style><script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script></head><body><header><b class="brand">16VITAWS LIVE</b><span id="feed" class="chip">…</span><span id="mode" class="chip">…</span><span id="mkt" class="chip">…</span>
 <span id="clock" class="chip mut"></span><span style="flex:1"></span><a id="login" class="chip" href="/shoonya/login" target="_blank" style="display:none;background:#1F6A4A;color:#fff;text-decoration:none;font-weight:600">🔑 Login to Shoonya</a><button id="kill">■ KILL SWITCH</button></header>
 <div id="codebox" style="display:none;padding:10px 16px;background:#1B2842"><b>After logging in:</b> if Shoonya's page did not come back here by itself, copy the full address from that tab and paste it: <input id="code" style="width:50%;padding:6px" placeholder="https://...?code=..."> <button class="g" id="codebtn">Use this login</button> <span id="codemsg" class="mut"></span></div>
 <main><div class="card" style="grid-column:1/-1;border-color:#2A4A7A"><h3>Connection check</h3><div id="diag" class="mut">…</div></div><div class="card" style="grid-column:1/-1"><table id="q"></table><p class="mut" style="font-size:12px">Prices: your broker's exchange feed, updated on every trade (tick). "Age" = seconds since that symbol's last exchange tick. Nothing is estimated: a symbol without a tick shows "—".</p></div>
 <div class="card"><h3>Positions (live P&amp;L)</h3><table id="pos"></table><p id="acct" class="mut"></p></div>
 <div class="card"><h3>REAL trading lock</h3><div id="gate"></div></div>
+<div class="card" style="border-color:#2A5A4A"><h3>&#128272; 2-step verification (REAL money)</h3><div id="tfa"></div></div>
 <div class="card" style="grid-column:1/-1;border-color:#3E2A5C"><h3>&#127919; NIFTY options - live Shoonya prices</h3><div id="opt"></div></div>
 <div class="card"><h3>Today's signals from the portal</h3><div id="sig"></div></div>
 <div class="card"><h3>Activity</h3><ul id="ev"></ul></div></main>
@@ -2013,7 +2125,21 @@ function draw(S){const nl=S.feed.state==='NEEDS LOGIN';$('#login').style.display
  $('#sig').innerHTML=`<p class=mut>Regime ${e(S.signals.regime||'?')} · data ${e(S.signals.data_status||'?')}</p><p><b>BUY</b>: ${S.signals.buys.map(b=>e(b.symbol)+' near '+f2(b.entry)).join(', ')||'none today'}</p><p><b>SELL</b>: ${S.signals.sells.map(e).join(', ')||'none'}</p>`;
  $('#ev').innerHTML=S.events.slice().reverse().slice(0,40).map(x=>`<li><span class=mut>${e(x.time)}</span> ${e(x.msg)}</li>`).join('')||'<li class=mut>Nothing yet</li>';}
 function connect(){const es=new EventSource('/stream');es.onmessage=m=>draw(JSON.parse(m.data));es.onerror=()=>{$('#feed').className='chip DISCONNECTED';$('#feed').textContent='● screen lost connection to VISION LIVE - retrying';}}
-$('#kill').onclick=async()=>{const k=$('#kill').className!=='g';if(!k&&prompt('Type RESUME to switch the kill switch off')!=='RESUME')return;await fetch(k?'/kill':'/resume',{method:'POST',headers:{'X-Vision':'1'}})};
+let TF={};
+$('#kill').onclick=async()=>{const k=$('#kill').className!=='g';let body='{}';
+ if(!k){if(TF.enabled){const c=prompt('Kill switch OFF needs your authenticator code (6 digits):');if(!c)return;body=JSON.stringify({code:c})}else if(prompt('Type RESUME to switch the kill switch off')!=='RESUME')return}
+ const r=await fetch(k?'/kill':'/resume',{method:'POST',headers:{'X-Vision':'1','Content-Type':'application/json'},body});if(r.status===401){const j=await r.json();alert(j.msg)}};
+async function tfPost(p,code){const r=await fetch('/2fa/'+p,{method:'POST',headers:{'X-Vision':'1','Content-Type':'application/json'},body:JSON.stringify({code})});return r.json()}
+let tfSig='';
+function drawTF(T){TF=T||{};const sig=JSON.stringify([TF.enabled,TF.unlocked,TF.setup_pending,TF.lockout_s>0]);if(sig===tfSig)return;tfSig=sig;const el=$('#tfa');
+ if(!TF.enabled){el.innerHTML=`<p class=dn><b>Not set up.</b> REAL money stays locked until you set this up.</p><p class=mut>You need an authenticator app on your phone (Google Authenticator, Microsoft Authenticator or Authy).</p><button class=g id=tfs>Set up 2-step</button><div id=tfq></div>`;
+  $('#tfs').onclick=async()=>{const j=await tfPost('setup');if(!j.ok){alert(j.msg);return}
+   $('#tfq').innerHTML=`<p>1. In the app, add an account and scan this code:</p><div id=qr style="background:#fff;padding:8px;display:inline-block"></div><p class=mut style="font-size:12px">Cannot scan? Type this key: <b style="letter-spacing:.1em">${e(j.secret.replace(/(.{4})/g,'$1 '))}</b> (time-based)</p><p>2. Type the 6-digit code it shows:</p><input id=tfc inputmode=numeric maxlength=6 style="padding:8px;width:120px"> <button class=g id=tfok>Confirm</button> <span id=tfm class=mut></span><p class=mut style="font-size:12px">Write the key on paper and keep it safe - it is shown only now.</p>`;
+   try{new QRCode($('#qr'),{text:j.uri,width:180,height:180})}catch(x){$('#qr').innerHTML='<a href="'+e(j.uri)+'">open in authenticator</a>'}
+   $('#tfok').onclick=async()=>{const r=await tfPost('confirm',$('#tfc').value);$('#tfm').textContent=r.msg;if(r.ok)tfSig=''}};return}
+ if(TF.unlocked){el.innerHTML=`<p class=up><b>REAL money unlocked</b> until ${e((TF.unlocked_until||'').slice(11,16))} today (the other safety gates still apply).</p><button id=tfl>Lock REAL money now</button>`;$('#tfl').onclick=async()=>{await tfPost('lock');tfSig=''};return}
+ el.innerHTML=`<p><b>ON</b> since ${e((TF.since||'').slice(0,10))}. REAL orders are locked today until you type a fresh code.</p>${TF.lockout_s>0?'<p class=dn>Too many wrong codes - wait a few minutes.</p>':''}<input id=tfc inputmode=numeric maxlength=6 placeholder="6-digit code" style="padding:8px;width:140px"> <button class=g id=tfu>Unlock REAL money for today</button> <span id=tfm class=mut></span>`;
+ $('#tfu').onclick=async()=>{const r=await tfPost('unlock',$('#tfc').value);$('#tfm').textContent=r.msg;if(r.ok)tfSig=''}}
 $('#codebtn').onclick=async()=>{const r=await fetch('/shoonya/code',{method:'POST',headers:{'X-Vision':'1'},body:$('#code').value});const j=await r.json();$('#codemsg').textContent=j.msg};
 function drawOpt(O){if(!O){$('#opt').innerHTML='<p class=mut>Not loaded yet.</p>';return}const s=O.signal||{},L=O.legs,v=O.live,o=O.open;
  $('#opt').innerHTML=`<p><b>${s.action==='BUY'?e(s.name):'No options trade today'}</b> ${s.action==='BUY'?`<span class=mut>(${e((s.why||[]).join(' · '))})</span>`:''} · mode <b>${e(O.mode)}</b></p>`+
@@ -2028,7 +2154,7 @@ function drawDiag(H){if(!H)return;const c=(ok,t)=>`<b class=${ok?'up':'dn'}>${e(
  <tr><td>Address Shoonya knows</td><td>${e(H.registered_ip||'unknown')} <span class=mut>${e(H.registered_ip_source||'')}</span> ${H.ip_status==='UNKNOWN'?'':c(H.ip_status==='MATCH',H.ip_status)}</td></tr>
  <tr><td>Live prices</td><td>${c(H.market_data==='LIVE',H.market_data)} <span class=mut>${H.symbols_live}/${H.symbols_requested} symbols ticking</span></td></tr>
  <tr><td>Paper engine · Real orders</td><td><b class=up>${e(H.paper_engine)}</b> · ${c(H.real_orders==='BLOCKED',H.real_orders)}</td></tr></table>${H.auth_detail?`<p class=dn style="font-size:13px">${e(H.auth_detail)}</p>`:''}`}
-const _draw=draw;draw=S=>{_draw(S);drawOpt(S.options);drawDiag(S.broker_health)};
+const _draw=draw;draw=S=>{_draw(S);drawOpt(S.options);drawDiag(S.broker_health);drawTF(S.twofa)};
 connect();
 </script></body></html>"""
 
@@ -2687,6 +2813,7 @@ def _build_state(app):
     return {"time": now().strftime("%H:%M:%S"), "served_at_ms": int(nowt * 1000),
             "feed": app.feed.health() if app.feed else {"state": "DISCONNECTED", "last_error": "no credentials"},
             "mode": app.trader.mode(), "mode_requested": app.cfg.get("MODE", "PAPER").upper(), "market": app.market,
+            "twofa": app.safety.twofa.status(),
             "killed": killed, "paused": paused, "quotes": quotes, "positions": pos,
             "account": {"equity": app.paper.equity(app.book), "cash": app.paper.s["cash"], "closed": len(app.paper.s["trades"]), "today": app.paper.realized_today()},
             "real_blockers": app.safety.real_blockers(app.paper), "gate": app.paper.record(), "signals": app.trader.signals,
@@ -2775,7 +2902,7 @@ def make_handler(app):
                 self.send_error(403); return
             self.send_response(204); self._cors()
             self.send_header("Access-Control-Allow-Methods", "GET, POST")
-            self.send_header("Access-Control-Allow-Headers", "X-Vision")
+            self.send_header("Access-Control-Allow-Headers", "X-Vision, Content-Type")
             self.send_header("Access-Control-Allow-Private-Network", "true")
             self.send_header("Access-Control-Max-Age", "600")
             self.end_headers()
@@ -2837,6 +2964,39 @@ def make_handler(app):
             if origin and origin not in LOCAL_ORIGINS and not (origin == PORTAL_ORIGIN and self.path in PORTAL_POSTS):
                 self.send_error(403); return                # the portal can only stop/pause/resume and close PAPER positions - never buy
             pause_file = os.path.join(os.path.dirname(KILL_FILE), "PAUSED")
+            body = {}
+            if self.path.startswith("/2fa/") or self.path == "/resume":
+                n = int(self.headers.get("Content-Length") or 0)
+                try:
+                    body = json.loads(self.rfile.read(min(n, 2000)).decode("utf-8", "ignore") or "{}")
+                except ValueError:
+                    body = {}
+            tf = getattr(getattr(app, "safety", None), "twofa", None)
+            if self.path.startswith("/2fa/"):
+                if tf is None:
+                    self.send_error(404); return
+                if origin and origin not in LOCAL_ORIGINS:      # 2-step set-up / unlock: ONLY on this laptop's own screen
+                    self.send_error(403); return
+                if self.path == "/2fa/setup":
+                    r = tf.setup_start()
+                elif self.path == "/2fa/confirm":
+                    r = tf.setup_confirm(body.get("code"))
+                elif self.path == "/2fa/unlock":
+                    r = tf.unlock(body.get("code"))
+                    if r["ok"]:
+                        app.journal.add("REAL_UNLOCKED", "REAL money unlocked for today with your authenticator code", mode="LIVE", source="user")
+                elif self.path == "/2fa/lock":
+                    tf.lock(); r = {"ok": True, "msg": "REAL money locked."}
+                    app.journal.add("REAL_LOCKED", "REAL money locked by you", mode="LIVE", source="user")
+                else:
+                    self.send_error(404); return
+                b = json.dumps(r).encode()
+                self.send_response(200); self.send_header("Content-Type", "application/json"); self.end_headers(); self.wfile.write(b); return
+            if self.path == "/resume" and tf is not None and tf.enabled() and os.path.exists(KILL_FILE):
+                ok, msg = tf.check(body.get("code"), "resume")
+                if not ok:
+                    b = json.dumps({"ok": False, "need_code": True, "msg": msg}).encode()
+                    self.send_response(401); self._cors(); self.send_header("Content-Type", "application/json"); self.end_headers(); self.wfile.write(b); return
             if self.path == "/kill":
                 open(KILL_FILE, "w").write(now().isoformat()); app.trader.log("kill", "KILL SWITCH ON - no new orders")
             elif self.path == "/pause":
