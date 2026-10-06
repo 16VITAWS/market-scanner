@@ -87,7 +87,10 @@ def test_real_mode_stays_locked_until_every_condition_holds(VL):
     t.feed = FakeFeed()
     for i in range(30):                                                                              # a passing live-paper record
         paper.s["trades"].append({"pnl": 100.0 if i % 3 else -50.0, "closed": "2026-09-01T10:00:00"})
-    assert paper.record()["passed"] and t.mode() == "REAL"
+    assert paper.record()["passed"] and t.mode() == "PAPER"                                            # 2-step not set up yet
+    assert any("2-step" in b for b in t.safety.real_blockers(paper))
+    _unlock_2fa(VL, t.safety.twofa)
+    assert t.mode() == "REAL"
     book.update("TCS", {"p": 3402.0, "t": time.time()}); t.on_tick("TCS")
     o = t.feed.orders[0]
     assert o["side"] == "BUY" and o["limit"] == 3419.05 and o["sym"] == "TCS"
@@ -341,7 +344,9 @@ def test_options_real_locked_then_orders_both_legs_safely(VL, tmp_path):
             self.orders.append((exch, tsym, side, qty, limit, prd)); return f"N{len(self.orders)}"
     o.feed = FF()
     o.s["trades"] = [{"pnl": 500.0}, {"pnl": 400.0}, {"pnl": -200.0}]
-    assert o.record()["passed"] and o.mode() == "REAL"
+    assert o.record()["passed"] and o.mode() == "PAPER" and any("2-step" in b for b in o.real_blockers())
+    _unlock_2fa(VL, o.safety.twofa)
+    assert o.mode() == "REAL"
     now_t = time.time()
     px(130.0, 58.0, now_t); o.on_tick()
     assert [x[:4] for x in o.feed.orders] == [("NFO", "NIFTY06OCT26P22400", "BUY", 65), ("NFO", "NIFTY06OCT26P22200", "SELL", 65)]
@@ -878,3 +883,65 @@ def test_paper_progress_counts_trades_and_explains_why_none(VL, monkeypatch, tmp
     assert any("0 BUY signals" in w and "BEAR" in w for w in P["why_none_today"])
     app.chain_tr.s["trades"] = [{"pnl": 120.0, "entry_time": "2026-10-01T10:00:00"}, {"pnl": -40.0, "entry_time": "2026-10-01T11:00:00"}]
     assert VL.paper_progress(app)["options"]["closed"] == 2                              # AI option-chain trades count for the options test
+
+
+# ---------------------------------------------------------------- 2-step verification for REAL money
+def _unlock_2fa(VL, tf, t0=1_800_000_000.0):
+    clock = {"t": t0}
+    tf.clock = lambda: clock["t"]
+    sec = tf.setup_start()["secret"]
+    assert tf.setup_confirm(VL.totp(sec, clock["t"]))["ok"]
+    clock["t"] += 30
+    assert tf.unlock(VL.totp(sec, clock["t"]))["ok"]
+    return sec, clock
+
+
+def test_2fa_setup_unlock_replay_and_lockout(VL):
+    tf = VL.TwoFA()
+    assert not tf.enabled() and "not set up" in tf.blocker()
+    sec, clock = _unlock_2fa(VL, tf)
+    assert tf.enabled() and tf.unlocked() and tf.blocker() is None
+    assert (os.stat(tf.path).st_mode & 0o777) == 0o600                                  # secret file readable by you only
+    assert VL.TwoFA().enabled() and not VL.TwoFA().unlocked()                           # a restart needs a fresh code
+    tf.lock()
+    assert "not entered today" in tf.blocker()
+    assert not tf.unlock(VL.totp(sec, clock["t"]))["ok"]                                # the same code cannot be used twice
+    for _ in range(5):
+        assert not tf.unlock("000000")["ok"]
+    clock["t"] += 30
+    r = tf.unlock(VL.totp(sec, clock["t"]))
+    assert not r["ok"] and "wait" in r["msg"].lower()                                   # 5 wrong codes -> locked out
+    clock["t"] += 301
+    assert tf.unlock(VL.totp(sec, clock["t"]))["ok"]
+    assert not tf.setup_start()["ok"]                                                   # cannot be silently replaced
+    rows = [json.loads(x)["event"] for x in open(VL.AUDIT)]
+    assert "2fa_enabled" in rows and "2fa_wrong" in rows and "2fa_real_unlocked" in rows
+
+
+def test_2fa_endpoints_local_only_and_resume_needs_code(VL, tmp_path):
+    import urllib.request, urllib.error, threading, types
+    app = types.SimpleNamespace(safety=VL.Safety({}), journal=types.SimpleNamespace(add=lambda *a, **k: None),
+                                trader=types.SimpleNamespace(log=lambda *a, **k: None))
+    srv = VL.ThreadingHTTPServer(("127.0.0.1", 0), VL.make_handler(app)) if hasattr(VL, "make_handler") else None
+    if srv is None:
+        pytest.skip("handler factory not exposed")
+    threading.Thread(target=srv.serve_forever, daemon=True).start()
+    port = srv.server_address[1]
+
+    def req(path, origin=None, body=None):
+        h = {"X-Vision": "1", "Content-Type": "application/json"}
+        if origin:
+            h["Origin"] = origin
+        r = urllib.request.Request(f"http://127.0.0.1:{port}{path}", data=json.dumps(body or {}).encode(), method="POST", headers=h)
+        try:
+            with urllib.request.urlopen(r) as resp:
+                return resp.status, resp.read()
+        except urllib.error.HTTPError as e:
+            return e.code, e.read()
+    assert req("/2fa/setup", VL.PORTAL_ORIGIN)[0] == 403                                # the portal can never set up or unlock
+    st, b = req("/2fa/setup", VL.LOCAL_ORIGINS[0])
+    sec = json.loads(b)["secret"]
+    assert json.loads(req("/2fa/confirm", VL.LOCAL_ORIGINS[0], {"code": VL.totp(sec)})[1])["ok"]
+    open(VL.KILL_FILE, "w").write("x")
+    assert req("/resume", VL.PORTAL_ORIGIN)[0] == 401 and os.path.exists(VL.KILL_FILE)    # kill OFF needs a code now
+    srv.shutdown()
