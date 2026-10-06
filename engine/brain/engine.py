@@ -5,6 +5,7 @@ reports. Returns the JSON written to api/brain.json. All inputs are passed in; n
 import time
 import datetime as dt
 import numpy as np
+import pandas as pd
 from . import decide as DE, regime as RG, paper as PA, daybook as DB, strategies as S, score as SC
 from .. import config as C
 
@@ -57,7 +58,8 @@ def run(L, stocks, idx, frames, sectors, bar_date, data_ok=True, event_check=Non
     bench = {}
     try:
         ic = idx["Close"]
-        s0 = ic[ic.index >= np.datetime64(span[0])].iloc[0] if span[0] else None
+        span_start = pd.Timestamp(span[0], tz=ic.index.tz) if span[0] else None          # same time zone as the index
+        s0 = ic[ic.index >= span_start].iloc[0] if span_start is not None else None
         bench["nifty_return_pct_over_span"] = round((float(ic.iloc[-1]) / float(s0) - 1) * 100, 2) if s0 is not None else None
     except Exception:
         bench["nifty_return_pct_over_span"] = None
