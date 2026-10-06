@@ -31,4 +31,13 @@ def main(site):
 
 
 if __name__ == "__main__":
-    main(sys.argv[sys.argv.index("--site") + 1] if "--site" in sys.argv else "site")
+    from engine import vault
+    _site = sys.argv[sys.argv.index("--site") + 1] if "--site" in sys.argv else "site"
+    try:
+        vault.unlock(_site)
+    except vault.VaultError as e:
+        sys.exit(f"VAULT: {e}")
+    try:
+        main(_site)
+    finally:
+        vault.lock(_site)
