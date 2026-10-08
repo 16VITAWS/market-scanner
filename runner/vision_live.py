@@ -70,6 +70,11 @@ SHOONYA_SECRET=
 # Leave empty: it is learned automatically after the first successful login.
 SHOONYA_REGISTERED_IP=
 SHOONYA_OAUTH_URL=https://api.shoonya.com/OAuthlogin/authorize/oauth
+# Optional fixed internet address (needed on a phone hotspot / mobile data, whose address keeps changing).
+# Buy a "static IP proxy" for algo trading, register ITS address on Shoonya's Api Key page, and paste it here as
+#   STATIC_PROXY=http://USER:PASSWORD@HOST:PORT
+# All of this program's internet traffic (Shoonya login, prices, orders) then leaves from that one fixed address.
+STATIC_PROXY=
 # Angel One SmartAPI (free) - only if BROKER=ANGEL: create an app at smartapi.angelone.in, enable TOTP
 ANGEL_API_KEY=
 ANGEL_CLIENT_ID=
@@ -134,7 +139,39 @@ def load_settings(path=SETTINGS):
     return cfg
 
 
-SECRET_KEYS = ("ANGEL_API_KEY", "ANGEL_PASSWORD", "ANGEL_TOTP_SECRET", "SHOONYA_SECRET", "SHOONYA_ACCESS_TOKEN")
+SECRET_KEYS = ("ANGEL_API_KEY", "ANGEL_PASSWORD", "ANGEL_TOTP_SECRET", "SHOONYA_SECRET", "SHOONYA_ACCESS_TOKEN", "STATIC_PROXY")
+
+
+def proxy_url(cfg):
+    p = ((cfg or {}).get("STATIC_PROXY") or "").strip()
+    if not p:
+        return None
+    return p if "://" in p else "http://" + p
+
+
+def apply_proxy(cfg):
+    """STATIC_PROXY set -> every outbound web request of this program goes through that fixed address (this laptop's own
+    screen, 127.0.0.1, never does). Returns the proxy URL or None."""
+    p = proxy_url(cfg)
+    if not p:
+        return None
+    for k in ("HTTPS_PROXY", "HTTP_PROXY", "https_proxy", "http_proxy"):
+        os.environ[k] = p
+    os.environ["NO_PROXY"] = os.environ["no_proxy"] = "127.0.0.1,localhost"
+    return p
+
+
+def ws_proxy_kwargs(cfg):
+    """Same fixed address for the live-price WebSocket (websocket-client needs it passed explicitly)."""
+    p = proxy_url(cfg)
+    if not p:
+        return {}
+    import urllib.parse as up
+    u = up.urlparse(p)
+    kw = {"http_proxy_host": u.hostname, "http_proxy_port": u.port or 80, "proxy_type": "http"}
+    if u.username:
+        kw["http_proxy_auth"] = (up.unquote(u.username), up.unquote(u.password or ""))
+    return kw
 
 
 def scrub(text, cfg):
@@ -142,6 +179,12 @@ def scrub(text, cfg):
     for k in SECRET_KEYS:
         if cfg.get(k) and len(cfg[k]) >= 4:
             s = s.replace(cfg[k], "***")
+    pu = proxy_url(cfg)
+    if pu and "@" in pu:                                              # the proxy password on its own, too
+        import urllib.parse as up
+        pw = up.urlparse(pu).password
+        if pw and len(pw) >= 4:
+            s = s.replace(pw, "***").replace(up.unquote(pw), "***")
     return s
 
 
@@ -706,7 +749,7 @@ class ShoonyaFeed(threading.Thread):
 
                 ws = websocket.WebSocketApp(SH_WS, on_open=on_open, on_message=on_message, on_error=on_error)
                 self.ws = ws
-                ws.run_forever(ping_interval=3, ping_payload='{"t":"h"}')     # certificate verification stays ON
+                ws.run_forever(ping_interval=3, ping_payload='{"t":"h"}', **ws_proxy_kwargs(self.cfg))   # certificate verification stays ON
                 self.state = "DISCONNECTED"
             except Exception as e:  # noqa
                 self.state, self.last_error = "DISCONNECTED", scrub(e, self.cfg)
@@ -3423,6 +3466,8 @@ def diagnose(cfg, http=None, out=print):
 
 def main():
     cfg = load_settings()
+    if apply_proxy(cfg):
+        print("  Fixed internet address: all broker traffic goes through your STATIC_PROXY.", flush=True)
     if "--diagnose-shoonya" in sys.argv:
         diagnose(cfg); return
     try:
