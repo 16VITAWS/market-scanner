@@ -3200,6 +3200,24 @@ class App:
                 self.trader.log("ready", f"{name}: paper record fell below the bar again - stay on paper / reduce real size.")
                 self.notify("16VITAWS: paper record weakened", f"{name} no longer passes its paper test. Consider stopping real trading.")
 
+    def login_reminder(self):
+        """Trading day, 08:45-15:00 IST, Shoonya not logged in -> ONE phone message per day with the login link.
+        Paper trades on live prices (the ones that count toward real money) only start after this daily login."""
+        if self.broker != "SHOONYA" or getattr(self.sh_auth, "session", None):
+            return
+        t = now()
+        if t.weekday() >= 5 or not (dt.time(8, 45) <= t.time() < dt.time(15, 0)):
+            return
+        if t.time() >= dt.time(9, 15) and self.market != "OPEN":
+            return                                                         # holiday / closed day: no reminder
+        if getattr(self, "_login_reminded", None) == t.date():
+            return
+        self._login_reminded = t.date()
+        self.trader.log("login", "Reminder sent to your phone: log in to Shoonya so paper trading runs on live prices today.")
+        self.notify("16VITAWS: log in to Shoonya now",
+                    "Open http://127.0.0.1:8765 on your laptop and click 'Login to Shoonya'. Until then paper trading uses "
+                    "15-minute-delayed prices and today's trades do not count toward real money.")
+
     def notify(self, title, msg):
         try:
             self.req.post(f"https://ntfy.sh/{self.cfg.get('NTFY_TOPIC') or 'vision-ai-16vitaws-k7q2m9x4'}", data=msg.encode(),
@@ -3347,6 +3365,7 @@ class App:
             if time.time() - last_portal > 60:
                 self.refresh_portal(); last_portal = time.time()
                 self.check_ready()
+                self.login_reminder()
                 try:
                     self.refresh_chain()
                 except Exception as e:  # noqa
