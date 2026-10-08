@@ -945,3 +945,22 @@ def test_2fa_endpoints_local_only_and_resume_needs_code(VL, tmp_path):
     open(VL.KILL_FILE, "w").write("x")
     assert req("/resume", VL.PORTAL_ORIGIN)[0] == 401 and os.path.exists(VL.KILL_FILE)    # kill OFF needs a code now
     srv.shutdown()
+
+
+def test_login_reminder_once_per_trading_morning(VL, monkeypatch):
+    sent = []
+    app = types_app = type("A", (), {})()
+    app.broker, app.market = "SHOONYA", "CLOSED"
+    app.sh_auth = type("S", (), {"session": None})()
+    app.trader = type("T", (), {"log": lambda *a, **k: None})()
+    app.notify = lambda t, m: sent.append(t)
+    monkeypatch.setattr(VL, "now", lambda: dt.datetime(2026, 10, 7, 8, 50, tzinfo=VL.IST))   # Wednesday 08:50
+    VL.App.login_reminder(app); VL.App.login_reminder(app)
+    assert len(sent) == 1                                                  # once per day, not every minute
+    app.sh_auth.session = {"token": "x"}; app._login_reminded = None
+    VL.App.login_reminder(app)
+    assert len(sent) == 1                                                  # logged in -> no reminder
+    app.sh_auth.session = None
+    monkeypatch.setattr(VL, "now", lambda: dt.datetime(2026, 10, 10, 9, 0, tzinfo=VL.IST))   # Saturday
+    VL.App.login_reminder(app)
+    assert len(sent) == 1
