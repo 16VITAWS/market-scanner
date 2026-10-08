@@ -687,6 +687,40 @@ def write_company_intel(site, offline, notify=True, light=False):
         return prev
 
 
+def refresh_news(site, offline=False):
+    """Market headlines only (Google News RSS) - cheap, so it runs every hour and every ~15 min in live sessions.
+    A failed fetch never wipes the last good headlines."""
+    if offline:
+        return False
+    try:
+        live = NEWS.market_news()
+    except Exception as e:  # noqa
+        log("news refresh failed:", e)
+        return False
+    if not live.get("items"):
+        log("news refresh: no headlines returned - keeping the previous ones")
+        return False
+    old = site.load_json("api/news.json", {}) or {}
+    live["status"] = "FETCHED (Google News RSS, keyword sentiment)"
+    live["refreshed_at"] = dt.datetime.now(IST).isoformat(timespec="seconds")
+    out = {k: v for k, v in old.items() if k not in ("generated_at", "engine_version", "mode")}
+    out["live"] = live
+    if "legacy" not in out:
+        out["legacy"] = {"as_of": "2026-09-25", "items": site.legacy("news") or [], "status": "MANUAL / HISTORICAL"}
+    api.write(site.path, "news.json", out)
+    return True
+
+
+def job_news(site, offline=False):
+    """Hourly, every day: fresh headlines + company filings (NSE feeds), independent of market hours or the laptop."""
+    ok = refresh_news(site, offline)
+    try:
+        write_company_intel(site, offline, light=True)
+    except Exception as e:  # noqa
+        log("company intel (light) failed:", e)
+    log("news job:", "headlines refreshed" if ok else "headlines unchanged")
+
+
 def write_feeds(site, offline):
     legacy_news = site.legacy("news") or []
     out = {"legacy": {"as_of": "2026-09-25", "items": legacy_news, "headline_stat_pct": 33, "status": "MANUAL / HISTORICAL",
@@ -789,6 +823,7 @@ def job_intraday(site, offline=False, minutes=None, every=None):
     else:
         tel.provider_status("angelone", status="AWAITING SECRETS", configured=False)
     cycles = 0
+    last_news = 0.0
     while True:
         cycles += 1
         t0 = time.time()
@@ -931,6 +966,8 @@ def job_intraday(site, offline=False, minutes=None, every=None):
         if job_:
             job_.processed += n_ok; job_.failed += len(rejected) + len(bad)
         tel.save()
+        if cycles == 1 or time.time() - last_news >= 900:          # headlines every ~15 minutes during the session
+            refresh_news(site, offline); last_news = time.time()
         pub = LF.publish(site.path, token, repo)
         log(f"live cycle {cycles}: markets {sorted(open_mk) or 'closed'} · 5m {len(got)} · stocks {n_univ} · actions {status['paper_actions_this_cycle']} · {pub}")
         if not open_mk or time.time() + every > t_end:
@@ -1033,7 +1070,7 @@ def job_migrate(site):
 
 def main(argv=None):
     ap = argparse.ArgumentParser()
-    ap.add_argument("job", choices=["eod", "intraday", "weekend", "health", "migrate", "premarket"])
+    ap.add_argument("job", choices=["eod", "intraday", "weekend", "health", "migrate", "premarket", "news"])
     ap.add_argument("--site", default="site")
     ap.add_argument("--offline", action="store_true")
     ap.add_argument("--limit", type=int, default=None, help="limit universe size (testing)")
@@ -1058,6 +1095,8 @@ def _dispatch(a, site):
         job_eod(site, a.offline, a.limit, fetch_news=not a.no_news, weekend=a.job == "weekend")
     elif a.job == "premarket":
         job_premarket(site, a.offline)
+    elif a.job == "news":
+        job_news(site, a.offline)
     elif a.job == "intraday":
         job_intraday(site, a.offline)
     elif a.job == "health":

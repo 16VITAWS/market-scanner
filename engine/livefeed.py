@@ -16,7 +16,8 @@ from decimal import Decimal as D
 import pandas as pd
 
 IST = dt.timezone(dt.timedelta(hours=5, minutes=30))
-LIVE_FILES = ("quotes.json", "paper.json", "snapshot.json", "notifications.json", "live_status.json", "signals.json", "pipeline.json")
+LIVE_FILES = ("quotes.json", "paper.json", "snapshot.json", "notifications.json", "live_status.json", "signals.json", "pipeline.json",
+              "news.json")
 
 
 def quote_from_5m(df, old=None):
