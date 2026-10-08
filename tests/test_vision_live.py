@@ -964,3 +964,15 @@ def test_login_reminder_once_per_trading_morning(VL, monkeypatch):
     monkeypatch.setattr(VL, "now", lambda: dt.datetime(2026, 10, 10, 9, 0, tzinfo=VL.IST))   # Saturday
     VL.App.login_reminder(app)
     assert len(sent) == 1
+
+
+def test_static_proxy_routes_broker_traffic_and_hides_password(VL, monkeypatch):
+    for k in ("HTTPS_PROXY", "HTTP_PROXY", "https_proxy", "http_proxy", "NO_PROXY", "no_proxy"):
+        monkeypatch.delenv(k, raising=False)
+    assert VL.apply_proxy({}) is None and VL.ws_proxy_kwargs({}) == {}
+    cfg = {"STATIC_PROXY": "http://user1:s3cretPW@10.1.2.3:8080"}
+    assert VL.apply_proxy(cfg) == cfg["STATIC_PROXY"] and os.environ["HTTPS_PROXY"] == cfg["STATIC_PROXY"]
+    assert "127.0.0.1" in os.environ["NO_PROXY"]                                    # the local screen never goes via the proxy
+    kw = VL.ws_proxy_kwargs(cfg)
+    assert kw["http_proxy_host"] == "10.1.2.3" and kw["http_proxy_port"] == 8080 and kw["http_proxy_auth"] == ("user1", "s3cretPW")
+    assert "s3cretPW" not in VL.scrub("ProxyError: s3cretPW refused", cfg)
