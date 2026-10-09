@@ -1,0 +1,4366 @@
+{
+ "version": 2,
+ "created": "2026-09-27T20:47:31+05:30",
+ "accounts": {
+  "IN-SWING": {
+   "id": "IN-SWING",
+   "name": "India swing (auto)",
+   "currency": "INR",
+   "start_cash": "200000",
+   "cash": "200000",
+   "created": "2026-09-27T20:47:31+05:30",
+   "strategies": [
+    "trend_breakout_swing"
+   ],
+   "positions": {},
+   "equity": [
+    {
+     "date": "2026-09-25",
+     "value": "200000.00",
+     "cash": "200000.00"
+    },
+    {
+     "date": "2026-09-28",
+     "value": "200000.00",
+     "cash": "200000.00"
+    },
+    {
+     "date": "2026-09-25",
+     "value": "200000.00",
+     "cash": "200000.00"
+    },
+    {
+     "date": "2026-09-28",
+     "value": "200000.00",
+     "cash": "200000.00"
+    },
+    {
+     "date": "2026-09-29",
+     "value": "200000.00",
+     "cash": "200000.00"
+    },
+    {
+     "date": "2026-09-30",
+     "value": "200000.00",
+     "cash": "200000.00"
+    },
+    {
+     "date": "2026-10-01",
+     "value": "200000.00",
+     "cash": "200000.00"
+    },
+    {
+     "date": "2026-10-05",
+     "value": "200000.00",
+     "cash": "200000.00"
+    },
+    {
+     "date": "2026-10-06",
+     "value": "200000.00",
+     "cash": "200000.00"
+    },
+    {
+     "date": "2026-10-07",
+     "value": "200000.00",
+     "cash": "200000.00"
+    },
+    {
+     "date": "2026-10-08",
+     "value": "200000.00",
+     "cash": "200000.00"
+    }
+   ],
+   "peak": "200000",
+   "status": "ACTIVE",
+   "realized_pnl": "0",
+   "fees_paid": "0"
+  },
+  "IN-MANUAL": {
+   "id": "IN-MANUAL",
+   "name": "India manual practice",
+   "currency": "INR",
+   "start_cash": "200000",
+   "cash": "200000",
+   "created": "2026-09-27T20:47:31+05:30",
+   "strategies": [],
+   "positions": {},
+   "equity": [
+    {
+     "date": "2026-09-25",
+     "value": "200000.00",
+     "cash": "200000.00"
+    },
+    {
+     "date": "2026-09-28",
+     "value": "200000.00",
+     "cash": "200000.00"
+    },
+    {
+     "date": "2026-09-25",
+     "value": "200000.00",
+     "cash": "200000.00"
+    },
+    {
+     "date": "2026-09-29",
+     "value": "200000.00",
+     "cash": "200000.00"
+    },
+    {
+     "date": "2026-09-30",
+     "value": "200000.00",
+     "cash": "200000.00"
+    },
+    {
+     "date": "2026-10-01",
+     "value": "200000.00",
+     "cash": "200000.00"
+    },
+    {
+     "date": "2026-10-05",
+     "value": "200000.00",
+     "cash": "200000.00"
+    },
+    {
+     "date": "2026-10-06",
+     "value": "200000.00",
+     "cash": "200000.00"
+    }
+   ],
+   "peak": "200000",
+   "status": "ACTIVE",
+   "realized_pnl": "0",
+   "fees_paid": "0"
+  },
+  "US-MANUAL": {
+   "id": "US-MANUAL",
+   "name": "US manual practice",
+   "currency": "USD",
+   "start_cash": "10000",
+   "cash": "10000",
+   "created": "2026-09-27T20:47:31+05:30",
+   "strategies": [],
+   "positions": {},
+   "equity": [
+    {
+     "date": "2026-09-25",
+     "value": "10000.00",
+     "cash": "10000.00"
+    },
+    {
+     "date": "2026-09-28",
+     "value": "10000.00",
+     "cash": "10000.00"
+    },
+    {
+     "date": "2026-09-25",
+     "value": "10000.00",
+     "cash": "10000.00"
+    },
+    {
+     "date": "2026-09-29",
+     "value": "10000.00",
+     "cash": "10000.00"
+    },
+    {
+     "date": "2026-09-30",
+     "value": "10000.00",
+     "cash": "10000.00"
+    },
+    {
+     "date": "2026-10-01",
+     "value": "10000.00",
+     "cash": "10000.00"
+    },
+    {
+     "date": "2026-10-02",
+     "value": "10000.00",
+     "cash": "10000.00"
+    },
+    {
+     "date": "2026-10-03",
+     "value": "10000.00",
+     "cash": "10000.00"
+    },
+    {
+     "date": "2026-10-05",
+     "value": "10000.00",
+     "cash": "10000.00"
+    },
+    {
+     "date": "2026-10-06",
+     "value": "10000.00",
+     "cash": "10000.00"
+    }
+   ],
+   "peak": "10000",
+   "status": "ACTIVE",
+   "realized_pnl": "0",
+   "fees_paid": "0"
+  },
+  "US-SWING": {
+   "id": "US-SWING",
+   "name": "US swing (auto)",
+   "currency": "USD",
+   "start_cash": "10000",
+   "cash": "10018.55",
+   "created": "2026-09-28T23:14:01+05:30",
+   "strategies": [
+    "trend_breakout_swing_us"
+   ],
+   "positions": {},
+   "equity": [
+    {
+     "date": "2026-09-28",
+     "value": "10000.00",
+     "cash": "10000.00"
+    },
+    {
+     "date": "2026-09-29",
+     "value": "10000.00",
+     "cash": "10000.00"
+    },
+    {
+     "date": "2026-09-28",
+     "value": "10000.00",
+     "cash": "10000.00"
+    },
+    {
+     "date": "2026-09-29",
+     "value": "10000.00",
+     "cash": "10000.00"
+    },
+    {
+     "date": "2026-09-30",
+     "value": "10000.00",
+     "cash": "10000.00"
+    },
+    {
+     "date": "2026-09-29",
+     "value": "10000.00",
+     "cash": "10000.00"
+    },
+    {
+     "date": "2026-09-30",
+     "value": "10000.00",
+     "cash": "10000.00"
+    },
+    {
+     "date": "2026-10-01",
+     "value": "10000.00",
+     "cash": "10000.00"
+    },
+    {
+     "date": "2026-09-30",
+     "value": "10000.00",
+     "cash": "10000.00"
+    },
+    {
+     "date": "2026-10-01",
+     "value": "10000.00",
+     "cash": "10000.00"
+    },
+    {
+     "date": "2026-10-02",
+     "value": "10000.00",
+     "cash": "10000.00"
+    },
+    {
+     "date": "2026-10-01",
+     "value": "10000.00",
+     "cash": "10000.00"
+    },
+    {
+     "date": "2026-10-02",
+     "value": "9997.64",
+     "cash": "8335.88"
+    },
+    {
+     "date": "2026-10-03",
+     "value": "9997.64",
+     "cash": "8335.88"
+    },
+    {
+     "date": "2026-10-02",
+     "value": "10004.48",
+     "cash": "8335.88"
+    },
+    {
+     "date": "2026-10-05",
+     "value": "10010.68",
+     "cash": "8335.88"
+    },
+    {
+     "date": "2026-10-06",
+     "value": "10010.68",
+     "cash": "8335.88"
+    },
+    {
+     "date": "2026-10-05",
+     "value": "10012.28",
+     "cash": "8335.88"
+    },
+    {
+     "date": "2026-10-06",
+     "value": "10018.55",
+     "cash": "10018.55"
+    },
+    {
+     "date": "2026-10-07",
+     "value": "10018.55",
+     "cash": "10018.55"
+    }
+   ],
+   "peak": "10019.56",
+   "status": "ACTIVE",
+   "realized_pnl": "18.55",
+   "fees_paid": "0.05"
+  },
+  "IN-OPTIONS": {
+   "id": "IN-OPTIONS",
+   "name": "India index options (auto, modeled prices)",
+   "currency": "INR",
+   "start_cash": "200000",
+   "cash": "203542.46",
+   "created": "2026-09-28T23:14:01+05:30",
+   "strategies": [
+    "index_options_regime"
+   ],
+   "positions": {
+    "NIFTY 13OCT26 22200/22000 PE DEBIT SPREAD": {
+     "symbol": "NIFTY 13OCT26 22200/22000 PE DEBIT SPREAD",
+     "qty": "65",
+     "avg_price": "75.98",
+     "fees": "53.43",
+     "opened": "2026-10-08",
+     "bars_held": 0,
+     "stop": null,
+     "target": null,
+     "strategy": "index_options_regime",
+     "reason": "Regime BEAR; Close 22,206 < SMA50 23,761; RSI 27 < 45",
+     "sector": null,
+     "segment": "options",
+     "high_water": "75.98",
+     "last": "71.1",
+     "spread": {
+      "underlying": "NIFTY",
+      "kind": "P",
+      "expiry": "2026-10-13",
+      "k_long": 22200,
+      "k_short": 22000,
+      "width": 200,
+      "lot": 65
+     },
+     "max_loss": "5045.56",
+     "max_profit": "7954.44"
+    },
+    "NIFTY 13OCT26 22250/22050 PE DEBIT SPREAD": {
+     "symbol": "NIFTY 13OCT26 22250/22050 PE DEBIT SPREAD",
+     "qty": "65",
+     "avg_price": "80.6",
+     "fees": "53.99",
+     "opened": "2026-10-08",
+     "bars_held": 0,
+     "stop": null,
+     "target": null,
+     "strategy": "index_options_regime",
+     "reason": "Regime BEAR; Close 22,232 < SMA50 23,761; RSI 28 < 45",
+     "sector": null,
+     "segment": "options",
+     "high_water": "80.6",
+     "last": "80.6",
+     "spread": {
+      "underlying": "NIFTY",
+      "kind": "P",
+      "expiry": "2026-10-13",
+      "k_long": 22250,
+      "k_short": 22050,
+      "width": 200,
+      "lot": 65
+     },
+     "max_loss": "5346.98",
+     "max_profit": "7653.02"
+    }
+   },
+   "equity": [
+    {
+     "date": "2026-09-28",
+     "value": "199944.92",
+     "cash": "194652.62"
+    },
+    {
+     "date": "2026-09-29",
+     "value": "200323.08",
+     "cash": "189516.83"
+    },
+    {
+     "date": "2026-09-30",
+     "value": "202726.78",
+     "cash": "189516.83"
+    },
+    {
+     "date": "2026-10-01",
+     "value": "207731.56",
+     "cash": "203074.31"
+    },
+    {
+     "date": "2026-10-05",
+     "value": "203709.24",
+     "cash": "198586.59"
+    },
+    {
+     "date": "2026-10-06",
+     "value": "201228.18",
+     "cash": "193233.18"
+    },
+    {
+     "date": "2026-10-07",
+     "value": "205030.03",
+     "cash": "193233.18"
+    },
+    {
+     "date": "2026-10-08",
+     "value": "213402.96",
+     "cash": "203542.46"
+    }
+   ],
+   "peak": "213774.15",
+   "status": "ACTIVE",
+   "realized_pnl": "13827.58",
+   "fees_paid": "671.49"
+  },
+  "IN-VALUE": {
+   "id": "IN-VALUE",
+   "name": "India long-term value (auto, monthly)",
+   "currency": "INR",
+   "start_cash": "500000",
+   "cash": "423422.91",
+   "created": "2026-09-29T21:09:44+05:30",
+   "strategies": [
+    "value_longterm"
+   ],
+   "positions": {
+    "BBTC": {
+     "symbol": "BBTC",
+     "qty": "7",
+     "avg_price": "1366.53",
+     "fees": "16.99",
+     "opened": "2026-09-30",
+     "bars_held": 0,
+     "stop": "1016.25",
+     "target": null,
+     "strategy": "value_longterm",
+     "reason": "value BUY: conviction 0.78, base 5y return 32.6%/yr",
+     "sector": "Consumer Defensive",
+     "segment": "delivery",
+     "high_water": "1378.8",
+     "last": "1297.0"
+    },
+    "BLS": {
+     "symbol": "BLS",
+     "qty": "50",
+     "avg_price": "220.04",
+     "fees": "19.54",
+     "opened": "2026-09-30",
+     "bars_held": 66,
+     "stop": "164.66",
+     "target": null,
+     "strategy": "value_longterm",
+     "reason": "value BUY: conviction 0.687, base 5y return 16.4%/yr",
+     "sector": "Industrials",
+     "segment": "delivery",
+     "high_water": "225.52999877929688",
+     "last": "215.0800018310547"
+    },
+    "BPCL": {
+     "symbol": "BPCL",
+     "qty": "49",
+     "avg_price": "302.81",
+     "fees": "26.36",
+     "opened": "2026-09-30",
+     "bars_held": 66,
+     "stop": "224.51",
+     "target": null,
+     "strategy": "value_longterm",
+     "reason": "value BUY: conviction 0.841, base 5y return 20.2%/yr",
+     "sector": "Energy",
+     "segment": "delivery",
+     "high_water": "308.25",
+     "last": "286.25"
+    },
+    "HINDPETRO": {
+     "symbol": "HINDPETRO",
+     "qty": "40",
+     "avg_price": "346.95",
+     "fees": "24.65",
+     "opened": "2026-10-05",
+     "bars_held": 30,
+     "stop": "258.75",
+     "target": null,
+     "strategy": "value_longterm",
+     "reason": "value BUY: conviction 0.847, base 5y return 22.8%/yr",
+     "sector": "Energy",
+     "segment": "delivery",
+     "high_water": "351.75",
+     "last": "326.6000061035156"
+    },
+    "TMCV": {
+     "symbol": "TMCV",
+     "qty": "29",
+     "avg_price": "417.87",
+     "fees": "21.52",
+     "opened": "2026-10-05",
+     "bars_held": 30,
+     "stop": "311.62",
+     "target": null,
+     "strategy": "value_longterm",
+     "reason": "value BUY: conviction 0.664, base 5y return 109.8%/yr",
+     "sector": "Consumer Cyclical",
+     "segment": "delivery",
+     "high_water": "437.54998779296875",
+     "last": "413.20001220703125"
+    },
+    "VEDL": {
+     "symbol": "VEDL",
+     "qty": "59",
+     "avg_price": "254.91",
+     "fees": "26.71",
+     "opened": "2026-10-05",
+     "bars_held": 30,
+     "stop": "189.04",
+     "target": null,
+     "strategy": "value_longterm",
+     "reason": "value BUY: conviction 0.838, base 5y return 32.8%/yr",
+     "sector": "Basic Materials",
+     "segment": "delivery",
+     "high_water": "267.70001220703125",
+     "last": "253.10000610351562"
+    }
+   },
+   "equity": [
+    {
+     "date": "2026-09-29",
+     "value": "500000.00",
+     "cash": "500000.00"
+    },
+    {
+     "date": "2026-09-30",
+     "value": "499783.71",
+     "cash": "464531.71"
+    },
+    {
+     "date": "2026-10-01",
+     "value": "499445.61",
+     "cash": "464531.71"
+    },
+    {
+     "date": "2026-10-05",
+     "value": "498994.11",
+     "cash": "423422.91"
+    },
+    {
+     "date": "2026-10-06",
+     "value": "500715.51",
+     "cash": "423422.91"
+    },
+    {
+     "date": "2026-10-07",
+     "value": "499622.76",
+     "cash": "423422.91"
+    },
+    {
+     "date": "2026-10-08",
+     "value": "497261.86",
+     "cash": "423422.91"
+    }
+   ],
+   "peak": "500755.21",
+   "status": "ACTIVE",
+   "realized_pnl": "0",
+   "fees_paid": "135.77"
+  },
+  "US-VALUE": {
+   "id": "US-VALUE",
+   "name": "US long-term value (auto, monthly)",
+   "currency": "USD",
+   "start_cash": "20000",
+   "cash": "18055.22",
+   "created": "2026-09-29T21:09:44+05:30",
+   "strategies": [
+    "value_longterm"
+   ],
+   "positions": {
+    "ADBE": {
+     "symbol": "ADBE",
+     "qty": "2",
+     "avg_price": "243.29",
+     "fees": "0.00",
+     "opened": "2026-10-02",
+     "bars_held": 40,
+     "stop": "179.96",
+     "target": null,
+     "strategy": "value_longterm",
+     "reason": "value BUY: conviction 0.912, base 5y return 21.1%/yr",
+     "sector": "Technology",
+     "segment": "delivery",
+     "high_water": "248.3000030517578",
+     "last": "232.77000427246094"
+    },
+    "CB": {
+     "symbol": "CB",
+     "qty": "1",
+     "avg_price": "330.98",
+     "fees": "0.00",
+     "opened": "2026-10-02",
+     "bars_held": 39,
+     "stop": "243.94",
+     "target": null,
+     "strategy": "value_longterm",
+     "reason": "value BUY: conviction 0.629, base 5y return 0.0%/yr",
+     "sector": "Financial Services",
+     "segment": "delivery",
+     "high_water": "336.0",
+     "last": "334.70001220703125"
+    },
+    "CMCSA": {
+     "symbol": "CMCSA",
+     "qty": "19",
+     "avg_price": "21.94",
+     "fees": "0.00",
+     "opened": "2026-10-02",
+     "bars_held": 40,
+     "stop": "16.32",
+     "target": null,
+     "strategy": "value_longterm",
+     "reason": "value BUY: conviction 0.749, base 5y return 18.8%/yr",
+     "sector": "Communication Services",
+     "segment": "delivery",
+     "high_water": "21.959999084472656",
+     "last": "20.940000534057617"
+    },
+    "INTU": {
+     "symbol": "INTU",
+     "qty": "1",
+     "avg_price": "284.20",
+     "fees": "0.00",
+     "opened": "2026-10-02",
+     "bars_held": 40,
+     "stop": "206.78",
+     "target": null,
+     "strategy": "value_longterm",
+     "reason": "value BUY: conviction 0.873, base 5y return 23.7%/yr",
+     "sector": "Technology",
+     "segment": "delivery",
+     "high_water": "297.239990234375",
+     "last": "297.239990234375"
+    },
+    "PYPL": {
+     "symbol": "PYPL",
+     "qty": "8",
+     "avg_price": "53.27",
+     "fees": "0.00",
+     "opened": "2026-10-02",
+     "bars_held": 39,
+     "stop": "39.4",
+     "target": null,
+     "strategy": "value_longterm",
+     "reason": "value BUY: conviction 0.702, base 5y return 0.0%/yr",
+     "sector": "Financial Services",
+     "segment": "delivery",
+     "high_water": "54.95000076293945",
+     "last": "54.95000076293945"
+    }
+   },
+   "equity": [
+    {
+     "date": "2026-09-29",
+     "value": "20000.00",
+     "cash": "20000.00"
+    },
+    {
+     "date": "2026-09-30",
+     "value": "20000.00",
+     "cash": "20000.00"
+    },
+    {
+     "date": "2026-10-01",
+     "value": "20000.00",
+     "cash": "20000.00"
+    },
+    {
+     "date": "2026-10-02",
+     "value": "20000.00",
+     "cash": "20000.00"
+    },
+    {
+     "date": "2026-10-01",
+     "value": "20000.00",
+     "cash": "20000.00"
+    },
+    {
+     "date": "2026-10-02",
+     "value": "19972.37",
+     "cash": "18055.22"
+    },
+    {
+     "date": "2026-10-03",
+     "value": "19972.37",
+     "cash": "18055.22"
+    },
+    {
+     "date": "2026-10-01",
+     "value": "19974.80",
+     "cash": "18055.22"
+    },
+    {
+     "date": "2026-10-05",
+     "value": "19982.46",
+     "cash": "18055.22"
+    },
+    {
+     "date": "2026-10-06",
+     "value": "19998.13",
+     "cash": "18055.22"
+    },
+    {
+     "date": "2026-10-07",
+     "value": "19996.25",
+     "cash": "18055.22"
+    },
+    {
+     "date": "2026-10-08",
+     "value": "19990.16",
+     "cash": "18055.22"
+    }
+   ],
+   "peak": "20004.140017242431693",
+   "status": "ACTIVE",
+   "realized_pnl": "0",
+   "fees_paid": "0.00"
+  },
+  "IN-BRAIN": {
+   "id": "IN-BRAIN",
+   "name": "India Trading Brain (auto, multi-strategy)",
+   "currency": "INR",
+   "start_cash": "200000",
+   "cash": "200000",
+   "created": "2026-10-06T19:57:22+05:30",
+   "strategies": [
+    "brain_ensemble"
+   ],
+   "positions": {},
+   "equity": [
+    {
+     "date": "2026-10-06",
+     "value": "200000.00",
+     "cash": "200000.00"
+    },
+    {
+     "date": "2026-10-07",
+     "value": "200000.00",
+     "cash": "200000.00"
+    },
+    {
+     "date": "2026-10-08",
+     "value": "200000.00",
+     "cash": "200000.00"
+    }
+   ],
+   "peak": "200000",
+   "status": "ACTIVE",
+   "realized_pnl": "0",
+   "fees_paid": "0",
+   "brain_plans": {},
+   "brain_last_bar": "2026-10-08"
+  }
+ },
+ "orders": [
+  {
+   "id": "O0000006-48fde5",
+   "account": "IN-OPTIONS",
+   "symbol": "NIFTY 06OCT26 22800/22600 PE DEBIT SPREAD",
+   "side": "buy",
+   "qty": "65",
+   "filled_qty": "65",
+   "type": "MARKET",
+   "limit": null,
+   "stop_px": null,
+   "status": "FILLED",
+   "created_at": "2026-09-28T23:31:41+05:30",
+   "decided_on_bar": "None",
+   "strategy": "index_options_regime",
+   "signal_id": null,
+   "reason": "Regime BEAR; Close 22,780 < SMA50 23,963; RSI 28 < 45",
+   "stop": null,
+   "target": null,
+   "dedupe_key": "IN-OPTIONS|NIFTY 06OCT26 22800/22600 PE DEBIT SPREAD|2026-09-28",
+   "risk": null,
+   "segment": "options",
+   "currency": "INR",
+   "sector": null,
+   "expires_after_bars": 3,
+   "bars_waited": 0,
+   "fills": [
+    "F0000007"
+   ],
+   "meta": {
+    "spread": {
+     "action": "BUY",
+     "name": "NIFTY 06OCT26 22800/22600 PE DEBIT SPREAD",
+     "underlying": "NIFTY",
+     "kind": "P",
+     "expiry": "2026-10-06",
+     "dte": 8,
+     "k_long": 22800,
+     "k_short": 22600,
+     "width": 200,
+     "debit": 81.42,
+     "long_px": 177.15,
+     "short_px": 95.73,
+     "max_profit": 118.58,
+     "max_loss": 81.42,
+     "lot": 65,
+     "spot": 22780.25,
+     "sigma": 0.13637499809265136,
+     "sigma_source": "India VIX 13.64 (2026-09-28)",
+     "breakeven": 22718.58,
+     "why": [
+      "Regime BEAR",
+      "Close 22,780 < SMA50 23,963",
+      "RSI 28 < 45"
+     ],
+     "pricing": "MODELED (Black-Scholes)"
+    }
+   },
+   "closed_at": "2026-09-28T23:31:41+05:30"
+  },
+  {
+   "id": "O0000008-a25f55",
+   "account": "IN-OPTIONS",
+   "symbol": "NIFTY 06OCT26 22700/22500 PE DEBIT SPREAD",
+   "side": "buy",
+   "qty": "65",
+   "filled_qty": "65",
+   "type": "MARKET",
+   "limit": null,
+   "stop_px": null,
+   "status": "FILLED",
+   "created_at": "2026-09-29T15:13:41+05:30",
+   "decided_on_bar": "None",
+   "strategy": "index_options_regime",
+   "signal_id": null,
+   "reason": "Regime BEAR; Close 22,693 < SMA50 23,932; RSI 26 < 45",
+   "stop": null,
+   "target": null,
+   "dedupe_key": "IN-OPTIONS|NIFTY 06OCT26 22700/22500 PE DEBIT SPREAD|2026-09-29",
+   "risk": null,
+   "segment": "options",
+   "currency": "INR",
+   "sector": null,
+   "expires_after_bars": 3,
+   "bars_waited": 0,
+   "fills": [
+    "F0000009"
+   ],
+   "meta": {
+    "spread": {
+     "action": "BUY",
+     "name": "NIFTY 06OCT26 22700/22500 PE DEBIT SPREAD",
+     "underlying": "NIFTY",
+     "kind": "P",
+     "expiry": "2026-10-06",
+     "dte": 7,
+     "k_long": 22700,
+     "k_short": 22500,
+     "width": 200,
+     "debit": 78.18,
+     "long_px": 158.28,
+     "short_px": 80.11,
+     "max_profit": 121.82,
+     "max_loss": 78.18,
+     "lot": 65,
+     "spot": 22693.25,
+     "sigma": 0.1347249984741211,
+     "sigma_source": "India VIX 13.47 (2026-09-29)",
+     "breakeven": 22621.82,
+     "why": [
+      "Regime BEAR",
+      "Close 22,693 < SMA50 23,932",
+      "RSI 26 < 45"
+     ],
+     "pricing": "MODELED (Black-Scholes)"
+    }
+   },
+   "closed_at": "2026-09-29T15:13:41+05:30"
+  },
+  {
+   "id": "O0000012-50f57f",
+   "account": "IN-VALUE",
+   "symbol": "BLS",
+   "side": "buy",
+   "qty": "50",
+   "filled_qty": "50",
+   "type": "MARKET",
+   "limit": null,
+   "stop_px": null,
+   "status": "FILLED",
+   "created_at": "2026-09-29T21:36:37+05:30",
+   "decided_on_bar": "2026-09-29",
+   "strategy": "value_longterm",
+   "signal_id": null,
+   "reason": "value BUY: conviction 0.687, base 5y return 16.4%/yr",
+   "stop": "164.66",
+   "target": null,
+   "dedupe_key": "IN-VALUE|BLS|buy|2026-09-29|value_longterm",
+   "risk": null,
+   "segment": "delivery",
+   "currency": "INR",
+   "sector": "Industrials",
+   "expires_after_bars": 5,
+   "bars_waited": 0,
+   "fills": [
+    "F0000016"
+   ],
+   "meta": {
+    "weight": 0.0223,
+    "conviction": 0.687
+   },
+   "closed_at": "2026-09-30T09:21:24+05:30"
+  },
+  {
+   "id": "O0000013-53d89e",
+   "account": "IN-VALUE",
+   "symbol": "BBTC",
+   "side": "buy",
+   "qty": "7",
+   "filled_qty": "7",
+   "type": "MARKET",
+   "limit": null,
+   "stop_px": null,
+   "status": "FILLED",
+   "created_at": "2026-09-29T21:36:37+05:30",
+   "decided_on_bar": "2026-09-29",
+   "strategy": "value_longterm",
+   "signal_id": null,
+   "reason": "value BUY: conviction 0.78, base 5y return 32.6%/yr",
+   "stop": "1016.25",
+   "target": null,
+   "dedupe_key": "IN-VALUE|BBTC|buy|2026-09-29|value_longterm",
+   "risk": null,
+   "segment": "delivery",
+   "currency": "INR",
+   "sector": "Consumer Defensive",
+   "expires_after_bars": 5,
+   "bars_waited": 0,
+   "fills": [
+    "F0000015"
+   ],
+   "meta": {
+    "weight": 0.0212,
+    "conviction": 0.78
+   },
+   "closed_at": "2026-09-30T09:21:24+05:30"
+  },
+  {
+   "id": "O0000014-b6e083",
+   "account": "IN-VALUE",
+   "symbol": "BPCL",
+   "side": "buy",
+   "qty": "49",
+   "filled_qty": "49",
+   "type": "MARKET",
+   "limit": null,
+   "stop_px": null,
+   "status": "FILLED",
+   "created_at": "2026-09-29T21:36:37+05:30",
+   "decided_on_bar": "2026-09-29",
+   "strategy": "value_longterm",
+   "signal_id": null,
+   "reason": "value BUY: conviction 0.841, base 5y return 20.2%/yr",
+   "stop": "224.51",
+   "target": null,
+   "dedupe_key": "IN-VALUE|BPCL|buy|2026-09-29|value_longterm",
+   "risk": null,
+   "segment": "delivery",
+   "currency": "INR",
+   "sector": "Energy",
+   "expires_after_bars": 5,
+   "bars_waited": 0,
+   "fills": [
+    "F0000017"
+   ],
+   "meta": {
+    "weight": 0.0295,
+    "conviction": 0.841
+   },
+   "closed_at": "2026-09-30T09:21:24+05:30"
+  },
+  {
+   "id": "O0000018-797e2d",
+   "account": "IN-OPTIONS",
+   "symbol": "NIFTY 06OCT26 22800/22600 PE DEBIT SPREAD",
+   "side": "sell",
+   "qty": "65",
+   "filled_qty": "65",
+   "type": "MARKET",
+   "limit": null,
+   "stop_px": null,
+   "status": "FILLED",
+   "created_at": "2026-10-01T12:30:16+05:30",
+   "decided_on_bar": "None",
+   "strategy": "index_options_regime",
+   "signal_id": null,
+   "reason": "take-profit (live): modeled value 142.46 >= debit + 50% of max profit",
+   "stop": null,
+   "target": null,
+   "dedupe_key": "IN-OPTIONS|NIFTY 06OCT26 22800/22600 PE DEBIT SPREAD|exit|2026-10-01",
+   "risk": null,
+   "segment": "options",
+   "currency": "INR",
+   "sector": null,
+   "expires_after_bars": 3,
+   "bars_waited": 0,
+   "fills": [
+    "F0000019"
+   ],
+   "meta": {},
+   "closed_at": "2026-10-01T12:30:16+05:30"
+  },
+  {
+   "id": "O0000020-2b7bd3",
+   "account": "IN-OPTIONS",
+   "symbol": "NIFTY 06OCT26 22700/22500 PE DEBIT SPREAD",
+   "side": "sell",
+   "qty": "65",
+   "filled_qty": "65",
+   "type": "MARKET",
+   "limit": null,
+   "stop_px": null,
+   "status": "FILLED",
+   "created_at": "2026-10-01T12:51:32+05:30",
+   "decided_on_bar": "None",
+   "strategy": "index_options_regime",
+   "signal_id": null,
+   "reason": "take-profit (live): modeled value 140.42 >= debit + 50% of max profit",
+   "stop": null,
+   "target": null,
+   "dedupe_key": "IN-OPTIONS|NIFTY 06OCT26 22700/22500 PE DEBIT SPREAD|exit|2026-10-01",
+   "risk": null,
+   "segment": "options",
+   "currency": "INR",
+   "sector": null,
+   "expires_after_bars": 3,
+   "bars_waited": 0,
+   "fills": [
+    "F0000021"
+   ],
+   "meta": {},
+   "closed_at": "2026-10-01T12:51:32+05:30"
+  },
+  {
+   "id": "O0000022-2e75cb",
+   "account": "IN-OPTIONS",
+   "symbol": "NIFTY 06OCT26 22400/22200 PE DEBIT SPREAD",
+   "side": "buy",
+   "qty": "65",
+   "filled_qty": "65",
+   "type": "MARKET",
+   "limit": null,
+   "stop_px": null,
+   "status": "FILLED",
+   "created_at": "2026-10-01T16:29:03+05:30",
+   "decided_on_bar": "None",
+   "strategy": "index_options_regime",
+   "signal_id": null,
+   "reason": "Regime BEAR; Close 22,422 < SMA50 23,870; RSI 23 < 45",
+   "stop": null,
+   "target": null,
+   "dedupe_key": "IN-OPTIONS|NIFTY 06OCT26 22400/22200 PE DEBIT SPREAD|2026-10-01",
+   "risk": null,
+   "segment": "options",
+   "currency": "INR",
+   "sector": null,
+   "expires_after_bars": 3,
+   "bars_waited": 0,
+   "fills": [
+    "F0000023"
+   ],
+   "meta": {
+    "spread": {
+     "action": "BUY",
+     "name": "NIFTY 06OCT26 22400/22200 PE DEBIT SPREAD",
+     "underlying": "NIFTY",
+     "kind": "P",
+     "expiry": "2026-10-06",
+     "dte": 5,
+     "k_long": 22400,
+     "k_short": 22200,
+     "width": 200,
+     "debit": 71.64,
+     "long_px": 131.17,
+     "short_px": 59.54,
+     "max_profit": 128.36,
+     "max_loss": 71.64,
+     "lot": 65,
+     "spot": 22421.94921875,
+     "sigma": 0.14454999923706055,
+     "sigma_source": "India VIX 14.45 (2026-10-01)",
+     "breakeven": 22328.36,
+     "why": [
+      "Regime BEAR",
+      "Close 22,422 < SMA50 23,870",
+      "RSI 23 < 45"
+     ],
+     "pricing": "MODELED (Black-Scholes)"
+    }
+   },
+   "closed_at": "2026-10-01T16:29:03+05:30"
+  },
+  {
+   "id": "O0000024-7b821f",
+   "account": "IN-VALUE",
+   "symbol": "HINDPETRO",
+   "side": "buy",
+   "qty": "40",
+   "filled_qty": "40",
+   "type": "MARKET",
+   "limit": null,
+   "stop_px": null,
+   "status": "FILLED",
+   "created_at": "2026-10-01T16:29:53+05:30",
+   "decided_on_bar": "2026-10-01",
+   "strategy": "value_longterm",
+   "signal_id": null,
+   "reason": "value BUY: conviction 0.847, base 5y return 22.8%/yr",
+   "stop": "258.75",
+   "target": null,
+   "dedupe_key": "IN-VALUE|HINDPETRO|buy|2026-10-01|value_longterm",
+   "risk": null,
+   "segment": "delivery",
+   "currency": "INR",
+   "sector": "Energy",
+   "expires_after_bars": 5,
+   "bars_waited": 0,
+   "fills": [
+    "F0000048"
+   ],
+   "meta": {
+    "weight": 0.0277,
+    "conviction": 0.847
+   },
+   "closed_at": "2026-10-05T09:31:40+05:30"
+  },
+  {
+   "id": "O0000025-7c8f79",
+   "account": "IN-VALUE",
+   "symbol": "VEDL",
+   "side": "buy",
+   "qty": "59",
+   "filled_qty": "59",
+   "type": "MARKET",
+   "limit": null,
+   "stop_px": null,
+   "status": "FILLED",
+   "created_at": "2026-10-01T16:29:53+05:30",
+   "decided_on_bar": "2026-10-01",
+   "strategy": "value_longterm",
+   "signal_id": null,
+   "reason": "value BUY: conviction 0.838, base 5y return 32.8%/yr",
+   "stop": "189.04",
+   "target": null,
+   "dedupe_key": "IN-VALUE|VEDL|buy|2026-10-01|value_longterm",
+   "risk": null,
+   "segment": "delivery",
+   "currency": "INR",
+   "sector": "Basic Materials",
+   "expires_after_bars": 5,
+   "bars_waited": 0,
+   "fills": [
+    "F0000050"
+   ],
+   "meta": {
+    "weight": 0.0298,
+    "conviction": 0.838
+   },
+   "closed_at": "2026-10-05T09:31:40+05:30"
+  },
+  {
+   "id": "O0000026-90a1b1",
+   "account": "IN-VALUE",
+   "symbol": "TMCV",
+   "side": "buy",
+   "qty": "29",
+   "filled_qty": "29",
+   "type": "MARKET",
+   "limit": null,
+   "stop_px": null,
+   "status": "FILLED",
+   "created_at": "2026-10-01T16:29:53+05:30",
+   "decided_on_bar": "2026-10-01",
+   "strategy": "value_longterm",
+   "signal_id": null,
+   "reason": "value BUY: conviction 0.664, base 5y return 109.8%/yr",
+   "stop": "311.62",
+   "target": null,
+   "dedupe_key": "IN-VALUE|TMCV|buy|2026-10-01|value_longterm",
+   "risk": null,
+   "segment": "delivery",
+   "currency": "INR",
+   "sector": "Consumer Cyclical",
+   "expires_after_bars": 5,
+   "bars_waited": 0,
+   "fills": [
+    "F0000049"
+   ],
+   "meta": {
+    "weight": 0.0247,
+    "conviction": 0.664
+   },
+   "closed_at": "2026-10-05T09:31:40+05:30"
+  },
+  {
+   "id": "O0000027-d29001",
+   "account": "US-VALUE",
+   "symbol": "INTU",
+   "side": "buy",
+   "qty": "1",
+   "filled_qty": "1",
+   "type": "MARKET",
+   "limit": null,
+   "stop_px": null,
+   "status": "FILLED",
+   "created_at": "2026-10-01T16:29:53+05:30",
+   "decided_on_bar": "2026-10-01",
+   "strategy": "value_longterm",
+   "signal_id": null,
+   "reason": "value BUY: conviction 0.873, base 5y return 23.7%/yr",
+   "stop": "206.78",
+   "target": null,
+   "dedupe_key": "US-VALUE|INTU|buy|2026-10-01|value_longterm",
+   "risk": null,
+   "segment": "delivery",
+   "currency": "USD",
+   "sector": "Technology",
+   "expires_after_bars": 5,
+   "bars_waited": 0,
+   "fills": [
+    "F0000044"
+   ],
+   "meta": {
+    "weight": 0.0246,
+    "conviction": 0.873
+   },
+   "closed_at": "2026-10-02T19:12:39+05:30"
+  },
+  {
+   "id": "O0000028-51596d",
+   "account": "US-VALUE",
+   "symbol": "ADBE",
+   "side": "buy",
+   "qty": "2",
+   "filled_qty": "2",
+   "type": "MARKET",
+   "limit": null,
+   "stop_px": null,
+   "status": "FILLED",
+   "created_at": "2026-10-01T16:29:53+05:30",
+   "decided_on_bar": "2026-10-01",
+   "strategy": "value_longterm",
+   "signal_id": null,
+   "reason": "value BUY: conviction 0.912, base 5y return 21.1%/yr",
+   "stop": "179.96",
+   "target": null,
+   "dedupe_key": "US-VALUE|ADBE|buy|2026-10-01|value_longterm",
+   "risk": null,
+   "segment": "delivery",
+   "currency": "USD",
+   "sector": "Technology",
+   "expires_after_bars": 5,
+   "bars_waited": 0,
+   "fills": [
+    "F0000041"
+   ],
+   "meta": {
+    "weight": 0.0252,
+    "conviction": 0.912
+   },
+   "closed_at": "2026-10-02T19:12:39+05:30"
+  },
+  {
+   "id": "O0000029-e9d6a2",
+   "account": "US-VALUE",
+   "symbol": "PYPL",
+   "side": "buy",
+   "qty": "8",
+   "filled_qty": "8",
+   "type": "MARKET",
+   "limit": null,
+   "stop_px": null,
+   "status": "FILLED",
+   "created_at": "2026-10-01T16:29:53+05:30",
+   "decided_on_bar": "2026-10-01",
+   "strategy": "value_longterm",
+   "signal_id": null,
+   "reason": "value BUY: conviction 0.702, base 5y return 0.0%/yr",
+   "stop": "39.4",
+   "target": null,
+   "dedupe_key": "US-VALUE|PYPL|buy|2026-10-01|value_longterm",
+   "risk": null,
+   "segment": "delivery",
+   "currency": "USD",
+   "sector": "Financial Services",
+   "expires_after_bars": 5,
+   "bars_waited": 0,
+   "fills": [
+    "F0000045"
+   ],
+   "meta": {
+    "weight": 0.0211,
+    "conviction": 0.702
+   },
+   "closed_at": "2026-10-02T19:12:39+05:30"
+  },
+  {
+   "id": "O0000030-dddeb4",
+   "account": "US-VALUE",
+   "symbol": "CB",
+   "side": "buy",
+   "qty": "1",
+   "filled_qty": "1",
+   "type": "MARKET",
+   "limit": null,
+   "stop_px": null,
+   "status": "FILLED",
+   "created_at": "2026-10-01T16:29:53+05:30",
+   "decided_on_bar": "2026-10-01",
+   "strategy": "value_longterm",
+   "signal_id": null,
+   "reason": "value BUY: conviction 0.629, base 5y return 0.0%/yr",
+   "stop": "243.94",
+   "target": null,
+   "dedupe_key": "US-VALUE|CB|buy|2026-10-01|value_longterm",
+   "risk": null,
+   "segment": "delivery",
+   "currency": "USD",
+   "sector": "Financial Services",
+   "expires_after_bars": 5,
+   "bars_waited": 0,
+   "fills": [
+    "F0000042"
+   ],
+   "meta": {
+    "weight": 0.0189,
+    "conviction": 0.629
+   },
+   "closed_at": "2026-10-02T19:12:39+05:30"
+  },
+  {
+   "id": "O0000031-e5b0e8",
+   "account": "US-VALUE",
+   "symbol": "CMCSA",
+   "side": "buy",
+   "qty": "19",
+   "filled_qty": "19",
+   "type": "MARKET",
+   "limit": null,
+   "stop_px": null,
+   "status": "FILLED",
+   "created_at": "2026-10-01T16:29:53+05:30",
+   "decided_on_bar": "2026-10-01",
+   "strategy": "value_longterm",
+   "signal_id": null,
+   "reason": "value BUY: conviction 0.749, base 5y return 18.8%/yr",
+   "stop": "16.32",
+   "target": null,
+   "dedupe_key": "US-VALUE|CMCSA|buy|2026-10-01|value_longterm",
+   "risk": null,
+   "segment": "delivery",
+   "currency": "USD",
+   "sector": "Communication Services",
+   "expires_after_bars": 5,
+   "bars_waited": 0,
+   "fills": [
+    "F0000043"
+   ],
+   "meta": {
+    "weight": 0.0207,
+    "conviction": 0.749
+   },
+   "closed_at": "2026-10-02T19:12:39+05:30"
+  },
+  {
+   "id": "O0000032-2f5659",
+   "account": "US-SWING",
+   "symbol": "ADI",
+   "side": "buy",
+   "qty": "4",
+   "filled_qty": "4",
+   "type": "MARKET",
+   "limit": null,
+   "stop_px": null,
+   "status": "FILLED",
+   "created_at": "2026-10-01T19:05:31+05:30",
+   "decided_on_bar": "2026-10-01",
+   "strategy": "trend_breakout_swing_us",
+   "signal_id": "trend_breakout_swing_us|ADI|2026-10-01",
+   "reason": "Uptrend: close 395.22 > SMA50 373.91 > SMA200 357.06; 21-day SMA crossed above 50-day within the last 4 bars",
+   "stop": "374.89",
+   "target": "425.71",
+   "dedupe_key": "US-SWING|ADI|buy|2026-10-01|trend_breakout_swing_us",
+   "risk": {
+    "approved": true,
+    "reason": "approved",
+    "checks": [
+     {
+      "check": "kill_switch",
+      "ok": true,
+      "detail": "off"
+     },
+     {
+      "check": "mode",
+      "ok": true,
+      "detail": "paper engine mode PAPER"
+     },
+     {
+      "check": "data_fresh",
+      "ok": true,
+      "detail": "data status OK"
+     },
+     {
+      "check": "qty_positive",
+      "ok": true,
+      "detail": "qty 4"
+     },
+     {
+      "check": "orders_per_run",
+      "ok": true,
+      "detail": "0/10"
+     },
+     {
+      "check": "account_active",
+      "ok": true,
+      "detail": "ACTIVE"
+     },
+     {
+      "check": "daily_loss",
+      "ok": true,
+      "detail": "today 0 vs limit -200"
+     },
+     {
+      "check": "max_drawdown",
+      "ok": true,
+      "detail": "drawdown 0.0%"
+     },
+     {
+      "check": "max_positions",
+      "ok": true,
+      "detail": "0/5 open"
+     },
+     {
+      "check": "not_already_held",
+      "ok": true,
+      "detail": "new"
+     },
+     {
+      "check": "position_size",
+      "ok": true,
+      "detail": "1581 vs cap 2500"
+     },
+     {
+      "check": "gross_exposure",
+      "ok": true,
+      "detail": "1581 vs 10000"
+     },
+     {
+      "check": "cash",
+      "ok": true,
+      "detail": "need 1581, cash 10000"
+     },
+     {
+      "check": "stop_below_entry",
+      "ok": true,
+      "detail": "stop 374.89"
+     },
+     {
+      "check": "risk_per_trade",
+      "ok": true,
+      "detail": "risk 81 vs 100"
+     }
+    ]
+   },
+   "segment": "delivery",
+   "currency": "USD",
+   "sector": null,
+   "expires_after_bars": 3,
+   "bars_waited": 1,
+   "fills": [
+    "F0000040"
+   ],
+   "meta": {
+    "score": 5,
+    "sizing_note": "ok",
+    "size_mult": "1"
+   },
+   "closed_at": "2026-10-02T19:01:59+05:30"
+  },
+  {
+   "id": "R0000046",
+   "account": "US-SWING",
+   "symbol": "ADI",
+   "side": "buy",
+   "qty": "4",
+   "filled_qty": "0",
+   "type": "MARKET",
+   "status": "REJECTED",
+   "created_at": "2026-10-03T06:53:22+05:30",
+   "decided_on_bar": "2026-10-02",
+   "strategy": "trend_breakout_swing_us",
+   "reason": "already holding this symbol",
+   "risk": {
+    "approved": false,
+    "reason": "already holding this symbol",
+    "checks": [
+     {
+      "check": "kill_switch",
+      "ok": true,
+      "detail": "off"
+     },
+     {
+      "check": "mode",
+      "ok": true,
+      "detail": "paper engine mode PAPER"
+     },
+     {
+      "check": "data_fresh",
+      "ok": true,
+      "detail": "data status OK"
+     },
+     {
+      "check": "qty_positive",
+      "ok": true,
+      "detail": "qty 4"
+     },
+     {
+      "check": "orders_per_run",
+      "ok": true,
+      "detail": "0/10"
+     },
+     {
+      "check": "account_active",
+      "ok": true,
+      "detail": "ACTIVE"
+     },
+     {
+      "check": "daily_loss",
+      "ok": true,
+      "detail": "today 0 vs limit -200"
+     },
+     {
+      "check": "max_drawdown",
+      "ok": true,
+      "detail": "drawdown -0.2%"
+     },
+     {
+      "check": "max_positions",
+      "ok": true,
+      "detail": "1/5 open"
+     },
+     {
+      "check": "not_already_held",
+      "ok": false,
+      "detail": "already held"
+     }
+    ]
+   },
+   "fills": []
+  },
+  {
+   "id": "R0000047",
+   "account": "US-SWING",
+   "symbol": "ADI",
+   "side": "buy",
+   "qty": "4",
+   "filled_qty": "0",
+   "type": "MARKET",
+   "status": "REJECTED",
+   "created_at": "2026-10-03T07:03:47+05:30",
+   "decided_on_bar": "2026-10-02",
+   "strategy": "trend_breakout_swing_us",
+   "reason": "already holding this symbol",
+   "risk": {
+    "approved": false,
+    "reason": "already holding this symbol",
+    "checks": [
+     {
+      "check": "kill_switch",
+      "ok": true,
+      "detail": "off"
+     },
+     {
+      "check": "mode",
+      "ok": true,
+      "detail": "paper engine mode PAPER"
+     },
+     {
+      "check": "data_fresh",
+      "ok": true,
+      "detail": "data status OK"
+     },
+     {
+      "check": "qty_positive",
+      "ok": true,
+      "detail": "qty 4"
+     },
+     {
+      "check": "orders_per_run",
+      "ok": true,
+      "detail": "0/10"
+     },
+     {
+      "check": "account_active",
+      "ok": true,
+      "detail": "ACTIVE"
+     },
+     {
+      "check": "daily_loss",
+      "ok": true,
+      "detail": "today 0 vs limit -199"
+     },
+     {
+      "check": "max_drawdown",
+      "ok": true,
+      "detail": "drawdown -0.6%"
+     },
+     {
+      "check": "max_positions",
+      "ok": true,
+      "detail": "1/5 open"
+     },
+     {
+      "check": "not_already_held",
+      "ok": false,
+      "detail": "already held"
+     }
+    ]
+   },
+   "fills": []
+  },
+  {
+   "id": "O0000051-f48677",
+   "account": "IN-OPTIONS",
+   "symbol": "NIFTY 06OCT26 22400/22200 PE DEBIT SPREAD",
+   "side": "sell",
+   "qty": "65",
+   "filled_qty": "65",
+   "type": "MARKET",
+   "limit": null,
+   "stop_px": null,
+   "status": "FILLED",
+   "created_at": "2026-10-05T09:31:40+05:30",
+   "decided_on_bar": "None",
+   "strategy": "index_options_regime",
+   "signal_id": null,
+   "reason": "stop (live): modeled value 11.36 <= 50% of debit 71.64",
+   "stop": null,
+   "target": null,
+   "dedupe_key": "IN-OPTIONS|NIFTY 06OCT26 22400/22200 PE DEBIT SPREAD|exit|2026-10-05",
+   "risk": null,
+   "segment": "options",
+   "currency": "INR",
+   "sector": null,
+   "expires_after_bars": 3,
+   "bars_waited": 0,
+   "fills": [
+    "F0000052"
+   ],
+   "meta": {},
+   "closed_at": "2026-10-05T09:31:40+05:30"
+  },
+  {
+   "id": "O0000053-4a992e",
+   "account": "IN-OPTIONS",
+   "symbol": "NIFTY 13OCT26 22550/22350 PE DEBIT SPREAD",
+   "side": "buy",
+   "qty": "65",
+   "filled_qty": "65",
+   "type": "MARKET",
+   "limit": null,
+   "stop_px": null,
+   "status": "FILLED",
+   "created_at": "2026-10-05T16:30:02+05:30",
+   "decided_on_bar": "None",
+   "strategy": "index_options_regime",
+   "signal_id": null,
+   "reason": "Regime BEAR; Close 22,556 < SMA50 23,844; RSI 28 < 45",
+   "stop": null,
+   "target": null,
+   "dedupe_key": "IN-OPTIONS|NIFTY 13OCT26 22550/22350 PE DEBIT SPREAD|2026-10-05",
+   "risk": null,
+   "segment": "options",
+   "currency": "INR",
+   "sector": null,
+   "expires_after_bars": 3,
+   "bars_waited": 0,
+   "fills": [
+    "F0000054"
+   ],
+   "meta": {
+    "spread": {
+     "action": "BUY",
+     "name": "NIFTY 13OCT26 22550/22350 PE DEBIT SPREAD",
+     "underlying": "NIFTY",
+     "kind": "P",
+     "expiry": "2026-10-13",
+     "dte": 8,
+     "k_long": 22550,
+     "k_short": 22350,
+     "width": 200,
+     "debit": 78.81,
+     "long_px": 178.31,
+     "short_px": 99.51,
+     "max_profit": 121.19,
+     "max_loss": 78.81,
+     "lot": 65,
+     "spot": 22555.75,
+     "sigma": 0.14774999618530274,
+     "sigma_source": "India VIX 14.77 (2026-10-05)",
+     "breakeven": 22471.19,
+     "why": [
+      "Regime BEAR",
+      "Close 22,556 < SMA50 23,844",
+      "RSI 28 < 45"
+     ],
+     "pricing": "MODELED (Black-Scholes)"
+    }
+   },
+   "closed_at": "2026-10-05T16:30:02+05:30"
+  },
+  {
+   "id": "O0000055-84559f",
+   "account": "US-SWING",
+   "symbol": "ADI",
+   "side": "sell",
+   "qty": "4",
+   "filled_qty": "4",
+   "type": "MARKET",
+   "limit": null,
+   "stop_px": null,
+   "status": "FILLED",
+   "created_at": "2026-10-05T19:51:15+05:30",
+   "decided_on_bar": "2026-10-05",
+   "strategy": "trend_breakout_swing_us",
+   "signal_id": null,
+   "reason": "time exit (20 bars)",
+   "stop": null,
+   "target": null,
+   "dedupe_key": "US-SWING|ADI|sell|2026-10-05|trend_breakout_swing_us",
+   "risk": null,
+   "segment": "delivery",
+   "currency": "USD",
+   "sector": null,
+   "expires_after_bars": 3,
+   "bars_waited": 1,
+   "fills": [
+    "F0000065"
+   ],
+   "meta": {},
+   "closed_at": "2026-10-06T19:02:19+05:30"
+  },
+  {
+   "id": "R0000056",
+   "account": "US-SWING",
+   "symbol": "ADI",
+   "side": "buy",
+   "qty": "4",
+   "filled_qty": "0",
+   "type": "MARKET",
+   "status": "REJECTED",
+   "created_at": "2026-10-05T19:51:15+05:30",
+   "decided_on_bar": "2026-10-05",
+   "strategy": "trend_breakout_swing_us",
+   "reason": "already holding this symbol",
+   "risk": {
+    "approved": false,
+    "reason": "already holding this symbol",
+    "checks": [
+     {
+      "check": "kill_switch",
+      "ok": true,
+      "detail": "off"
+     },
+     {
+      "check": "mode",
+      "ok": true,
+      "detail": "paper engine mode PAPER"
+     },
+     {
+      "check": "data_fresh",
+      "ok": true,
+      "detail": "data status OK"
+     },
+     {
+      "check": "qty_positive",
+      "ok": true,
+      "detail": "qty 4"
+     },
+     {
+      "check": "orders_per_run",
+      "ok": true,
+      "detail": "0/10"
+     },
+     {
+      "check": "account_active",
+      "ok": true,
+      "detail": "ACTIVE"
+     },
+     {
+      "check": "daily_loss",
+      "ok": true,
+      "detail": "today 0 vs limit -200"
+     },
+     {
+      "check": "max_drawdown",
+      "ok": true,
+      "detail": "drawdown -0.3%"
+     },
+     {
+      "check": "max_positions",
+      "ok": true,
+      "detail": "1/5 open"
+     },
+     {
+      "check": "not_already_held",
+      "ok": false,
+      "detail": "already held"
+     }
+    ]
+   },
+   "fills": []
+  },
+  {
+   "id": "R0000057",
+   "account": "US-SWING",
+   "symbol": "ADI",
+   "side": "buy",
+   "qty": "4",
+   "filled_qty": "0",
+   "type": "MARKET",
+   "status": "REJECTED",
+   "created_at": "2026-10-05T20:01:32+05:30",
+   "decided_on_bar": "2026-10-05",
+   "strategy": "trend_breakout_swing_us",
+   "reason": "already holding this symbol",
+   "risk": {
+    "approved": false,
+    "reason": "already holding this symbol",
+    "checks": [
+     {
+      "check": "kill_switch",
+      "ok": true,
+      "detail": "off"
+     },
+     {
+      "check": "mode",
+      "ok": true,
+      "detail": "paper engine mode PAPER"
+     },
+     {
+      "check": "data_fresh",
+      "ok": true,
+      "detail": "data status OK"
+     },
+     {
+      "check": "qty_positive",
+      "ok": true,
+      "detail": "qty 4"
+     },
+     {
+      "check": "orders_per_run",
+      "ok": true,
+      "detail": "0/10"
+     },
+     {
+      "check": "account_active",
+      "ok": true,
+      "detail": "ACTIVE"
+     },
+     {
+      "check": "daily_loss",
+      "ok": true,
+      "detail": "today 0 vs limit -200"
+     },
+     {
+      "check": "max_drawdown",
+      "ok": true,
+      "detail": "drawdown -0.3%"
+     },
+     {
+      "check": "max_positions",
+      "ok": true,
+      "detail": "1/5 open"
+     },
+     {
+      "check": "not_already_held",
+      "ok": false,
+      "detail": "already held"
+     }
+    ]
+   },
+   "fills": []
+  },
+  {
+   "id": "R0000058",
+   "account": "US-SWING",
+   "symbol": "ADI",
+   "side": "buy",
+   "qty": "4",
+   "filled_qty": "0",
+   "type": "MARKET",
+   "status": "REJECTED",
+   "created_at": "2026-10-05T20:12:12+05:30",
+   "decided_on_bar": "2026-10-05",
+   "strategy": "trend_breakout_swing_us",
+   "reason": "already holding this symbol",
+   "risk": {
+    "approved": false,
+    "reason": "already holding this symbol",
+    "checks": [
+     {
+      "check": "kill_switch",
+      "ok": true,
+      "detail": "off"
+     },
+     {
+      "check": "mode",
+      "ok": true,
+      "detail": "paper engine mode PAPER"
+     },
+     {
+      "check": "data_fresh",
+      "ok": true,
+      "detail": "data status OK"
+     },
+     {
+      "check": "qty_positive",
+      "ok": true,
+      "detail": "qty 4"
+     },
+     {
+      "check": "orders_per_run",
+      "ok": true,
+      "detail": "0/10"
+     },
+     {
+      "check": "account_active",
+      "ok": true,
+      "detail": "ACTIVE"
+     },
+     {
+      "check": "daily_loss",
+      "ok": true,
+      "detail": "today 0 vs limit -200"
+     },
+     {
+      "check": "max_drawdown",
+      "ok": true,
+      "detail": "drawdown -0.3%"
+     },
+     {
+      "check": "max_positions",
+      "ok": true,
+      "detail": "1/5 open"
+     },
+     {
+      "check": "not_already_held",
+      "ok": false,
+      "detail": "already held"
+     }
+    ]
+   },
+   "fills": []
+  },
+  {
+   "id": "R0000059",
+   "account": "US-SWING",
+   "symbol": "ADI",
+   "side": "buy",
+   "qty": "4",
+   "filled_qty": "0",
+   "type": "MARKET",
+   "status": "REJECTED",
+   "created_at": "2026-10-05T20:36:13+05:30",
+   "decided_on_bar": "2026-10-05",
+   "strategy": "trend_breakout_swing_us",
+   "reason": "already holding this symbol",
+   "risk": {
+    "approved": false,
+    "reason": "already holding this symbol",
+    "checks": [
+     {
+      "check": "kill_switch",
+      "ok": true,
+      "detail": "off"
+     },
+     {
+      "check": "mode",
+      "ok": true,
+      "detail": "paper engine mode PAPER"
+     },
+     {
+      "check": "data_fresh",
+      "ok": true,
+      "detail": "data status OK"
+     },
+     {
+      "check": "qty_positive",
+      "ok": true,
+      "detail": "qty 4"
+     },
+     {
+      "check": "orders_per_run",
+      "ok": true,
+      "detail": "0/10"
+     },
+     {
+      "check": "account_active",
+      "ok": true,
+      "detail": "ACTIVE"
+     },
+     {
+      "check": "daily_loss",
+      "ok": true,
+      "detail": "today 0 vs limit -200"
+     },
+     {
+      "check": "max_drawdown",
+      "ok": true,
+      "detail": "drawdown -0.3%"
+     },
+     {
+      "check": "max_positions",
+      "ok": true,
+      "detail": "1/5 open"
+     },
+     {
+      "check": "not_already_held",
+      "ok": false,
+      "detail": "already held"
+     }
+    ]
+   },
+   "fills": []
+  },
+  {
+   "id": "R0000060",
+   "account": "US-SWING",
+   "symbol": "ADI",
+   "side": "buy",
+   "qty": "4",
+   "filled_qty": "0",
+   "type": "MARKET",
+   "status": "REJECTED",
+   "created_at": "2026-10-05T20:46:12+05:30",
+   "decided_on_bar": "2026-10-05",
+   "strategy": "trend_breakout_swing_us",
+   "reason": "already holding this symbol",
+   "risk": {
+    "approved": false,
+    "reason": "already holding this symbol",
+    "checks": [
+     {
+      "check": "kill_switch",
+      "ok": true,
+      "detail": "off"
+     },
+     {
+      "check": "mode",
+      "ok": true,
+      "detail": "paper engine mode PAPER"
+     },
+     {
+      "check": "data_fresh",
+      "ok": true,
+      "detail": "data status OK"
+     },
+     {
+      "check": "qty_positive",
+      "ok": true,
+      "detail": "qty 4"
+     },
+     {
+      "check": "orders_per_run",
+      "ok": true,
+      "detail": "0/10"
+     },
+     {
+      "check": "account_active",
+      "ok": true,
+      "detail": "ACTIVE"
+     },
+     {
+      "check": "daily_loss",
+      "ok": true,
+      "detail": "today 0 vs limit -200"
+     },
+     {
+      "check": "max_drawdown",
+      "ok": true,
+      "detail": "drawdown -0.3%"
+     },
+     {
+      "check": "max_positions",
+      "ok": true,
+      "detail": "1/5 open"
+     },
+     {
+      "check": "not_already_held",
+      "ok": false,
+      "detail": "already held"
+     }
+    ]
+   },
+   "fills": []
+  },
+  {
+   "id": "R0000061",
+   "account": "US-SWING",
+   "symbol": "ADI",
+   "side": "buy",
+   "qty": "4",
+   "filled_qty": "0",
+   "type": "MARKET",
+   "status": "REJECTED",
+   "created_at": "2026-10-05T20:56:36+05:30",
+   "decided_on_bar": "2026-10-05",
+   "strategy": "trend_breakout_swing_us",
+   "reason": "already holding this symbol",
+   "risk": {
+    "approved": false,
+    "reason": "already holding this symbol",
+    "checks": [
+     {
+      "check": "kill_switch",
+      "ok": true,
+      "detail": "off"
+     },
+     {
+      "check": "mode",
+      "ok": true,
+      "detail": "paper engine mode PAPER"
+     },
+     {
+      "check": "data_fresh",
+      "ok": true,
+      "detail": "data status OK"
+     },
+     {
+      "check": "qty_positive",
+      "ok": true,
+      "detail": "qty 4"
+     },
+     {
+      "check": "orders_per_run",
+      "ok": true,
+      "detail": "0/10"
+     },
+     {
+      "check": "account_active",
+      "ok": true,
+      "detail": "ACTIVE"
+     },
+     {
+      "check": "daily_loss",
+      "ok": true,
+      "detail": "today 0 vs limit -200"
+     },
+     {
+      "check": "max_drawdown",
+      "ok": true,
+      "detail": "drawdown -0.3%"
+     },
+     {
+      "check": "max_positions",
+      "ok": true,
+      "detail": "1/5 open"
+     },
+     {
+      "check": "not_already_held",
+      "ok": false,
+      "detail": "already held"
+     }
+    ]
+   },
+   "fills": []
+  },
+  {
+   "id": "R0000062",
+   "account": "US-SWING",
+   "symbol": "ADI",
+   "side": "buy",
+   "qty": "4",
+   "filled_qty": "0",
+   "type": "MARKET",
+   "status": "REJECTED",
+   "created_at": "2026-10-05T21:31:09+05:30",
+   "decided_on_bar": "2026-10-05",
+   "strategy": "trend_breakout_swing_us",
+   "reason": "already holding this symbol",
+   "risk": {
+    "approved": false,
+    "reason": "already holding this symbol",
+    "checks": [
+     {
+      "check": "kill_switch",
+      "ok": true,
+      "detail": "off"
+     },
+     {
+      "check": "mode",
+      "ok": true,
+      "detail": "paper engine mode PAPER"
+     },
+     {
+      "check": "data_fresh",
+      "ok": true,
+      "detail": "data status OK"
+     },
+     {
+      "check": "qty_positive",
+      "ok": true,
+      "detail": "qty 4"
+     },
+     {
+      "check": "orders_per_run",
+      "ok": true,
+      "detail": "0/10"
+     },
+     {
+      "check": "account_active",
+      "ok": true,
+      "detail": "ACTIVE"
+     },
+     {
+      "check": "daily_loss",
+      "ok": true,
+      "detail": "today 0 vs limit -200"
+     },
+     {
+      "check": "max_drawdown",
+      "ok": true,
+      "detail": "drawdown -0.3%"
+     },
+     {
+      "check": "max_positions",
+      "ok": true,
+      "detail": "1/5 open"
+     },
+     {
+      "check": "not_already_held",
+      "ok": false,
+      "detail": "already held"
+     }
+    ]
+   },
+   "fills": []
+  },
+  {
+   "id": "O0000063-374534",
+   "account": "IN-OPTIONS",
+   "symbol": "NIFTY 13OCT26 22800/22600 PE DEBIT SPREAD",
+   "side": "buy",
+   "qty": "65",
+   "filled_qty": "65",
+   "type": "MARKET",
+   "limit": null,
+   "stop_px": null,
+   "status": "FILLED",
+   "created_at": "2026-10-06T16:29:22+05:30",
+   "decided_on_bar": "None",
+   "strategy": "index_options_regime",
+   "signal_id": null,
+   "reason": "Regime BEAR; Close 22,776 < SMA50 23,824; RSI 36 < 45",
+   "stop": null,
+   "target": null,
+   "dedupe_key": "IN-OPTIONS|NIFTY 13OCT26 22800/22600 PE DEBIT SPREAD|2026-10-06",
+   "risk": null,
+   "segment": "options",
+   "currency": "INR",
+   "sector": null,
+   "expires_after_bars": 3,
+   "bars_waited": 0,
+   "fills": [
+    "F0000064"
+   ],
+   "meta": {
+    "spread": {
+     "action": "BUY",
+     "name": "NIFTY 13OCT26 22800/22600 PE DEBIT SPREAD",
+     "underlying": "NIFTY",
+     "kind": "P",
+     "expiry": "2026-10-13",
+     "dte": 7,
+     "k_long": 22800,
+     "k_short": 22600,
+     "width": 200,
+     "debit": 81.52,
+     "long_px": 168.96,
+     "short_px": 87.44,
+     "max_profit": 118.48,
+     "max_loss": 81.52,
+     "lot": 65,
+     "spot": 22776.099609375,
+     "sigma": 0.13607500076293946,
+     "sigma_source": "India VIX 13.61 (2026-10-06)",
+     "breakeven": 22718.48,
+     "why": [
+      "Regime BEAR",
+      "Close 22,776 < SMA50 23,824",
+      "RSI 36 < 45"
+     ],
+     "pricing": "MODELED (Black-Scholes)"
+    }
+   },
+   "closed_at": "2026-10-06T16:29:22+05:30"
+  },
+  {
+   "id": "O0000067-237ac4",
+   "account": "US-SWING",
+   "symbol": "PM",
+   "side": "buy",
+   "qty": "11",
+   "filled_qty": "0",
+   "type": "MARKET",
+   "limit": null,
+   "stop_px": null,
+   "status": "PENDING",
+   "created_at": "2026-10-08T15:14:42+05:30",
+   "decided_on_bar": "2026-10-07",
+   "strategy": "trend_breakout_swing_us",
+   "signal_id": "trend_breakout_swing_us|PM|2026-10-07",
+   "reason": "Uptrend: close 192.69 > SMA50 188.18 > SMA200 175.54; 21-day SMA crossed above 50-day within the last 4 bars",
+   "stop": "184.18",
+   "target": "205.45",
+   "dedupe_key": "US-SWING|PM|buy|2026-10-07|trend_breakout_swing_us",
+   "risk": {
+    "approved": true,
+    "reason": "approved",
+    "checks": [
+     {
+      "check": "kill_switch",
+      "ok": true,
+      "detail": "off"
+     },
+     {
+      "check": "mode",
+      "ok": true,
+      "detail": "paper engine mode PAPER"
+     },
+     {
+      "check": "data_fresh",
+      "ok": true,
+      "detail": "data status OK"
+     },
+     {
+      "check": "qty_positive",
+      "ok": true,
+      "detail": "qty 11"
+     },
+     {
+      "check": "orders_per_run",
+      "ok": true,
+      "detail": "0/10"
+     },
+     {
+      "check": "account_active",
+      "ok": true,
+      "detail": "ACTIVE"
+     },
+     {
+      "check": "daily_loss",
+      "ok": true,
+      "detail": "today 0 vs limit -200"
+     },
+     {
+      "check": "max_drawdown",
+      "ok": true,
+      "detail": "drawdown -0.0%"
+     },
+     {
+      "check": "max_positions",
+      "ok": true,
+      "detail": "0/5 open"
+     },
+     {
+      "check": "not_already_held",
+      "ok": true,
+      "detail": "new"
+     },
+     {
+      "check": "position_size",
+      "ok": true,
+      "detail": "2120 vs cap 2505"
+     },
+     {
+      "check": "gross_exposure",
+      "ok": true,
+      "detail": "2120 vs 10019"
+     },
+     {
+      "check": "cash",
+      "ok": true,
+      "detail": "need 2120, cash 10019"
+     },
+     {
+      "check": "stop_below_entry",
+      "ok": true,
+      "detail": "stop 184.18"
+     },
+     {
+      "check": "risk_per_trade",
+      "ok": true,
+      "detail": "risk 94 vs 100"
+     }
+    ]
+   },
+   "segment": "delivery",
+   "currency": "USD",
+   "sector": null,
+   "expires_after_bars": 3,
+   "bars_waited": 0,
+   "fills": [],
+   "meta": {
+    "score": 5,
+    "sizing_note": "ok",
+    "size_mult": "1"
+   }
+  },
+  {
+   "id": "O0000068-72f694",
+   "account": "IN-OPTIONS",
+   "symbol": "NIFTY 13OCT26 22550/22350 PE DEBIT SPREAD",
+   "side": "sell",
+   "qty": "65",
+   "filled_qty": "65",
+   "type": "MARKET",
+   "limit": null,
+   "stop_px": null,
+   "status": "FILLED",
+   "created_at": "2026-10-08T15:14:42+05:30",
+   "decided_on_bar": "None",
+   "strategy": "index_options_regime",
+   "signal_id": null,
+   "reason": "take-profit: value 142.71 >= debit + 50% of max profit",
+   "stop": null,
+   "target": null,
+   "dedupe_key": "IN-OPTIONS|NIFTY 13OCT26 22550/22350 PE DEBIT SPREAD|exit|2026-10-08",
+   "risk": null,
+   "segment": "options",
+   "currency": "INR",
+   "sector": null,
+   "expires_after_bars": 3,
+   "bars_waited": 0,
+   "fills": [
+    "F0000069"
+   ],
+   "meta": {},
+   "closed_at": "2026-10-08T15:14:42+05:30"
+  },
+  {
+   "id": "O0000070-167180",
+   "account": "IN-OPTIONS",
+   "symbol": "NIFTY 13OCT26 22800/22600 PE DEBIT SPREAD",
+   "side": "sell",
+   "qty": "65",
+   "filled_qty": "65",
+   "type": "MARKET",
+   "limit": null,
+   "stop_px": null,
+   "status": "FILLED",
+   "created_at": "2026-10-08T15:14:42+05:30",
+   "decided_on_bar": "None",
+   "strategy": "index_options_regime",
+   "signal_id": null,
+   "reason": "take-profit: value 176.03 >= debit + 50% of max profit",
+   "stop": null,
+   "target": null,
+   "dedupe_key": "IN-OPTIONS|NIFTY 13OCT26 22800/22600 PE DEBIT SPREAD|exit|2026-10-08",
+   "risk": null,
+   "segment": "options",
+   "currency": "INR",
+   "sector": null,
+   "expires_after_bars": 3,
+   "bars_waited": 0,
+   "fills": [
+    "F0000071"
+   ],
+   "meta": {},
+   "closed_at": "2026-10-08T15:14:42+05:30"
+  },
+  {
+   "id": "O0000072-31af10",
+   "account": "IN-OPTIONS",
+   "symbol": "NIFTY 13OCT26 22200/22000 PE DEBIT SPREAD",
+   "side": "buy",
+   "qty": "65",
+   "filled_qty": "65",
+   "type": "MARKET",
+   "limit": null,
+   "stop_px": null,
+   "status": "FILLED",
+   "created_at": "2026-10-08T15:14:42+05:30",
+   "decided_on_bar": "None",
+   "strategy": "index_options_regime",
+   "signal_id": null,
+   "reason": "Regime BEAR; Close 22,206 < SMA50 23,761; RSI 27 < 45",
+   "stop": null,
+   "target": null,
+   "dedupe_key": "IN-OPTIONS|NIFTY 13OCT26 22200/22000 PE DEBIT SPREAD|2026-10-08",
+   "risk": null,
+   "segment": "options",
+   "currency": "INR",
+   "sector": null,
+   "expires_after_bars": 3,
+   "bars_waited": 0,
+   "fills": [
+    "F0000073"
+   ],
+   "meta": {
+    "spread": {
+     "action": "BUY",
+     "name": "NIFTY 13OCT26 22200/22000 PE DEBIT SPREAD",
+     "underlying": "NIFTY",
+     "kind": "P",
+     "expiry": "2026-10-13",
+     "dte": 5,
+     "k_long": 22200,
+     "k_short": 22000,
+     "width": 200,
+     "debit": 75.98,
+     "long_px": 145.78,
+     "short_px": 69.79,
+     "max_profit": 124.02,
+     "max_loss": 75.98,
+     "lot": 65,
+     "spot": 22205.650390625,
+     "sigma": 0.15262499809265137,
+     "sigma_source": "India VIX 15.26 (2026-10-08)",
+     "breakeven": 22124.02,
+     "why": [
+      "Regime BEAR",
+      "Close 22,206 < SMA50 23,761",
+      "RSI 27 < 45"
+     ],
+     "pricing": "MODELED (Black-Scholes)"
+    }
+   },
+   "closed_at": "2026-10-08T15:14:42+05:30"
+  },
+  {
+   "id": "O0000076-59766d",
+   "account": "IN-OPTIONS",
+   "symbol": "NIFTY 13OCT26 22250/22050 PE DEBIT SPREAD",
+   "side": "buy",
+   "qty": "65",
+   "filled_qty": "65",
+   "type": "MARKET",
+   "limit": null,
+   "stop_px": null,
+   "status": "FILLED",
+   "created_at": "2026-10-08T15:47:34+05:30",
+   "decided_on_bar": "None",
+   "strategy": "index_options_regime",
+   "signal_id": null,
+   "reason": "Regime BEAR; Close 22,232 < SMA50 23,761; RSI 28 < 45",
+   "stop": null,
+   "target": null,
+   "dedupe_key": "IN-OPTIONS|NIFTY 13OCT26 22250/22050 PE DEBIT SPREAD|2026-10-08",
+   "risk": null,
+   "segment": "options",
+   "currency": "INR",
+   "sector": null,
+   "expires_after_bars": 3,
+   "bars_waited": 0,
+   "fills": [
+    "F0000077"
+   ],
+   "meta": {
+    "spread": {
+     "action": "BUY",
+     "name": "NIFTY 13OCT26 22250/22050 PE DEBIT SPREAD",
+     "underlying": "NIFTY",
+     "kind": "P",
+     "expiry": "2026-10-13",
+     "dte": 5,
+     "k_long": 22250,
+     "k_short": 22050,
+     "width": 200,
+     "debit": 80.6,
+     "long_px": 157.76,
+     "short_px": 77.15,
+     "max_profit": 119.4,
+     "max_loss": 80.6,
+     "lot": 65,
+     "spot": 22231.80078125,
+     "sigma": 0.15274999618530274,
+     "sigma_source": "India VIX 15.27 (2026-10-08)",
+     "breakeven": 22169.4,
+     "why": [
+      "Regime BEAR",
+      "Close 22,232 < SMA50 23,761",
+      "RSI 28 < 45"
+     ],
+     "pricing": "MODELED (Black-Scholes)"
+    }
+   },
+   "closed_at": "2026-10-08T15:47:34+05:30"
+  }
+ ],
+ "fills": [
+  {
+   "id": "F0000007",
+   "order": "O0000006-48fde5",
+   "account": "IN-OPTIONS",
+   "symbol": "NIFTY 06OCT26 22800/22600 PE DEBIT SPREAD",
+   "side": "buy",
+   "qty": "65",
+   "price": "81.42",
+   "value": "5292.30",
+   "fees": "55.08",
+   "fee_breakdown": {
+    "total": "55.08",
+    "method": "override (multi-leg / modeled)"
+   },
+   "bar": "2026-09-28",
+   "time": "2026-09-28T23:31:41+05:30",
+   "rule": "modeled_bs_close",
+   "note": "MODELED debit at today's close (no option quote feed)"
+  },
+  {
+   "id": "F0000009",
+   "order": "O0000008-a25f55",
+   "account": "IN-OPTIONS",
+   "symbol": "NIFTY 06OCT26 22700/22500 PE DEBIT SPREAD",
+   "side": "buy",
+   "qty": "65",
+   "price": "78.18",
+   "value": "5081.70",
+   "fees": "54.09",
+   "fee_breakdown": {
+    "total": "54.09",
+    "method": "override (multi-leg / modeled)"
+   },
+   "bar": "2026-09-29",
+   "time": "2026-09-29T15:13:41+05:30",
+   "rule": "modeled_bs_close",
+   "note": "MODELED debit at today's close (no option quote feed)"
+  },
+  {
+   "id": "F0000015",
+   "order": "O0000013-53d89e",
+   "account": "IN-VALUE",
+   "symbol": "BBTC",
+   "side": "buy",
+   "qty": "7",
+   "price": "1366.53",
+   "value": "9565.71",
+   "fees": "16.99",
+   "fee_breakdown": {
+    "brokerage": "4.78",
+    "stt": "9.57",
+    "stamp": "1.43",
+    "exchange": "0.28",
+    "sebi": "0.01",
+    "dp": "0.00",
+    "gst": "0.91",
+    "total": "16.99",
+    "broker": "groww",
+    "segment": "delivery"
+   },
+   "bar": "2026-09-30",
+   "time": "2026-09-30T09:21:24+05:30",
+   "rule": "next_bar_open",
+   "note": "[filled live during the session]"
+  },
+  {
+   "id": "F0000016",
+   "order": "O0000012-50f57f",
+   "account": "IN-VALUE",
+   "symbol": "BLS",
+   "side": "buy",
+   "qty": "50",
+   "price": "220.04",
+   "value": "11002.00",
+   "fees": "19.54",
+   "fee_breakdown": {
+    "brokerage": "5.50",
+    "stt": "11.00",
+    "stamp": "1.65",
+    "exchange": "0.33",
+    "sebi": "0.01",
+    "dp": "0.00",
+    "gst": "1.05",
+    "total": "19.54",
+    "broker": "groww",
+    "segment": "delivery"
+   },
+   "bar": "2026-09-30",
+   "time": "2026-09-30T09:21:24+05:30",
+   "rule": "next_bar_open",
+   "note": "[filled live during the session]"
+  },
+  {
+   "id": "F0000017",
+   "order": "O0000014-b6e083",
+   "account": "IN-VALUE",
+   "symbol": "BPCL",
+   "side": "buy",
+   "qty": "49",
+   "price": "302.81",
+   "value": "14837.69",
+   "fees": "26.36",
+   "fee_breakdown": {
+    "brokerage": "7.42",
+    "stt": "14.84",
+    "stamp": "2.23",
+    "exchange": "0.44",
+    "sebi": "0.01",
+    "dp": "0.00",
+    "gst": "1.42",
+    "total": "26.36",
+    "broker": "groww",
+    "segment": "delivery"
+   },
+   "bar": "2026-09-30",
+   "time": "2026-09-30T09:21:24+05:30",
+   "rule": "next_bar_open",
+   "note": "[filled live during the session]"
+  },
+  {
+   "id": "F0000019",
+   "order": "O0000018-797e2d",
+   "account": "IN-OPTIONS",
+   "symbol": "NIFTY 06OCT26 22800/22600 PE DEBIT SPREAD",
+   "side": "sell",
+   "qty": "65",
+   "price": "142.46",
+   "value": "9259.90",
+   "fees": "60.30",
+   "fee_breakdown": {
+    "total": "60.30",
+    "method": "override (multi-leg / modeled)"
+   },
+   "bar": "2026-10-01",
+   "time": "2026-10-01T12:30:16+05:30",
+   "rule": "modeled_bs_live",
+   "note": "take-profit (live): modeled value 142.46 >= debit + 50% of max profit (MODELED price, live session)"
+  },
+  {
+   "id": "F0000021",
+   "order": "O0000020-2b7bd3",
+   "account": "IN-OPTIONS",
+   "symbol": "NIFTY 06OCT26 22700/22500 PE DEBIT SPREAD",
+   "side": "sell",
+   "qty": "65",
+   "price": "140.42",
+   "value": "9127.30",
+   "fees": "60.11",
+   "fee_breakdown": {
+    "total": "60.11",
+    "method": "override (multi-leg / modeled)"
+   },
+   "bar": "2026-10-01",
+   "time": "2026-10-01T12:51:32+05:30",
+   "rule": "modeled_bs_live",
+   "note": "take-profit (live): modeled value 140.42 >= debit + 50% of max profit (MODELED price, live session)"
+  },
+  {
+   "id": "F0000023",
+   "order": "O0000022-2e75cb",
+   "account": "IN-OPTIONS",
+   "symbol": "NIFTY 06OCT26 22400/22200 PE DEBIT SPREAD",
+   "side": "buy",
+   "qty": "65",
+   "price": "71.64",
+   "value": "4656.60",
+   "fees": "52.71",
+   "fee_breakdown": {
+    "total": "52.71",
+    "method": "override (multi-leg / modeled)"
+   },
+   "bar": "2026-10-01",
+   "time": "2026-10-01T16:29:03+05:30",
+   "rule": "modeled_bs_close",
+   "note": "MODELED debit at today's close (no option quote feed)"
+  },
+  {
+   "id": "F0000040",
+   "order": "O0000032-2f5659",
+   "account": "US-SWING",
+   "symbol": "ADI",
+   "side": "buy",
+   "qty": "4",
+   "price": "416.03",
+   "value": "1664.12",
+   "fees": "0.00",
+   "fee_breakdown": {
+    "brokerage": "0.00",
+    "sec_fee": "0.00",
+    "total": "0.00",
+    "broker": "groww",
+    "segment": "us_equity"
+   },
+   "bar": "2026-10-02",
+   "time": "2026-10-02T19:01:59+05:30",
+   "rule": "next_bar_open",
+   "note": ""
+  },
+  {
+   "id": "F0000041",
+   "order": "O0000028-51596d",
+   "account": "US-VALUE",
+   "symbol": "ADBE",
+   "side": "buy",
+   "qty": "2",
+   "price": "243.29",
+   "value": "486.58",
+   "fees": "0.00",
+   "fee_breakdown": {
+    "brokerage": "0.00",
+    "sec_fee": "0.00",
+    "total": "0.00",
+    "broker": "groww",
+    "segment": "us_equity"
+   },
+   "bar": "2026-10-02",
+   "time": "2026-10-02T19:12:39+05:30",
+   "rule": "next_bar_open",
+   "note": "[filled live during the session]"
+  },
+  {
+   "id": "F0000042",
+   "order": "O0000030-dddeb4",
+   "account": "US-VALUE",
+   "symbol": "CB",
+   "side": "buy",
+   "qty": "1",
+   "price": "330.98",
+   "value": "330.98",
+   "fees": "0.00",
+   "fee_breakdown": {
+    "brokerage": "0.00",
+    "sec_fee": "0.00",
+    "total": "0.00",
+    "broker": "groww",
+    "segment": "us_equity"
+   },
+   "bar": "2026-10-02",
+   "time": "2026-10-02T19:12:39+05:30",
+   "rule": "next_bar_open",
+   "note": "[filled live during the session]"
+  },
+  {
+   "id": "F0000043",
+   "order": "O0000031-e5b0e8",
+   "account": "US-VALUE",
+   "symbol": "CMCSA",
+   "side": "buy",
+   "qty": "19",
+   "price": "21.94",
+   "value": "416.86",
+   "fees": "0.00",
+   "fee_breakdown": {
+    "brokerage": "0.00",
+    "sec_fee": "0.00",
+    "total": "0.00",
+    "broker": "groww",
+    "segment": "us_equity"
+   },
+   "bar": "2026-10-02",
+   "time": "2026-10-02T19:12:39+05:30",
+   "rule": "next_bar_open",
+   "note": "[filled live during the session]"
+  },
+  {
+   "id": "F0000044",
+   "order": "O0000027-d29001",
+   "account": "US-VALUE",
+   "symbol": "INTU",
+   "side": "buy",
+   "qty": "1",
+   "price": "284.20",
+   "value": "284.20",
+   "fees": "0.00",
+   "fee_breakdown": {
+    "brokerage": "0.00",
+    "sec_fee": "0.00",
+    "total": "0.00",
+    "broker": "groww",
+    "segment": "us_equity"
+   },
+   "bar": "2026-10-02",
+   "time": "2026-10-02T19:12:39+05:30",
+   "rule": "next_bar_open",
+   "note": "[filled live during the session]"
+  },
+  {
+   "id": "F0000045",
+   "order": "O0000029-e9d6a2",
+   "account": "US-VALUE",
+   "symbol": "PYPL",
+   "side": "buy",
+   "qty": "8",
+   "price": "53.27",
+   "value": "426.16",
+   "fees": "0.00",
+   "fee_breakdown": {
+    "brokerage": "0.00",
+    "sec_fee": "0.00",
+    "total": "0.00",
+    "broker": "groww",
+    "segment": "us_equity"
+   },
+   "bar": "2026-10-02",
+   "time": "2026-10-02T19:12:39+05:30",
+   "rule": "next_bar_open",
+   "note": "[filled live during the session]"
+  },
+  {
+   "id": "F0000048",
+   "order": "O0000024-7b821f",
+   "account": "IN-VALUE",
+   "symbol": "HINDPETRO",
+   "side": "buy",
+   "qty": "40",
+   "price": "346.95",
+   "value": "13878.00",
+   "fees": "24.65",
+   "fee_breakdown": {
+    "brokerage": "6.94",
+    "stt": "13.88",
+    "stamp": "2.08",
+    "exchange": "0.41",
+    "sebi": "0.01",
+    "dp": "0.00",
+    "gst": "1.33",
+    "total": "24.65",
+    "broker": "groww",
+    "segment": "delivery"
+   },
+   "bar": "2026-10-05",
+   "time": "2026-10-05T09:31:40+05:30",
+   "rule": "next_bar_open",
+   "note": "[filled live during the session]"
+  },
+  {
+   "id": "F0000049",
+   "order": "O0000026-90a1b1",
+   "account": "IN-VALUE",
+   "symbol": "TMCV",
+   "side": "buy",
+   "qty": "29",
+   "price": "417.87",
+   "value": "12118.23",
+   "fees": "21.52",
+   "fee_breakdown": {
+    "brokerage": "6.06",
+    "stt": "12.12",
+    "stamp": "1.82",
+    "exchange": "0.36",
+    "sebi": "0.01",
+    "dp": "0.00",
+    "gst": "1.16",
+    "total": "21.52",
+    "broker": "groww",
+    "segment": "delivery"
+   },
+   "bar": "2026-10-05",
+   "time": "2026-10-05T09:31:40+05:30",
+   "rule": "next_bar_open",
+   "note": "[filled live during the session]"
+  },
+  {
+   "id": "F0000050",
+   "order": "O0000025-7c8f79",
+   "account": "IN-VALUE",
+   "symbol": "VEDL",
+   "side": "buy",
+   "qty": "59",
+   "price": "254.91",
+   "value": "15039.69",
+   "fees": "26.71",
+   "fee_breakdown": {
+    "brokerage": "7.52",
+    "stt": "15.04",
+    "stamp": "2.26",
+    "exchange": "0.45",
+    "sebi": "0.02",
+    "dp": "0.00",
+    "gst": "1.44",
+    "total": "26.71",
+    "broker": "groww",
+    "segment": "delivery"
+   },
+   "bar": "2026-10-05",
+   "time": "2026-10-05T09:31:40+05:30",
+   "rule": "next_bar_open",
+   "note": "[filled live during the session]"
+  },
+  {
+   "id": "F0000052",
+   "order": "O0000051-f48677",
+   "account": "IN-OPTIONS",
+   "symbol": "NIFTY 06OCT26 22400/22200 PE DEBIT SPREAD",
+   "side": "sell",
+   "qty": "65",
+   "price": "11.36",
+   "value": "738.40",
+   "fees": "48.24",
+   "fee_breakdown": {
+    "total": "48.24",
+    "method": "override (multi-leg / modeled)"
+   },
+   "bar": "2026-10-05",
+   "time": "2026-10-05T09:31:40+05:30",
+   "rule": "modeled_bs_live",
+   "note": "stop (live): modeled value 11.36 <= 50% of debit 71.64 (MODELED price, live session)"
+  },
+  {
+   "id": "F0000054",
+   "order": "O0000053-4a992e",
+   "account": "IN-OPTIONS",
+   "symbol": "NIFTY 13OCT26 22550/22350 PE DEBIT SPREAD",
+   "side": "buy",
+   "qty": "65",
+   "price": "78.81",
+   "value": "5122.65",
+   "fees": "55.23",
+   "fee_breakdown": {
+    "total": "55.23",
+    "method": "override (multi-leg / modeled)"
+   },
+   "bar": "2026-10-05",
+   "time": "2026-10-05T16:30:02+05:30",
+   "rule": "modeled_bs_close",
+   "note": "MODELED debit at today's close (no option quote feed)"
+  },
+  {
+   "id": "F0000064",
+   "order": "O0000063-374534",
+   "account": "IN-OPTIONS",
+   "symbol": "NIFTY 13OCT26 22800/22600 PE DEBIT SPREAD",
+   "side": "buy",
+   "qty": "65",
+   "price": "81.52",
+   "value": "5298.80",
+   "fees": "54.61",
+   "fee_breakdown": {
+    "total": "54.61",
+    "method": "override (multi-leg / modeled)"
+   },
+   "bar": "2026-10-06",
+   "time": "2026-10-06T16:29:22+05:30",
+   "rule": "modeled_bs_close",
+   "note": "MODELED debit at today's close (no option quote feed)"
+  },
+  {
+   "id": "F0000065",
+   "order": "O0000055-84559f",
+   "account": "US-SWING",
+   "symbol": "ADI",
+   "side": "sell",
+   "qty": "4",
+   "price": "420.68",
+   "value": "1682.72",
+   "fees": "0.05",
+   "fee_breakdown": {
+    "brokerage": "0.00",
+    "sec_fee": "0.05",
+    "total": "0.05",
+    "broker": "groww",
+    "segment": "us_equity"
+   },
+   "bar": "2026-10-06",
+   "time": "2026-10-06T19:02:19+05:30",
+   "rule": "next_bar_open",
+   "note": ""
+  },
+  {
+   "id": "F0000069",
+   "order": "O0000068-72f694",
+   "account": "IN-OPTIONS",
+   "symbol": "NIFTY 13OCT26 22550/22350 PE DEBIT SPREAD",
+   "side": "sell",
+   "qty": "65",
+   "price": "142.71",
+   "value": "9276.15",
+   "fees": "60.32",
+   "fee_breakdown": {
+    "total": "60.32",
+    "method": "override (multi-leg / modeled)"
+   },
+   "bar": "2026-10-08",
+   "time": "2026-10-08T15:14:42+05:30",
+   "rule": "modeled_bs_close",
+   "note": "take-profit: value 142.71 >= debit + 50% of max profit (MODELED price)"
+  },
+  {
+   "id": "F0000071",
+   "order": "O0000070-167180",
+   "account": "IN-OPTIONS",
+   "symbol": "NIFTY 13OCT26 22800/22600 PE DEBIT SPREAD",
+   "side": "sell",
+   "qty": "65",
+   "price": "176.03",
+   "value": "11441.95",
+   "fees": "63.38",
+   "fee_breakdown": {
+    "total": "63.38",
+    "method": "override (multi-leg / modeled)"
+   },
+   "bar": "2026-10-08",
+   "time": "2026-10-08T15:14:42+05:30",
+   "rule": "modeled_bs_close",
+   "note": "take-profit: value 176.03 >= debit + 50% of max profit (MODELED price)"
+  },
+  {
+   "id": "F0000073",
+   "order": "O0000072-31af10",
+   "account": "IN-OPTIONS",
+   "symbol": "NIFTY 13OCT26 22200/22000 PE DEBIT SPREAD",
+   "side": "buy",
+   "qty": "65",
+   "price": "75.98",
+   "value": "4938.70",
+   "fees": "53.43",
+   "fee_breakdown": {
+    "total": "53.43",
+    "method": "override (multi-leg / modeled)"
+   },
+   "bar": "2026-10-08",
+   "time": "2026-10-08T15:14:42+05:30",
+   "rule": "modeled_bs_close",
+   "note": "MODELED debit at today's close (no option quote feed)"
+  },
+  {
+   "id": "F0000077",
+   "order": "O0000076-59766d",
+   "account": "IN-OPTIONS",
+   "symbol": "NIFTY 13OCT26 22250/22050 PE DEBIT SPREAD",
+   "side": "buy",
+   "qty": "65",
+   "price": "80.6",
+   "value": "5239.00",
+   "fees": "53.99",
+   "fee_breakdown": {
+    "total": "53.99",
+    "method": "override (multi-leg / modeled)"
+   },
+   "bar": "2026-10-08",
+   "time": "2026-10-08T15:47:34+05:30",
+   "rule": "modeled_bs_close",
+   "note": "MODELED debit at today's close (no option quote feed)"
+  }
+ ],
+ "cash_ledger": [
+  {
+   "time": "2026-09-27T20:47:31+05:30",
+   "account": "IN-SWING",
+   "type": "DEPOSIT",
+   "amount": "200000.00",
+   "balance_after": "200000.00",
+   "ref": "opening balance"
+  },
+  {
+   "time": "2026-09-27T20:47:31+05:30",
+   "account": "IN-MANUAL",
+   "type": "DEPOSIT",
+   "amount": "200000.00",
+   "balance_after": "200000.00",
+   "ref": "opening balance"
+  },
+  {
+   "time": "2026-09-27T20:47:31+05:30",
+   "account": "US-MANUAL",
+   "type": "DEPOSIT",
+   "amount": "10000.00",
+   "balance_after": "10000.00",
+   "ref": "opening balance"
+  },
+  {
+   "time": "2026-09-28T23:14:01+05:30",
+   "account": "US-SWING",
+   "type": "DEPOSIT",
+   "amount": "10000.00",
+   "balance_after": "10000.00",
+   "ref": "opening balance"
+  },
+  {
+   "time": "2026-09-28T23:14:01+05:30",
+   "account": "IN-OPTIONS",
+   "type": "DEPOSIT",
+   "amount": "200000.00",
+   "balance_after": "200000.00",
+   "ref": "opening balance"
+  },
+  {
+   "time": "2026-09-28T23:31:41+05:30",
+   "account": "IN-OPTIONS",
+   "type": "BUY",
+   "amount": "-5347.38",
+   "balance_after": "194652.62",
+   "ref": "O0000006-48fde5"
+  },
+  {
+   "time": "2026-09-29T15:13:41+05:30",
+   "account": "IN-OPTIONS",
+   "type": "BUY",
+   "amount": "-5135.79",
+   "balance_after": "189516.83",
+   "ref": "O0000008-a25f55"
+  },
+  {
+   "time": "2026-09-29T21:09:44+05:30",
+   "account": "IN-VALUE",
+   "type": "DEPOSIT",
+   "amount": "500000.00",
+   "balance_after": "500000.00",
+   "ref": "opening balance"
+  },
+  {
+   "time": "2026-09-29T21:09:44+05:30",
+   "account": "US-VALUE",
+   "type": "DEPOSIT",
+   "amount": "20000.00",
+   "balance_after": "20000.00",
+   "ref": "opening balance"
+  },
+  {
+   "time": "2026-09-30T09:21:24+05:30",
+   "account": "IN-VALUE",
+   "type": "BUY",
+   "amount": "-9582.70",
+   "balance_after": "490417.30",
+   "ref": "O0000013-53d89e"
+  },
+  {
+   "time": "2026-09-30T09:21:24+05:30",
+   "account": "IN-VALUE",
+   "type": "BUY",
+   "amount": "-11021.54",
+   "balance_after": "479395.76",
+   "ref": "O0000012-50f57f"
+  },
+  {
+   "time": "2026-09-30T09:21:24+05:30",
+   "account": "IN-VALUE",
+   "type": "BUY",
+   "amount": "-14864.05",
+   "balance_after": "464531.71",
+   "ref": "O0000014-b6e083"
+  },
+  {
+   "time": "2026-10-01T12:30:16+05:30",
+   "account": "IN-OPTIONS",
+   "type": "SELL",
+   "amount": "9199.60",
+   "balance_after": "198716.43",
+   "ref": "O0000018-797e2d"
+  },
+  {
+   "time": "2026-10-01T12:51:32+05:30",
+   "account": "IN-OPTIONS",
+   "type": "SELL",
+   "amount": "9067.19",
+   "balance_after": "207783.62",
+   "ref": "O0000020-2b7bd3"
+  },
+  {
+   "time": "2026-10-01T16:29:03+05:30",
+   "account": "IN-OPTIONS",
+   "type": "BUY",
+   "amount": "-4709.31",
+   "balance_after": "203074.31",
+   "ref": "O0000022-2e75cb"
+  },
+  {
+   "time": "2026-10-02T19:01:59+05:30",
+   "account": "US-SWING",
+   "type": "BUY",
+   "amount": "-1664.12",
+   "balance_after": "8335.88",
+   "ref": "O0000032-2f5659"
+  },
+  {
+   "time": "2026-10-02T19:12:39+05:30",
+   "account": "US-VALUE",
+   "type": "BUY",
+   "amount": "-486.58",
+   "balance_after": "19513.42",
+   "ref": "O0000028-51596d"
+  },
+  {
+   "time": "2026-10-02T19:12:39+05:30",
+   "account": "US-VALUE",
+   "type": "BUY",
+   "amount": "-330.98",
+   "balance_after": "19182.44",
+   "ref": "O0000030-dddeb4"
+  },
+  {
+   "time": "2026-10-02T19:12:39+05:30",
+   "account": "US-VALUE",
+   "type": "BUY",
+   "amount": "-416.86",
+   "balance_after": "18765.58",
+   "ref": "O0000031-e5b0e8"
+  },
+  {
+   "time": "2026-10-02T19:12:39+05:30",
+   "account": "US-VALUE",
+   "type": "BUY",
+   "amount": "-284.20",
+   "balance_after": "18481.38",
+   "ref": "O0000027-d29001"
+  },
+  {
+   "time": "2026-10-02T19:12:39+05:30",
+   "account": "US-VALUE",
+   "type": "BUY",
+   "amount": "-426.16",
+   "balance_after": "18055.22",
+   "ref": "O0000029-e9d6a2"
+  },
+  {
+   "time": "2026-10-05T09:31:40+05:30",
+   "account": "IN-VALUE",
+   "type": "BUY",
+   "amount": "-13902.65",
+   "balance_after": "450629.06",
+   "ref": "O0000024-7b821f"
+  },
+  {
+   "time": "2026-10-05T09:31:40+05:30",
+   "account": "IN-VALUE",
+   "type": "BUY",
+   "amount": "-12139.75",
+   "balance_after": "438489.31",
+   "ref": "O0000026-90a1b1"
+  },
+  {
+   "time": "2026-10-05T09:31:40+05:30",
+   "account": "IN-VALUE",
+   "type": "BUY",
+   "amount": "-15066.40",
+   "balance_after": "423422.91",
+   "ref": "O0000025-7c8f79"
+  },
+  {
+   "time": "2026-10-05T09:31:40+05:30",
+   "account": "IN-OPTIONS",
+   "type": "SELL",
+   "amount": "690.16",
+   "balance_after": "203764.47",
+   "ref": "O0000051-f48677"
+  },
+  {
+   "time": "2026-10-05T16:30:02+05:30",
+   "account": "IN-OPTIONS",
+   "type": "BUY",
+   "amount": "-5177.88",
+   "balance_after": "198586.59",
+   "ref": "O0000053-4a992e"
+  },
+  {
+   "time": "2026-10-06T16:29:22+05:30",
+   "account": "IN-OPTIONS",
+   "type": "BUY",
+   "amount": "-5353.41",
+   "balance_after": "193233.18",
+   "ref": "O0000063-374534"
+  },
+  {
+   "time": "2026-10-06T19:02:19+05:30",
+   "account": "US-SWING",
+   "type": "SELL",
+   "amount": "1682.67",
+   "balance_after": "10018.55",
+   "ref": "O0000055-84559f"
+  },
+  {
+   "time": "2026-10-06T19:57:22+05:30",
+   "account": "IN-BRAIN",
+   "type": "DEPOSIT",
+   "amount": "200000.00",
+   "balance_after": "200000.00",
+   "ref": "opening balance"
+  },
+  {
+   "time": "2026-10-08T15:14:42+05:30",
+   "account": "IN-OPTIONS",
+   "type": "SELL",
+   "amount": "9215.83",
+   "balance_after": "202449.01",
+   "ref": "O0000068-72f694"
+  },
+  {
+   "time": "2026-10-08T15:14:42+05:30",
+   "account": "IN-OPTIONS",
+   "type": "SELL",
+   "amount": "11378.57",
+   "balance_after": "213827.58",
+   "ref": "O0000070-167180"
+  },
+  {
+   "time": "2026-10-08T15:14:42+05:30",
+   "account": "IN-OPTIONS",
+   "type": "BUY",
+   "amount": "-4992.13",
+   "balance_after": "208835.45",
+   "ref": "O0000072-31af10"
+  },
+  {
+   "time": "2026-10-08T15:47:34+05:30",
+   "account": "IN-OPTIONS",
+   "type": "BUY",
+   "amount": "-5292.99",
+   "balance_after": "203542.46",
+   "ref": "O0000076-59766d"
+  }
+ ],
+ "trades": [
+  {
+   "account": "IN-OPTIONS",
+   "symbol": "NIFTY 06OCT26 22800/22600 PE DEBIT SPREAD",
+   "qty": "65",
+   "entry_date": "2026-09-28",
+   "entry": "81.42",
+   "exit_date": "2026-10-01",
+   "exit": "142.46",
+   "pnl": "3852.22",
+   "pnl_pct": "72.79",
+   "fees": "115.38",
+   "bars_held": 0,
+   "reason": "take-profit (live): modeled value 142.46 >= debit + 50% of max profit (MODELED price, live session)",
+   "strategy": "index_options_regime",
+   "order": "O0000018-797e2d"
+  },
+  {
+   "account": "IN-OPTIONS",
+   "symbol": "NIFTY 06OCT26 22700/22500 PE DEBIT SPREAD",
+   "qty": "65",
+   "entry_date": "2026-09-29",
+   "entry": "78.18",
+   "exit_date": "2026-10-01",
+   "exit": "140.42",
+   "pnl": "3931.40",
+   "pnl_pct": "77.36",
+   "fees": "114.20",
+   "bars_held": 0,
+   "reason": "take-profit (live): modeled value 140.42 >= debit + 50% of max profit (MODELED price, live session)",
+   "strategy": "index_options_regime",
+   "order": "O0000020-2b7bd3"
+  },
+  {
+   "account": "IN-OPTIONS",
+   "symbol": "NIFTY 06OCT26 22400/22200 PE DEBIT SPREAD",
+   "qty": "65",
+   "entry_date": "2026-10-01",
+   "entry": "71.64",
+   "exit_date": "2026-10-05",
+   "exit": "11.36",
+   "pnl": "-4019.15",
+   "pnl_pct": "-86.31",
+   "fees": "100.95",
+   "bars_held": 0,
+   "reason": "stop (live): modeled value 11.36 <= 50% of debit 71.64 (MODELED price, live session)",
+   "strategy": "index_options_regime",
+   "order": "O0000051-f48677"
+  },
+  {
+   "account": "US-SWING",
+   "symbol": "ADI",
+   "qty": "4",
+   "entry_date": "2026-10-02",
+   "entry": "416.03",
+   "exit_date": "2026-10-06",
+   "exit": "420.68",
+   "pnl": "18.55",
+   "pnl_pct": "1.11",
+   "fees": "0.05",
+   "bars_held": 32,
+   "reason": "time exit (20 bars)",
+   "strategy": "trend_breakout_swing_us",
+   "order": "O0000055-84559f"
+  },
+  {
+   "account": "IN-OPTIONS",
+   "symbol": "NIFTY 13OCT26 22550/22350 PE DEBIT SPREAD",
+   "qty": "65",
+   "entry_date": "2026-10-05",
+   "entry": "78.81",
+   "exit_date": "2026-10-08",
+   "exit": "142.71",
+   "pnl": "4037.95",
+   "pnl_pct": "78.83",
+   "fees": "115.55",
+   "bars_held": 0,
+   "reason": "take-profit: value 142.71 >= debit + 50% of max profit (MODELED price)",
+   "strategy": "index_options_regime",
+   "order": "O0000068-72f694"
+  },
+  {
+   "account": "IN-OPTIONS",
+   "symbol": "NIFTY 13OCT26 22800/22600 PE DEBIT SPREAD",
+   "qty": "65",
+   "entry_date": "2026-10-06",
+   "entry": "81.52",
+   "exit_date": "2026-10-08",
+   "exit": "176.03",
+   "pnl": "6025.16",
+   "pnl_pct": "113.71",
+   "fees": "117.99",
+   "bars_held": 0,
+   "reason": "take-profit: value 176.03 >= debit + 50% of max profit (MODELED price)",
+   "strategy": "index_options_regime",
+   "order": "O0000070-167180"
+  }
+ ],
+ "audit": [
+  {
+   "seq": 1,
+   "time": "2026-09-27T20:47:31+05:30",
+   "kind": "account_created",
+   "account": "IN-SWING",
+   "cash": "200000",
+   "currency": "INR"
+  },
+  {
+   "seq": 2,
+   "time": "2026-09-27T20:47:31+05:30",
+   "kind": "account_created",
+   "account": "IN-MANUAL",
+   "cash": "200000",
+   "currency": "INR"
+  },
+  {
+   "seq": 3,
+   "time": "2026-09-27T20:47:31+05:30",
+   "kind": "account_created",
+   "account": "US-MANUAL",
+   "cash": "10000",
+   "currency": "USD"
+  },
+  {
+   "seq": 4,
+   "time": "2026-09-28T23:14:01+05:30",
+   "kind": "account_created",
+   "account": "US-SWING",
+   "cash": "10000",
+   "currency": "USD"
+  },
+  {
+   "seq": 5,
+   "time": "2026-09-28T23:14:01+05:30",
+   "kind": "account_created",
+   "account": "IN-OPTIONS",
+   "cash": "200000",
+   "currency": "INR"
+  },
+  {
+   "seq": 6,
+   "time": "2026-09-28T23:31:41+05:30",
+   "kind": "order_submitted",
+   "order": "O0000006-48fde5",
+   "account": "IN-OPTIONS",
+   "symbol": "NIFTY 06OCT26 22800/22600 PE DEBIT SPREAD",
+   "side": "buy",
+   "qty": "65",
+   "type": "MARKET",
+   "strategy": "index_options_regime"
+  },
+  {
+   "seq": 7,
+   "time": "2026-09-28T23:31:41+05:30",
+   "kind": "fill",
+   "order": "O0000006-48fde5",
+   "fill": "F0000007",
+   "symbol": "NIFTY 06OCT26 22800/22600 PE DEBIT SPREAD",
+   "side": "buy",
+   "qty": "65",
+   "price": "81.42",
+   "fees": "55.08"
+  },
+  {
+   "seq": 8,
+   "time": "2026-09-29T15:13:41+05:30",
+   "kind": "order_submitted",
+   "order": "O0000008-a25f55",
+   "account": "IN-OPTIONS",
+   "symbol": "NIFTY 06OCT26 22700/22500 PE DEBIT SPREAD",
+   "side": "buy",
+   "qty": "65",
+   "type": "MARKET",
+   "strategy": "index_options_regime"
+  },
+  {
+   "seq": 9,
+   "time": "2026-09-29T15:13:41+05:30",
+   "kind": "fill",
+   "order": "O0000008-a25f55",
+   "fill": "F0000009",
+   "symbol": "NIFTY 06OCT26 22700/22500 PE DEBIT SPREAD",
+   "side": "buy",
+   "qty": "65",
+   "price": "78.18",
+   "fees": "54.09"
+  },
+  {
+   "seq": 10,
+   "time": "2026-09-29T21:09:44+05:30",
+   "kind": "account_created",
+   "account": "IN-VALUE",
+   "cash": "500000",
+   "currency": "INR"
+  },
+  {
+   "seq": 11,
+   "time": "2026-09-29T21:09:44+05:30",
+   "kind": "account_created",
+   "account": "US-VALUE",
+   "cash": "20000",
+   "currency": "USD"
+  },
+  {
+   "seq": 12,
+   "time": "2026-09-29T21:36:37+05:30",
+   "kind": "order_submitted",
+   "order": "O0000012-50f57f",
+   "account": "IN-VALUE",
+   "symbol": "BLS",
+   "side": "buy",
+   "qty": "50",
+   "type": "MARKET",
+   "strategy": "value_longterm"
+  },
+  {
+   "seq": 13,
+   "time": "2026-09-29T21:36:37+05:30",
+   "kind": "order_submitted",
+   "order": "O0000013-53d89e",
+   "account": "IN-VALUE",
+   "symbol": "BBTC",
+   "side": "buy",
+   "qty": "7",
+   "type": "MARKET",
+   "strategy": "value_longterm"
+  },
+  {
+   "seq": 14,
+   "time": "2026-09-29T21:36:37+05:30",
+   "kind": "order_submitted",
+   "order": "O0000014-b6e083",
+   "account": "IN-VALUE",
+   "symbol": "BPCL",
+   "side": "buy",
+   "qty": "49",
+   "type": "MARKET",
+   "strategy": "value_longterm"
+  },
+  {
+   "seq": 15,
+   "time": "2026-09-30T09:21:24+05:30",
+   "kind": "fill",
+   "order": "O0000013-53d89e",
+   "fill": "F0000015",
+   "symbol": "BBTC",
+   "side": "buy",
+   "qty": "7",
+   "price": "1366.53",
+   "fees": "16.99"
+  },
+  {
+   "seq": 16,
+   "time": "2026-09-30T09:21:24+05:30",
+   "kind": "fill",
+   "order": "O0000012-50f57f",
+   "fill": "F0000016",
+   "symbol": "BLS",
+   "side": "buy",
+   "qty": "50",
+   "price": "220.04",
+   "fees": "19.54"
+  },
+  {
+   "seq": 17,
+   "time": "2026-09-30T09:21:24+05:30",
+   "kind": "fill",
+   "order": "O0000014-b6e083",
+   "fill": "F0000017",
+   "symbol": "BPCL",
+   "side": "buy",
+   "qty": "49",
+   "price": "302.81",
+   "fees": "26.36"
+  },
+  {
+   "seq": 18,
+   "time": "2026-10-01T12:30:16+05:30",
+   "kind": "order_submitted",
+   "order": "O0000018-797e2d",
+   "account": "IN-OPTIONS",
+   "symbol": "NIFTY 06OCT26 22800/22600 PE DEBIT SPREAD",
+   "side": "sell",
+   "qty": "65",
+   "type": "MARKET",
+   "strategy": "index_options_regime"
+  },
+  {
+   "seq": 19,
+   "time": "2026-10-01T12:30:16+05:30",
+   "kind": "fill",
+   "order": "O0000018-797e2d",
+   "fill": "F0000019",
+   "symbol": "NIFTY 06OCT26 22800/22600 PE DEBIT SPREAD",
+   "side": "sell",
+   "qty": "65",
+   "price": "142.46",
+   "fees": "60.30"
+  },
+  {
+   "seq": 20,
+   "time": "2026-10-01T12:51:32+05:30",
+   "kind": "order_submitted",
+   "order": "O0000020-2b7bd3",
+   "account": "IN-OPTIONS",
+   "symbol": "NIFTY 06OCT26 22700/22500 PE DEBIT SPREAD",
+   "side": "sell",
+   "qty": "65",
+   "type": "MARKET",
+   "strategy": "index_options_regime"
+  },
+  {
+   "seq": 21,
+   "time": "2026-10-01T12:51:32+05:30",
+   "kind": "fill",
+   "order": "O0000020-2b7bd3",
+   "fill": "F0000021",
+   "symbol": "NIFTY 06OCT26 22700/22500 PE DEBIT SPREAD",
+   "side": "sell",
+   "qty": "65",
+   "price": "140.42",
+   "fees": "60.11"
+  },
+  {
+   "seq": 22,
+   "time": "2026-10-01T16:29:03+05:30",
+   "kind": "order_submitted",
+   "order": "O0000022-2e75cb",
+   "account": "IN-OPTIONS",
+   "symbol": "NIFTY 06OCT26 22400/22200 PE DEBIT SPREAD",
+   "side": "buy",
+   "qty": "65",
+   "type": "MARKET",
+   "strategy": "index_options_regime"
+  },
+  {
+   "seq": 23,
+   "time": "2026-10-01T16:29:03+05:30",
+   "kind": "fill",
+   "order": "O0000022-2e75cb",
+   "fill": "F0000023",
+   "symbol": "NIFTY 06OCT26 22400/22200 PE DEBIT SPREAD",
+   "side": "buy",
+   "qty": "65",
+   "price": "71.64",
+   "fees": "52.71"
+  },
+  {
+   "seq": 24,
+   "time": "2026-10-01T16:29:53+05:30",
+   "kind": "order_submitted",
+   "order": "O0000024-7b821f",
+   "account": "IN-VALUE",
+   "symbol": "HINDPETRO",
+   "side": "buy",
+   "qty": "40",
+   "type": "MARKET",
+   "strategy": "value_longterm"
+  },
+  {
+   "seq": 25,
+   "time": "2026-10-01T16:29:53+05:30",
+   "kind": "order_submitted",
+   "order": "O0000025-7c8f79",
+   "account": "IN-VALUE",
+   "symbol": "VEDL",
+   "side": "buy",
+   "qty": "59",
+   "type": "MARKET",
+   "strategy": "value_longterm"
+  },
+  {
+   "seq": 26,
+   "time": "2026-10-01T16:29:53+05:30",
+   "kind": "order_submitted",
+   "order": "O0000026-90a1b1",
+   "account": "IN-VALUE",
+   "symbol": "TMCV",
+   "side": "buy",
+   "qty": "29",
+   "type": "MARKET",
+   "strategy": "value_longterm"
+  },
+  {
+   "seq": 27,
+   "time": "2026-10-01T16:29:53+05:30",
+   "kind": "order_submitted",
+   "order": "O0000027-d29001",
+   "account": "US-VALUE",
+   "symbol": "INTU",
+   "side": "buy",
+   "qty": "1",
+   "type": "MARKET",
+   "strategy": "value_longterm"
+  },
+  {
+   "seq": 28,
+   "time": "2026-10-01T16:29:53+05:30",
+   "kind": "order_submitted",
+   "order": "O0000028-51596d",
+   "account": "US-VALUE",
+   "symbol": "ADBE",
+   "side": "buy",
+   "qty": "2",
+   "type": "MARKET",
+   "strategy": "value_longterm"
+  },
+  {
+   "seq": 29,
+   "time": "2026-10-01T16:29:53+05:30",
+   "kind": "order_submitted",
+   "order": "O0000029-e9d6a2",
+   "account": "US-VALUE",
+   "symbol": "PYPL",
+   "side": "buy",
+   "qty": "8",
+   "type": "MARKET",
+   "strategy": "value_longterm"
+  },
+  {
+   "seq": 30,
+   "time": "2026-10-01T16:29:53+05:30",
+   "kind": "order_submitted",
+   "order": "O0000030-dddeb4",
+   "account": "US-VALUE",
+   "symbol": "CB",
+   "side": "buy",
+   "qty": "1",
+   "type": "MARKET",
+   "strategy": "value_longterm"
+  },
+  {
+   "seq": 31,
+   "time": "2026-10-01T16:29:53+05:30",
+   "kind": "order_submitted",
+   "order": "O0000031-e5b0e8",
+   "account": "US-VALUE",
+   "symbol": "CMCSA",
+   "side": "buy",
+   "qty": "19",
+   "type": "MARKET",
+   "strategy": "value_longterm"
+  },
+  {
+   "seq": 32,
+   "time": "2026-10-01T19:05:31+05:30",
+   "kind": "order_submitted",
+   "order": "O0000032-2f5659",
+   "account": "US-SWING",
+   "symbol": "ADI",
+   "side": "buy",
+   "qty": "4",
+   "type": "MARKET",
+   "strategy": "trend_breakout_swing_us"
+  },
+  {
+   "seq": 33,
+   "time": "2026-10-01T19:21:38+05:30",
+   "kind": "order_duplicate_blocked",
+   "order": "O0000032-2f5659",
+   "dedupe_key": "US-SWING|ADI|buy|2026-10-01|trend_breakout_swing_us"
+  },
+  {
+   "seq": 34,
+   "time": "2026-10-01T21:39:01+05:30",
+   "kind": "order_duplicate_blocked",
+   "order": "O0000032-2f5659",
+   "dedupe_key": "US-SWING|ADI|buy|2026-10-01|trend_breakout_swing_us"
+  },
+  {
+   "seq": 35,
+   "time": "2026-10-01T22:00:41+05:30",
+   "kind": "order_duplicate_blocked",
+   "order": "O0000032-2f5659",
+   "dedupe_key": "US-SWING|ADI|buy|2026-10-01|trend_breakout_swing_us"
+  },
+  {
+   "seq": 36,
+   "time": "2026-10-01T22:11:00+05:30",
+   "kind": "order_duplicate_blocked",
+   "order": "O0000032-2f5659",
+   "dedupe_key": "US-SWING|ADI|buy|2026-10-01|trend_breakout_swing_us"
+  },
+  {
+   "seq": 37,
+   "time": "2026-10-01T22:22:15+05:30",
+   "kind": "order_duplicate_blocked",
+   "order": "O0000032-2f5659",
+   "dedupe_key": "US-SWING|ADI|buy|2026-10-01|trend_breakout_swing_us"
+  },
+  {
+   "seq": 38,
+   "time": "2026-10-02T07:26:06+05:30",
+   "kind": "order_duplicate_blocked",
+   "order": "O0000032-2f5659",
+   "dedupe_key": "US-SWING|ADI|buy|2026-10-01|trend_breakout_swing_us"
+  },
+  {
+   "seq": 39,
+   "time": "2026-10-02T16:27:56+05:30",
+   "kind": "order_duplicate_blocked",
+   "order": "O0000032-2f5659",
+   "dedupe_key": "US-SWING|ADI|buy|2026-10-01|trend_breakout_swing_us"
+  },
+  {
+   "seq": 40,
+   "time": "2026-10-02T19:01:59+05:30",
+   "kind": "fill",
+   "order": "O0000032-2f5659",
+   "fill": "F0000040",
+   "symbol": "ADI",
+   "side": "buy",
+   "qty": "4",
+   "price": "416.03",
+   "fees": "0.00"
+  },
+  {
+   "seq": 41,
+   "time": "2026-10-02T19:12:39+05:30",
+   "kind": "fill",
+   "order": "O0000028-51596d",
+   "fill": "F0000041",
+   "symbol": "ADBE",
+   "side": "buy",
+   "qty": "2",
+   "price": "243.29",
+   "fees": "0.00"
+  },
+  {
+   "seq": 42,
+   "time": "2026-10-02T19:12:39+05:30",
+   "kind": "fill",
+   "order": "O0000030-dddeb4",
+   "fill": "F0000042",
+   "symbol": "CB",
+   "side": "buy",
+   "qty": "1",
+   "price": "330.98",
+   "fees": "0.00"
+  },
+  {
+   "seq": 43,
+   "time": "2026-10-02T19:12:39+05:30",
+   "kind": "fill",
+   "order": "O0000031-e5b0e8",
+   "fill": "F0000043",
+   "symbol": "CMCSA",
+   "side": "buy",
+   "qty": "19",
+   "price": "21.94",
+   "fees": "0.00"
+  },
+  {
+   "seq": 44,
+   "time": "2026-10-02T19:12:39+05:30",
+   "kind": "fill",
+   "order": "O0000027-d29001",
+   "fill": "F0000044",
+   "symbol": "INTU",
+   "side": "buy",
+   "qty": "1",
+   "price": "284.20",
+   "fees": "0.00"
+  },
+  {
+   "seq": 45,
+   "time": "2026-10-02T19:12:39+05:30",
+   "kind": "fill",
+   "order": "O0000029-e9d6a2",
+   "fill": "F0000045",
+   "symbol": "PYPL",
+   "side": "buy",
+   "qty": "8",
+   "price": "53.27",
+   "fees": "0.00"
+  },
+  {
+   "seq": 46,
+   "time": "2026-10-03T06:53:22+05:30",
+   "kind": "order_rejected",
+   "order": "R0000046",
+   "symbol": "ADI",
+   "reason": "already holding this symbol"
+  },
+  {
+   "seq": 47,
+   "time": "2026-10-03T07:03:47+05:30",
+   "kind": "order_rejected",
+   "order": "R0000047",
+   "symbol": "ADI",
+   "reason": "already holding this symbol"
+  },
+  {
+   "seq": 48,
+   "time": "2026-10-05T09:31:40+05:30",
+   "kind": "fill",
+   "order": "O0000024-7b821f",
+   "fill": "F0000048",
+   "symbol": "HINDPETRO",
+   "side": "buy",
+   "qty": "40",
+   "price": "346.95",
+   "fees": "24.65"
+  },
+  {
+   "seq": 49,
+   "time": "2026-10-05T09:31:40+05:30",
+   "kind": "fill",
+   "order": "O0000026-90a1b1",
+   "fill": "F0000049",
+   "symbol": "TMCV",
+   "side": "buy",
+   "qty": "29",
+   "price": "417.87",
+   "fees": "21.52"
+  },
+  {
+   "seq": 50,
+   "time": "2026-10-05T09:31:40+05:30",
+   "kind": "fill",
+   "order": "O0000025-7c8f79",
+   "fill": "F0000050",
+   "symbol": "VEDL",
+   "side": "buy",
+   "qty": "59",
+   "price": "254.91",
+   "fees": "26.71"
+  },
+  {
+   "seq": 51,
+   "time": "2026-10-05T09:31:40+05:30",
+   "kind": "order_submitted",
+   "order": "O0000051-f48677",
+   "account": "IN-OPTIONS",
+   "symbol": "NIFTY 06OCT26 22400/22200 PE DEBIT SPREAD",
+   "side": "sell",
+   "qty": "65",
+   "type": "MARKET",
+   "strategy": "index_options_regime"
+  },
+  {
+   "seq": 52,
+   "time": "2026-10-05T09:31:40+05:30",
+   "kind": "fill",
+   "order": "O0000051-f48677",
+   "fill": "F0000052",
+   "symbol": "NIFTY 06OCT26 22400/22200 PE DEBIT SPREAD",
+   "side": "sell",
+   "qty": "65",
+   "price": "11.36",
+   "fees": "48.24"
+  },
+  {
+   "seq": 53,
+   "time": "2026-10-05T16:30:02+05:30",
+   "kind": "order_submitted",
+   "order": "O0000053-4a992e",
+   "account": "IN-OPTIONS",
+   "symbol": "NIFTY 13OCT26 22550/22350 PE DEBIT SPREAD",
+   "side": "buy",
+   "qty": "65",
+   "type": "MARKET",
+   "strategy": "index_options_regime"
+  },
+  {
+   "seq": 54,
+   "time": "2026-10-05T16:30:02+05:30",
+   "kind": "fill",
+   "order": "O0000053-4a992e",
+   "fill": "F0000054",
+   "symbol": "NIFTY 13OCT26 22550/22350 PE DEBIT SPREAD",
+   "side": "buy",
+   "qty": "65",
+   "price": "78.81",
+   "fees": "55.23"
+  },
+  {
+   "seq": 55,
+   "time": "2026-10-05T19:51:15+05:30",
+   "kind": "order_submitted",
+   "order": "O0000055-84559f",
+   "account": "US-SWING",
+   "symbol": "ADI",
+   "side": "sell",
+   "qty": "4",
+   "type": "MARKET",
+   "strategy": "trend_breakout_swing_us"
+  },
+  {
+   "seq": 56,
+   "time": "2026-10-05T19:51:15+05:30",
+   "kind": "order_rejected",
+   "order": "R0000056",
+   "symbol": "ADI",
+   "reason": "already holding this symbol"
+  },
+  {
+   "seq": 57,
+   "time": "2026-10-05T20:01:32+05:30",
+   "kind": "order_rejected",
+   "order": "R0000057",
+   "symbol": "ADI",
+   "reason": "already holding this symbol"
+  },
+  {
+   "seq": 58,
+   "time": "2026-10-05T20:12:12+05:30",
+   "kind": "order_rejected",
+   "order": "R0000058",
+   "symbol": "ADI",
+   "reason": "already holding this symbol"
+  },
+  {
+   "seq": 59,
+   "time": "2026-10-05T20:36:13+05:30",
+   "kind": "order_rejected",
+   "order": "R0000059",
+   "symbol": "ADI",
+   "reason": "already holding this symbol"
+  },
+  {
+   "seq": 60,
+   "time": "2026-10-05T20:46:12+05:30",
+   "kind": "order_rejected",
+   "order": "R0000060",
+   "symbol": "ADI",
+   "reason": "already holding this symbol"
+  },
+  {
+   "seq": 61,
+   "time": "2026-10-05T20:56:36+05:30",
+   "kind": "order_rejected",
+   "order": "R0000061",
+   "symbol": "ADI",
+   "reason": "already holding this symbol"
+  },
+  {
+   "seq": 62,
+   "time": "2026-10-05T21:31:09+05:30",
+   "kind": "order_rejected",
+   "order": "R0000062",
+   "symbol": "ADI",
+   "reason": "already holding this symbol"
+  },
+  {
+   "seq": 63,
+   "time": "2026-10-06T16:29:22+05:30",
+   "kind": "order_submitted",
+   "order": "O0000063-374534",
+   "account": "IN-OPTIONS",
+   "symbol": "NIFTY 13OCT26 22800/22600 PE DEBIT SPREAD",
+   "side": "buy",
+   "qty": "65",
+   "type": "MARKET",
+   "strategy": "index_options_regime"
+  },
+  {
+   "seq": 64,
+   "time": "2026-10-06T16:29:22+05:30",
+   "kind": "fill",
+   "order": "O0000063-374534",
+   "fill": "F0000064",
+   "symbol": "NIFTY 13OCT26 22800/22600 PE DEBIT SPREAD",
+   "side": "buy",
+   "qty": "65",
+   "price": "81.52",
+   "fees": "54.61"
+  },
+  {
+   "seq": 65,
+   "time": "2026-10-06T19:02:19+05:30",
+   "kind": "fill",
+   "order": "O0000055-84559f",
+   "fill": "F0000065",
+   "symbol": "ADI",
+   "side": "sell",
+   "qty": "4",
+   "price": "420.68",
+   "fees": "0.05"
+  },
+  {
+   "seq": 66,
+   "time": "2026-10-06T19:57:22+05:30",
+   "kind": "account_created",
+   "account": "IN-BRAIN",
+   "cash": "200000",
+   "currency": "INR"
+  },
+  {
+   "seq": 67,
+   "time": "2026-10-08T15:14:42+05:30",
+   "kind": "order_submitted",
+   "order": "O0000067-237ac4",
+   "account": "US-SWING",
+   "symbol": "PM",
+   "side": "buy",
+   "qty": "11",
+   "type": "MARKET",
+   "strategy": "trend_breakout_swing_us"
+  },
+  {
+   "seq": 68,
+   "time": "2026-10-08T15:14:42+05:30",
+   "kind": "order_submitted",
+   "order": "O0000068-72f694",
+   "account": "IN-OPTIONS",
+   "symbol": "NIFTY 13OCT26 22550/22350 PE DEBIT SPREAD",
+   "side": "sell",
+   "qty": "65",
+   "type": "MARKET",
+   "strategy": "index_options_regime"
+  },
+  {
+   "seq": 69,
+   "time": "2026-10-08T15:14:42+05:30",
+   "kind": "fill",
+   "order": "O0000068-72f694",
+   "fill": "F0000069",
+   "symbol": "NIFTY 13OCT26 22550/22350 PE DEBIT SPREAD",
+   "side": "sell",
+   "qty": "65",
+   "price": "142.71",
+   "fees": "60.32"
+  },
+  {
+   "seq": 70,
+   "time": "2026-10-08T15:14:42+05:30",
+   "kind": "order_submitted",
+   "order": "O0000070-167180",
+   "account": "IN-OPTIONS",
+   "symbol": "NIFTY 13OCT26 22800/22600 PE DEBIT SPREAD",
+   "side": "sell",
+   "qty": "65",
+   "type": "MARKET",
+   "strategy": "index_options_regime"
+  },
+  {
+   "seq": 71,
+   "time": "2026-10-08T15:14:42+05:30",
+   "kind": "fill",
+   "order": "O0000070-167180",
+   "fill": "F0000071",
+   "symbol": "NIFTY 13OCT26 22800/22600 PE DEBIT SPREAD",
+   "side": "sell",
+   "qty": "65",
+   "price": "176.03",
+   "fees": "63.38"
+  },
+  {
+   "seq": 72,
+   "time": "2026-10-08T15:14:42+05:30",
+   "kind": "order_submitted",
+   "order": "O0000072-31af10",
+   "account": "IN-OPTIONS",
+   "symbol": "NIFTY 13OCT26 22200/22000 PE DEBIT SPREAD",
+   "side": "buy",
+   "qty": "65",
+   "type": "MARKET",
+   "strategy": "index_options_regime"
+  },
+  {
+   "seq": 73,
+   "time": "2026-10-08T15:14:42+05:30",
+   "kind": "fill",
+   "order": "O0000072-31af10",
+   "fill": "F0000073",
+   "symbol": "NIFTY 13OCT26 22200/22000 PE DEBIT SPREAD",
+   "side": "buy",
+   "qty": "65",
+   "price": "75.98",
+   "fees": "53.43"
+  },
+  {
+   "seq": 74,
+   "time": "2026-10-08T15:26:01+05:30",
+   "kind": "order_duplicate_blocked",
+   "order": "O0000067-237ac4",
+   "dedupe_key": "US-SWING|PM|buy|2026-10-07|trend_breakout_swing_us"
+  },
+  {
+   "seq": 75,
+   "time": "2026-10-08T15:47:34+05:30",
+   "kind": "order_duplicate_blocked",
+   "order": "O0000067-237ac4",
+   "dedupe_key": "US-SWING|PM|buy|2026-10-07|trend_breakout_swing_us"
+  },
+  {
+   "seq": 76,
+   "time": "2026-10-08T15:47:34+05:30",
+   "kind": "order_submitted",
+   "order": "O0000076-59766d",
+   "account": "IN-OPTIONS",
+   "symbol": "NIFTY 13OCT26 22250/22050 PE DEBIT SPREAD",
+   "side": "buy",
+   "qty": "65",
+   "type": "MARKET",
+   "strategy": "index_options_regime"
+  },
+  {
+   "seq": 77,
+   "time": "2026-10-08T15:47:34+05:30",
+   "kind": "fill",
+   "order": "O0000076-59766d",
+   "fill": "F0000077",
+   "symbol": "NIFTY 13OCT26 22250/22050 PE DEBIT SPREAD",
+   "side": "buy",
+   "qty": "65",
+   "price": "80.6",
+   "fees": "53.99"
+  },
+  {
+   "seq": 78,
+   "time": "2026-10-08T15:58:37+05:30",
+   "kind": "order_duplicate_blocked",
+   "order": "O0000067-237ac4",
+   "dedupe_key": "US-SWING|PM|buy|2026-10-07|trend_breakout_swing_us"
+  },
+  {
+   "seq": 79,
+   "time": "2026-10-08T16:30:14+05:30",
+   "kind": "order_duplicate_blocked",
+   "order": "O0000067-237ac4",
+   "dedupe_key": "US-SWING|PM|buy|2026-10-07|trend_breakout_swing_us"
+  }
+ ],
+ "seq": 79,
+ "migrations": [
+  {
+   "at": "2026-09-27T20:47:31+05:30",
+   "from": "v1 (market-scanner main, portfolio.json absent; paper_log.csv empty)",
+   "note": "v1 auto paper account had cash 2,00,000 and 0 positions on 2026-09-25; IN-SWING starts from the same state."
+  }
+ ],
+ "value_rebalanced": {
+  "IN-VALUE": "2026-10",
+  "US-VALUE": "2026-10"
+ }
+}

@@ -1,0 +1,462 @@
+{
+ "engine_version": "2.7.0",
+ "run_at": "2026-09-29T21:44:10+05:30",
+ "data_date": "2026-09-29",
+ "mode": "PAPER",
+ "data_status": "OK",
+ "regime": {
+  "state": "BEAR",
+  "text": "Index below its 200-day average and 50-day below 200-day: downtrend. No new buys; protect capital.",
+  "close": 22716.2,
+  "date": "2026-09-29",
+  "sma50": 23932.93,
+  "sma200": 24389.55,
+  "rsi": 26.7,
+  "vol20_annualised_pct": 10.1,
+  "high_vol": false,
+  "ret3m": -0.05372233899696488,
+  "support": [],
+  "resistance": [
+   23532.73,
+   23839.3,
+   24388.19
+  ],
+  "rule": "BULL: close>SMA200 and SMA50>SMA200; BEAR: both below; else SIDEWAYS",
+  "computed_at": "2026-09-29T21:33:53+05:30"
+ },
+ "buys": [],
+ "sells": [
+  {
+   "action": "SELL",
+   "score": -6,
+   "why": [
+    "Downtrend: close 1202.60 < SMA50 1299.44 < SMA200 1440.34",
+    "Weak momentum: RSI 31",
+    "Broke previous 20-day low 1210.80 on volume 6.6x average",
+    "Lagging NIFTY by 5.6% over 3 months"
+   ],
+   "contrib": [
+    {
+     "points": -2,
+     "rule": "Downtrend: close 1202.60 < SMA50 1299.44 < SMA200 1440.34"
+    },
+    {
+     "points": -1,
+     "rule": "Weak momentum: RSI 31"
+    },
+    {
+     "points": -2,
+     "rule": "Broke previous 20-day low 1210.80 on volume 6.6x average"
+    },
+    {
+     "points": -1,
+     "rule": "Lagging NIFTY by 5.6% over 3 months"
+    }
+   ],
+   "entry": 1202.6,
+   "stop": 1156.51,
+   "target": 1271.73,
+   "atr": 23.04,
+   "rsi": 31.0,
+   "sma50": 1299.44,
+   "sma200": 1440.34,
+   "vol_ratio": 6.58,
+   "turnover_cr": 17.7,
+   "symbol": "ACC",
+   "bar": "2026-09-29",
+   "strategy": "trend_breakout_swing",
+   "version": "1.1.0",
+   "sector": "Construction Materials",
+   "vol20": 111170.75,
+   "signal_id": "trend_breakout_swing|ACC|2026-09-29",
+   "news": [],
+   "news_risk": false,
+   "news_status": "ok",
+   "ai_p": 0.376,
+   "ai_view": "NEUTRAL"
+  },
+  {
+   "action": "SELL",
+   "score": -6,
+   "why": [
+    "Downtrend: close 531.15 < SMA50 600.20 < SMA200 646.05",
+    "Weak momentum: RSI 36",
+    "Broke previous 20-day low 532.75 on volume 2.4x average",
+    "Lagging NIFTY by 13.4% over 3 months"
+   ],
+   "contrib": [
+    {
+     "points": -2,
+     "rule": "Downtrend: close 531.15 < SMA50 600.20 < SMA200 646.05"
+    },
+    {
+     "points": -1,
+     "rule": "Weak momentum: RSI 36"
+    },
+    {
+     "points": -2,
+     "rule": "Broke previous 20-day low 532.75 on volume 2.4x average"
+    },
+    {
+     "points": -1,
+     "rule": "Lagging NIFTY by 13.4% over 3 months"
+    }
+   ],
+   "entry": 531.15,
+   "stop": 491.51,
+   "target": 590.61,
+   "atr": 19.82,
+   "rsi": 35.6,
+   "sma50": 600.2,
+   "sma200": 646.05,
+   "vol_ratio": 2.43,
+   "turnover_cr": 22.3,
+   "symbol": "BIKAJI",
+   "bar": "2026-09-29",
+   "strategy": "trend_breakout_swing",
+   "version": "1.1.0",
+   "sector": "Fast Moving Consumer Goods",
+   "vol20": 371499.05,
+   "signal_id": "trend_breakout_swing|BIKAJI|2026-09-29",
+   "news": [],
+   "news_risk": false,
+   "news_status": "ok",
+   "ai_p": 0.468,
+   "ai_view": "AGREES"
+  },
+  {
+   "action": "SELL",
+   "score": -6,
+   "why": [
+    "Downtrend: close 119.51 < SMA50 126.56 < SMA200 133.65",
+    "Weak momentum: RSI 33",
+    "Broke previous 20-day low 120.26 on volume 1.9x average",
+    "Lagging NIFTY by 0.3% over 3 months"
+   ],
+   "contrib": [
+    {
+     "points": -2,
+     "rule": "Downtrend: close 119.51 < SMA50 126.56 < SMA200 133.65"
+    },
+    {
+     "points": -1,
+     "rule": "Weak momentum: RSI 33"
+    },
+    {
+     "points": -2,
+     "rule": "Broke previous 20-day low 120.26 on volume 1.9x average"
+    },
+    {
+     "points": -1,
+     "rule": "Lagging NIFTY by 0.3% over 3 months"
+    }
+   ],
+   "entry": 119.51,
+   "stop": 114.86,
+   "target": 126.48,
+   "atr": 2.32,
+   "rsi": 32.6,
+   "sma50": 126.56,
+   "sma200": 133.65,
+   "vol_ratio": 1.87,
+   "turnover_cr": 142.9,
+   "symbol": "CANBK",
+   "bar": "2026-09-29",
+   "strategy": "trend_breakout_swing",
+   "version": "1.1.0",
+   "sector": "Financial Services",
+   "vol20": 11005525.95,
+   "signal_id": "trend_breakout_swing|CANBK|2026-09-29",
+   "news": [],
+   "news_risk": false,
+   "news_status": "ok",
+   "ai_p": 0.389,
+   "ai_view": "NEUTRAL"
+  },
+  {
+   "action": "SELL",
+   "score": -6,
+   "why": [
+    "Downtrend: close 1862.00 < SMA50 2074.33 < SMA200 2152.44",
+    "Weak momentum: RSI 32",
+    "Broke previous 20-day low 1895.00 on volume 1.9x average",
+    "Lagging NIFTY by 7.6% over 3 months"
+   ],
+   "contrib": [
+    {
+     "points": -2,
+     "rule": "Downtrend: close 1862.00 < SMA50 2074.33 < SMA200 2152.44"
+    },
+    {
+     "points": -1,
+     "rule": "Weak momentum: RSI 32"
+    },
+    {
+     "points": -2,
+     "rule": "Broke previous 20-day low 1895.00 on volume 1.9x average"
+    },
+    {
+     "points": -1,
+     "rule": "Lagging NIFTY by 7.6% over 3 months"
+    }
+   ],
+   "entry": 1862.0,
+   "stop": 1766.44,
+   "target": 2005.34,
+   "atr": 47.78,
+   "rsi": 31.5,
+   "sma50": 2074.33,
+   "sma200": 2152.44,
+   "vol_ratio": 1.95,
+   "turnover_cr": 31.6,
+   "symbol": "GODFRYPHLP",
+   "bar": "2026-09-29",
+   "strategy": "trend_breakout_swing",
+   "version": "1.1.0",
+   "sector": "Fast Moving Consumer Goods",
+   "vol20": 152538.6,
+   "signal_id": "trend_breakout_swing|GODFRYPHLP|2026-09-29",
+   "news": [],
+   "news_risk": false,
+   "news_status": "ok",
+   "ai_p": 0.401,
+   "ai_view": "NEUTRAL"
+  },
+  {
+   "action": "SELL",
+   "score": -6,
+   "why": [
+    "Downtrend: close 1863.80 < SMA50 2018.17 < SMA200 2172.92",
+    "Weak momentum: RSI 30",
+    "Broke previous 20-day low 1893.20 on volume 1.7x average",
+    "Lagging NIFTY by 10.3% over 3 months"
+   ],
+   "contrib": [
+    {
+     "points": -2,
+     "rule": "Downtrend: close 1863.80 < SMA50 2018.17 < SMA200 2172.92"
+    },
+    {
+     "points": -1,
+     "rule": "Weak momentum: RSI 30"
+    },
+    {
+     "points": -2,
+     "rule": "Broke previous 20-day low 1893.20 on volume 1.7x average"
+    },
+    {
+     "points": -1,
+     "rule": "Lagging NIFTY by 10.3% over 3 months"
+    }
+   ],
+   "entry": 1863.8,
+   "stop": 1803.49,
+   "target": 1954.27,
+   "atr": 30.16,
+   "rsi": 30.3,
+   "sma50": 2018.17,
+   "sma200": 2172.92,
+   "vol_ratio": 1.68,
+   "turnover_cr": 249.2,
+   "symbol": "HINDUNILVR",
+   "bar": "2026-09-29",
+   "strategy": "trend_breakout_swing",
+   "version": "1.1.0",
+   "sector": "Fast Moving Consumer Goods",
+   "vol20": 1227907.4,
+   "signal_id": "trend_breakout_swing|HINDUNILVR|2026-09-29",
+   "news": [
+    {
+     "title": "NSE slips to 12th spot in list of most valuable Indian stocks; experts see more dip - check support, resistance, outlook - TradingView",
+     "link": "https://news.google.com/rss/articles/CBMiggJBVV95cUxNTG1scE1ybW45d0R6Rk9qS3p6RTUxTk1RS0hVUFhOUGh4ZFo3SjJKZWlUOGY1RmVyUW5xal9ra2g1NzViRVlPelZES3hZZWR5ajVLMmxGbURUWWZxZ3lscUJSTWJkNTNTSXlibWhiU1FFMU9zbkxyeURjZ05vV3dncXdSWkZvbVVabGtkN3BTQ1dVTFA3NnFKR1laa0F0Q24tRVlkWVExVE9JUWlXbkM3Z0xIaXNWbWlJcENITlYwZVVRZjdOZmpPY2ExeGNLTDNUZ0thQzloUmY2TkxsQzRiOHlZaHpvWDZLS3I2OHZ5blU2OG93SjZ3M1FfUFJDTE9kUkE?oc=5",
+     "published_utc": "2026-09-29T12:36:22+00:00",
+     "source": "TradingView",
+     "query": "HINDUNILVR NSE share",
+     "id": "804c6352a09b",
+     "tags": [
+      "NEUTRAL"
+     ],
+     "sentiment": "NEUTRAL",
+     "news_risk": false,
+     "method": "keyword heuristic",
+     "confidence": "low"
+    },
+    {
+     "title": "Hindustan Unilever \u0915\u0947 \u0936\u0947\u092f\u0930 \u091a\u0930\u094d\u091a\u093e \u092e\u0947\u0902, \u0915\u0902\u092a\u0928\u0940 \u20b92,000 \u0915\u0930\u094b\u0921\u093c \u0928\u093f\u0935\u0947\u0936 \u092f\u094b\u091c\u0928\u093e \u0915\u0947 \u0938\u093e\u0925 \u0928\u093f\u0930\u094d\u092e\u093e\u0923 \u092c\u0922\u093c\u093e\u0928\u0947 \u0915\u0940 \u0924\u0948\u092f\u093e\u0930\u0940 \u092e\u0947\u0902 \u0939\u0948\u0964 - Alice Blue",
+     "link": "https://news.google.com/rss/articles/CBMi4gFBVV95cUxPZkJCLU50UnZvLVNLZXFTOTFpT1E0Nm1BRElGSUlQM3ZuRVVRVWRJRE94X0l1OURSbkltYWx4MXBvMHNQWURVZWtBM1d4bC1yZjZQRktVRzJaR3o3dmd3RnZ1MjFucUJmWVBNMnhmdlYyS0dMSC02NVg4T0Y1UklaaTkybzZNYUVaNDRqb1QyR202ZGdaVldvOFBNamNKbzNSX2ZYLWh4cFBjcC0zOF9JN2wtNnRhMkhBcnFRcG1BczhLdXFMMDRsVDRaSTdKQjJjX2ZqZEI4SEVqTXlEbUNjUkZ3?oc=5",
+     "published_utc": "2026-09-29T06:38:19+00:00",
+     "source": "Alice Blue",
+     "query": "HINDUNILVR NSE share",
+     "id": "a8d13b1e935f",
+     "tags": [
+      "NEUTRAL"
+     ],
+     "sentiment": "NEUTRAL",
+     "news_risk": false,
+     "method": "keyword heuristic",
+     "confidence": "low"
+    }
+   ],
+   "news_risk": false,
+   "news_status": "ok",
+   "ai_p": 0.361,
+   "ai_view": "DISAGREES"
+  }
+ ],
+ "blocked": [
+  {
+   "symbol": "KIRLOSENG",
+   "score": 6,
+   "reason": "score +6, but NIFTY regime is BEAR (close < SMA200 and SMA50 < SMA200)",
+   "why": [
+    "Uptrend: close 2402.00 > SMA50 2156.30 > SMA200 1739.09",
+    "Healthy momentum: RSI 66",
+    "Broke previous 20-day high 2317.10 on volume 12.6x average",
+    "Beating NIFTY by 9.1% over 3 months"
+   ],
+   "entry": 2402.0,
+   "ai_p": 0.434,
+   "ai_view": "NEUTRAL"
+  },
+  {
+   "symbol": "MANKIND",
+   "score": 6,
+   "reason": "score +6, but NIFTY regime is BEAR (close < SMA200 and SMA50 < SMA200)",
+   "why": [
+    "Uptrend: close 2545.00 > SMA50 2413.06 > SMA200 2294.46",
+    "Healthy momentum: RSI 65",
+    "Broke previous 20-day high 2504.60 on volume 5.1x average",
+    "Beating NIFTY by 7.7% over 3 months"
+   ],
+   "entry": 2545.0,
+   "ai_p": 0.391,
+   "ai_view": "NEUTRAL"
+  }
+ ],
+ "scanned": 470,
+ "universe": 500,
+ "universe_source": "Nifty 500 (official NSE list)",
+ "strategy": {
+  "id": "trend_breakout_swing",
+  "name": "Trend + Breakout Swing",
+  "version": "1.1.0",
+  "status": "paper-approved",
+  "universe": "NIFTY 500 (NSE), price >= 50, 20-day turnover >= 10 cr",
+  "timeframe": "1d",
+  "segment": "delivery",
+  "hypothesis": "Stocks in an uptrend that break their 20-day high on above-average volume, while outperforming NIFTY, tend to continue for a few weeks. Only trade when the index itself is in an uptrend.",
+  "rules": {
+   "score": [
+    "+2 price > 50-day SMA > 200-day SMA (uptrend); -2 if the reverse",
+    "+1 21-day SMA crossed above 50-day within 4 bars; -1 if crossed below",
+    "+1 RSI(14) between 50 and 70; -1 if between 30 and 45",
+    "+2 close above previous 20-day high with volume > 1.5x 20-day average; -2 for a 20-day low",
+    "+1 3-month return beats NIFTY; -1 if it lags"
+   ],
+   "entry": "score >= +5 AND index regime BULL (or SIDEWAYS with score >= +6); no news-risk words in last 3 days",
+   "exit": "score <= -5 (SELL), stop 2xATR below entry, target 3xATR above, trailing stop 4% once up 5%, time exit 20 bars, regime turns BEAR",
+   "sizing": "1% of equity at risk between entry and stop; <= 25% of equity; <= 5% of 20-day volume; halve size when index 20-day vol > 25%"
+  },
+  "params": {
+   "buy_score": 5,
+   "sell_score": -5,
+   "stop_atr": 2.0,
+   "target_atr": 3.0,
+   "max_hold": 20,
+   "vol_mult": 1.5,
+   "rs_lookback": 63
+  },
+  "regime_filter": true,
+  "min_capital": 200000,
+  "holding": "5-20 sessions",
+  "failure_modes": [
+   "whipsaw in sideways markets (false breakouts)",
+   "gap-downs through the stop (fill worse than stop)",
+   "regime filter is slow: late entries after long rallies",
+   "news shocks; only headline words are screened"
+  ],
+  "warmup_bars": 200,
+  "param_hash": "b81c4fa041",
+  "code": true
+ },
+ "paper_actions": {
+  "IN-SWING": [
+   "Nothing to do: no fills, no exits, no new entries."
+  ],
+  "US-SWING": [
+   "Nothing to do: no fills, no exits, no new entries."
+  ],
+  "IN-OPTIONS": [
+   "HOLD NIFTY 06OCT26 22800/22600 PE DEBIT SPREAD: modeled value 92.28 vs debit 81.42, 7 days left",
+   "HOLD NIFTY 06OCT26 22700/22500 PE DEBIT SPREAD: modeled value 73.97 vs debit 78.18, 7 days left",
+   "Signal NIFTY 06OCT26 22700/22500 PE DEBIT SPREAD skipped: 2 spreads already open"
+  ],
+  "IN-VALUE": [
+   "Queued BUY 50 BLS at next open (weight 2.2%, stop -25%)",
+   "Queued BUY 7 BBTC at next open (weight 2.1%, stop -25%)",
+   "Queued BUY 49 BPCL at next open (weight 2.9%, stop -25%)"
+  ],
+  "US-VALUE": [
+   "Nothing to do: holding the long-term book."
+  ]
+ },
+ "rejected_dq": {
+  "USDINR": [
+   "high/low/close inconsistent",
+   "volume unreliable (many zero days)"
+  ],
+  "EURINR": [
+   "high/low/close inconsistent",
+   "volume unreliable (many zero days)"
+  ],
+  "GBPUSD": [
+   "high/low/close inconsistent",
+   "volume unreliable (many zero days)"
+  ],
+  "EURUSD": [
+   "high/low/close inconsistent",
+   "volume unreliable (many zero days)"
+  ],
+  "USDJPY": [
+   "high/low/close inconsistent",
+   "volume unreliable (many zero days)"
+  ]
+ },
+ "failed_download": [
+  "^CNXMIDCAP",
+  "DUMMYHEG.NS",
+  "MMC"
+ ],
+ "skipped": {
+  "ABFRL": "price 46.24 below minimum 50",
+  "BATAINDIA": "20-day turnover 9.8 (x1e7) below 10",
+  "BLUEDART": "20-day turnover 6.0 (x1e7) below 10",
+  "CIEINDIA": "20-day turnover 9.4 (x1e7) below 10",
+  "CENTRALBK": "price 30.04 below minimum 50",
+  "DCMSHRIRAM": "20-day turnover 6.4 (x1e7) below 10",
+  "DOMS": "20-day turnover 7.4 (x1e7) below 10",
+  "GALLANTT": "20-day turnover 5.2 (x1e7) below 10",
+  "GODREJIND": "20-day turnover 9.6 (x1e7) below 10",
+  "IRB": "price 16.98 below minimum 50",
+  "ITI": "20-day turnover 3.7 (x1e7) below 10",
+  "INDIACEM": "20-day turnover 5.6 (x1e7) below 10",
+  "IOB": "price 30.95 below minimum 50",
+  "JPPOWER": "price 15.26 below minimum 50",
+  "MMTC": "20-day turnover 8.1 (x1e7) below 10",
+  "MSUMI": "price 34.36 below minimum 50",
+  "NSLNISP": "price 41.79 below minimum 50",
+  "NIVABUPA": "20-day turnover 8.7 (x1e7) below 10",
+  "OLAELEC": "price 37.42 below minimum 50",
+  "RITES": "20-day turnover 6.6 (x1e7) below 10",
+  "RPOWER": "price 19.77 below minimum 50",
+  "SAGILITY": "price 42.54 below minimum 50",
+  "SOBHA": "20-day turnover 9.4 (x1e7) below 10",
+  "SUZLON": "price 39.50 below minimum 50",
+  "TTML": "price 35.18 below minimum 50",
+  "TRAVELFOOD": "20-day turnover 5.7 (x1e7) below 10",
+  "TRIDENT": "price 22.49 below minimum 50",
+  "UCOBANK": "price 23.05 below minimum 50",
+  "IDEA": "price 13.56 below minimum 50",
+  "YESBANK": "price 20.71 below minimum 50"
+ }
+}
