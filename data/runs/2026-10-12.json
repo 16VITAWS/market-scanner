@@ -1,0 +1,629 @@
+{
+ "engine_version": "2.8.0",
+ "run_at": "2026-10-12T19:25:35+05:30",
+ "data_date": "2026-10-12",
+ "mode": "PAPER",
+ "data_status": "OK",
+ "regime": {
+  "state": "BEAR",
+  "text": "Index below its 200-day average and 50-day below 200-day: downtrend. No new buys; protect capital.",
+  "close": 22363.35,
+  "date": "2026-10-12",
+  "sma50": 23687.39,
+  "sma200": 24253.97,
+  "rsi": 34.0,
+  "vol20_annualised_pct": 13.7,
+  "high_vol": false,
+  "ret3m": -0.07631450128557271,
+  "support": [
+   22198.6
+  ],
+  "resistance": [
+   22776.1,
+   23532.73,
+   23839.3
+  ],
+  "rule": "BULL: close>SMA200 and SMA50>SMA200; BEAR: both below; else SIDEWAYS",
+  "computed_at": "2026-10-12T19:13:43+05:30"
+ },
+ "buys": [],
+ "sells": [
+  {
+   "action": "SELL",
+   "score": -5,
+   "why": [
+    "Downtrend: close 3364.90 < SMA50 3822.09 < SMA200 3988.83",
+    "Broke previous 20-day low 3497.70 on volume 5.0x average",
+    "Lagging NIFTY by 8.1% over 3 months"
+   ],
+   "contrib": [
+    {
+     "points": -2,
+     "rule": "Downtrend: close 3364.90 < SMA50 3822.09 < SMA200 3988.83"
+    },
+    {
+     "points": -2,
+     "rule": "Broke previous 20-day low 3497.70 on volume 5.0x average"
+    },
+    {
+     "points": -1,
+     "rule": "Lagging NIFTY by 8.1% over 3 months"
+    }
+   ],
+   "entry": 3364.9,
+   "stop": 3172.55,
+   "target": 3653.42,
+   "atr": 96.17,
+   "rsi": 27.0,
+   "sma50": 3822.09,
+   "sma200": 3988.83,
+   "vol_ratio": 5.05,
+   "turnover_cr": 276.7,
+   "symbol": "DMART",
+   "bar": "2026-10-12",
+   "strategy": "trend_breakout_swing",
+   "version": "1.1.0",
+   "sector": "Consumer Services",
+   "vol20": 620408.65,
+   "signal_id": "trend_breakout_swing|DMART|2026-10-12",
+   "news": [
+    {
+     "title": "Avenue Supermarts Share Price - Live NSE: DMART Stock Price & Chart - Upstox",
+     "link": "https://news.google.com/rss/articles/CBMickFVX3lxTE1XWFIwbkpBcGVGdHFZSy1zZ3BtSzZQcWtzaE5SNWRXRGs1TEJlRnRqUklZcTh6eDBVMFdjOWdyZmJ0bTdJYVNkNGRpZFk1RFREblJELUtPaHBfdWpEellZOF8yaUI4SklLeXhrV0hXWE1rUQ?oc=5",
+     "published_utc": "2026-10-12T08:15:41+00:00",
+     "source": "Upstox",
+     "query": "DMART NSE share",
+     "id": "0c371776d682",
+     "tags": [
+      "NEUTRAL"
+     ],
+     "sentiment": "NEUTRAL",
+     "news_risk": false,
+     "method": "keyword heuristic",
+     "confidence": "low"
+    },
+    {
+     "title": "DMart stock slides 3% after Q2 results as margin pressure overshadows demand recovery; brokerages divided - Moneycontrol.com",
+     "link": "https://news.google.com/rss/articles/CBMi_AFBVV95cUxQQ0hFeU9MVE9sSFlOTE9ncUYxVjRQa0FiUWotLS1tLVNPM3VLV1E4ckFUeGpLMlN0RUU4ZnhQeUNZMmZ3WUF2SWNrb0RSc05oMHJZZHhuOFpwSHFRSXNzcGJLTGhFNUIxSnVKNXpSYjFaUlZDMXZQc0tjNkJsdlVHakVfLVZDTEJ6V3dwdnJaQkJLSkEyd2JtYVY5V25mSTdJVHJwc0h4QlNYUTJyOU1SMzJnYWNlX3VuWXpjX2x5REpFTkIzLXNZQjlNanNxSmt3Nk1yd3NPYWlfRWNic09fXzV6Rm95OF96NmtEZGgzSTYwc0NCWVA0WnE1TXXSAYICQVVfeXFMTzRpb3JSYTNYSXdCVXhhX0psV1NFQjktRkh0V2g3cmZEaVNvSThLNzNoTW5vbnM2cEdBSUQwZjZDUXVOc0F0cFA5ZWRsWGlUYWRCSXozUDhWcFpIa1ZCVGpQWHVfdm5XMkN1dlpuZVpPWkJITEdHY3Y0cGsyUS1haHpGczBTZURVc2w4UFZoS0EwQTFVUmw4V0ZDTDlzOWpJS01POXBuaU1SN2lxUjYwcVg2T2JaOXctR3F2UWJYMHBvOV9FMmtKbUJFbGduWXlyTEgtc1Zsem4xZFhkYmdKNlRUZGNPWXl3UzMzeHU2UUJMaFVMZnlOTDBVWlVIWXdCMnVn?oc=5",
+     "published_utc": "2026-10-12T03:52:45+00:00",
+     "source": "Moneycontrol.com",
+     "query": "DMART NSE share",
+     "id": "eb99c7fa2232",
+     "tags": [
+      "EVENT"
+     ],
+     "sentiment": "NEUTRAL",
+     "news_risk": true,
+     "method": "keyword heuristic",
+     "confidence": "low"
+    },
+    {
+     "title": "Key factors behind 4% drop in DMart share price on Monday; here is what investors should know - Upstox",
+     "link": "https://news.google.com/rss/articles/CBMi6gFBVV95cUxNc1piQzYxcGdKdlpJZG0zeFN5OEt1UmVxUElrV1NnNndjVjAzTXRaS1BwajNIZ21xVU9fdWY4QTJmaUtSRW8yV3VBVTdWd2JtSTdYc3puaGVZaDR3ODhzWk9nU3gzZVFGYVExODMwVjJHUF93U0tSU1N0M1hSS2M5N016ckhfc1oyUDlBNjB2ZWFPdlpDSGo5YndQS0tuTFFMRkdyYkEteF9CcDRSUWlTTzF0ZE5vSGhWU1hFM1NrN0ZBZ3RZMzJtS3FQU2dmYVpkZ3c3Z0FMQkk5RS1aWF9aLTkxQUhwa1BYTXc?oc=5",
+     "published_utc": "2026-10-12T05:41:02+00:00",
+     "source": "Upstox",
+     "query": "DMART NSE share",
+     "id": "f7d76d54ab70",
+     "tags": [
+      "NEUTRAL"
+     ],
+     "sentiment": "NEUTRAL",
+     "news_risk": false,
+     "method": "keyword heuristic",
+     "confidence": "low"
+    },
+    {
+     "title": "DMart share price target \u20b93,925: Motilal Oswal maintains Neutral - Business Upturn",
+     "link": "https://news.google.com/rss/articles/CBMiuAFBVV95cUxQWGJZVXhUZFpaYmQ3TnJBbFhsRG1iRnNITl9zVUlPZ0Z2OVM4S2dhbHl1ZFBKRzNLM0JQZDlyWGlKYzZJQUhIeWY5VVptLUtRU3MtWGJmRks1VEFwSHNNcWZsVHhlTmNIRFpLdG5OcFhkeldYdUQxc3E0R05tb2hwSzFKNC14Smxxb0RpSnhTeFBvcW85eTR5WU1pUlU2OEFaMy1qVGFjcl9GRWtJOHI0VjFCbE9abzN5?oc=5",
+     "published_utc": "2026-10-12T09:41:48+00:00",
+     "source": "Business Upturn",
+     "query": "DMART NSE share",
+     "id": "4b02a50603ba",
+     "tags": [
+      "NEUTRAL"
+     ],
+     "sentiment": "NEUTRAL",
+     "news_risk": false,
+     "method": "keyword heuristic",
+     "confidence": "low"
+    }
+   ],
+   "news_risk": true,
+   "news_status": "ok",
+   "ai_p": 0.4,
+   "ai_view": "NEUTRAL"
+  },
+  {
+   "action": "SELL",
+   "score": -5,
+   "why": [
+    "Downtrend: close 4182.00 < SMA50 4548.88 < SMA200 4745.69",
+    "21-day SMA crossed below 50-day within the last 4 bars",
+    "Weak momentum: RSI 34",
+    "Lagging NIFTY by 0.0% over 3 months"
+   ],
+   "contrib": [
+    {
+     "points": -2,
+     "rule": "Downtrend: close 4182.00 < SMA50 4548.88 < SMA200 4745.69"
+    },
+    {
+     "points": -1,
+     "rule": "21-day SMA crossed below 50-day within the last 4 bars"
+    },
+    {
+     "points": -1,
+     "rule": "Weak momentum: RSI 34"
+    },
+    {
+     "points": -1,
+     "rule": "Lagging NIFTY by 0.0% over 3 months"
+    }
+   ],
+   "entry": 4182.0,
+   "stop": 3928.64,
+   "target": 4562.04,
+   "atr": 126.68,
+   "rsi": 34.3,
+   "sma50": 4548.88,
+   "sma200": 4745.69,
+   "vol_ratio": 1.08,
+   "turnover_cr": 23.3,
+   "symbol": "SUNDARMFIN",
+   "bar": "2026-10-12",
+   "strategy": "trend_breakout_swing",
+   "version": "1.1.0",
+   "sector": "Financial Services",
+   "vol20": 49889.35,
+   "signal_id": "trend_breakout_swing|SUNDARMFIN|2026-10-12",
+   "news": [],
+   "news_risk": false,
+   "news_status": "ok",
+   "ai_p": 0.428,
+   "ai_view": "NEUTRAL"
+  },
+  {
+   "action": "SELL",
+   "score": -5,
+   "why": [
+    "Downtrend: close 955.70 < SMA50 986.92 < SMA200 1060.70",
+    "21-day SMA crossed below 50-day within the last 4 bars",
+    "Weak momentum: RSI 43",
+    "Lagging NIFTY by 1.4% over 3 months"
+   ],
+   "contrib": [
+    {
+     "points": -2,
+     "rule": "Downtrend: close 955.70 < SMA50 986.92 < SMA200 1060.70"
+    },
+    {
+     "points": -1,
+     "rule": "21-day SMA crossed below 50-day within the last 4 bars"
+    },
+    {
+     "points": -1,
+     "rule": "Weak momentum: RSI 43"
+    },
+    {
+     "points": -1,
+     "rule": "Lagging NIFTY by 1.4% over 3 months"
+    }
+   ],
+   "entry": 955.7,
+   "stop": 891.29,
+   "target": 1052.31,
+   "atr": 32.2,
+   "rsi": 43.1,
+   "sma50": 986.92,
+   "sma200": 1060.7,
+   "vol_ratio": 0.42,
+   "turnover_cr": 13.7,
+   "symbol": "TECHNOE",
+   "bar": "2026-10-12",
+   "strategy": "trend_breakout_swing",
+   "version": "1.1.0",
+   "sector": "Construction",
+   "vol20": 147681.5,
+   "signal_id": "trend_breakout_swing|TECHNOE|2026-10-12",
+   "news": [
+    {
+     "title": "Techno Electric TECHNOE Reg 74(5) Demat Certificate Q2 FY27 - Kalkine India",
+     "link": "https://news.google.com/rss/articles/CBMiyAFBVV95cUxPQWZDSi1GRmN2RkhoWjJBbGlvMTJ4MlE0LUVNY0g1Y0kyMGJlMG1CYi1fUVZEckVnUjBkcVU3TWhBaGNTak8wSXFxbXZJZzRVcnpiTXNjMlBTM25IZEVwTDNUZFZCeksyNGczUXlmdHl4TzBqSVpzYTE1QTZpZmFTTndHS2VrVFJuVnJkQjh4RVNLakdnM21kVmwteGR2YVZrQzRxdmlGNVNWcnBXZlhYYmJ0aGtzaVNlb3ZNazN1enFudDgxX2RKLQ?oc=5",
+     "published_utc": "2026-10-12T09:39:00+00:00",
+     "source": "Kalkine India",
+     "query": "TECHNOE NSE share",
+     "id": "0252aab439f6",
+     "tags": [
+      "EVENT"
+     ],
+     "sentiment": "NEUTRAL",
+     "news_risk": true,
+     "method": "keyword heuristic",
+     "confidence": "low"
+    }
+   ],
+   "news_risk": true,
+   "news_status": "ok",
+   "ai_p": 0.406,
+   "ai_view": "NEUTRAL"
+  },
+  {
+   "action": "SELL",
+   "score": -5,
+   "why": [
+    "Downtrend: close 1174.40 < SMA50 1272.46 < SMA200 1399.05",
+    "Broke previous 20-day low 1178.50 on volume 1.8x average",
+    "Lagging NIFTY by 10.9% over 3 months"
+   ],
+   "contrib": [
+    {
+     "points": -2,
+     "rule": "Downtrend: close 1174.40 < SMA50 1272.46 < SMA200 1399.05"
+    },
+    {
+     "points": -2,
+     "rule": "Broke previous 20-day low 1178.50 on volume 1.8x average"
+    },
+    {
+     "points": -1,
+     "rule": "Lagging NIFTY by 10.9% over 3 months"
+    }
+   ],
+   "entry": 1174.4,
+   "stop": 1108.99,
+   "target": 1272.52,
+   "atr": 32.71,
+   "rsi": 29.3,
+   "sma50": 1272.46,
+   "sma200": 1399.05,
+   "vol_ratio": 1.79,
+   "turnover_cr": 28.7,
+   "symbol": "TORNTPOWER",
+   "bar": "2026-10-12",
+   "strategy": "trend_breakout_swing",
+   "version": "1.1.0",
+   "sector": "Power",
+   "vol20": 216886.3,
+   "signal_id": "trend_breakout_swing|TORNTPOWER|2026-10-12",
+   "news": [],
+   "news_risk": false,
+   "news_status": "ok",
+   "ai_p": 0.46,
+   "ai_view": "NEUTRAL"
+  }
+ ],
+ "blocked": [
+  {
+   "symbol": "CARTRADE",
+   "score": 6,
+   "reason": "score +6, but NIFTY regime is BEAR (close < SMA200 and SMA50 < SMA200)",
+   "why": [
+    "Uptrend: close 3191.30 > SMA50 2934.23 > SMA200 2397.51",
+    "Healthy momentum: RSI 63",
+    "Broke previous 20-day high 3170.20 on volume 5.3x average",
+    "Beating NIFTY by 21.6% over 3 months"
+   ],
+   "entry": 3191.3,
+   "ai_p": 0.468,
+   "ai_view": "AGREES"
+  },
+  {
+   "symbol": "PNBHOUSING",
+   "score": 6,
+   "reason": "score +6, but NIFTY regime is BEAR (close < SMA200 and SMA50 < SMA200)",
+   "why": [
+    "Uptrend: close 1200.00 > SMA50 1141.06 > SMA200 992.13",
+    "Healthy momentum: RSI 64",
+    "Broke previous 20-day high 1189.60 on volume 1.7x average",
+    "Beating NIFTY by 15.4% over 3 months"
+   ],
+   "entry": 1200.0,
+   "ai_p": 0.417,
+   "ai_view": "NEUTRAL"
+  },
+  {
+   "symbol": "PTCIL",
+   "score": 5,
+   "reason": "score +5, but NIFTY regime is BEAR (close < SMA200 and SMA50 < SMA200)",
+   "why": [
+    "Uptrend: close 25715.00 > SMA50 21541.88 > SMA200 18419.64",
+    "Broke previous 20-day high 24900.00 on volume 2.0x average",
+    "Beating NIFTY by 53.0% over 3 months"
+   ],
+   "entry": 25715.0,
+   "ai_p": 0.456,
+   "ai_view": "NEUTRAL"
+  }
+ ],
+ "scanned": 470,
+ "universe": 499,
+ "universe_source": "Nifty 500 (official NSE list)",
+ "strategy": {
+  "id": "trend_breakout_swing",
+  "name": "Trend + Breakout Swing",
+  "version": "1.1.0",
+  "status": "paper-approved",
+  "universe": "NIFTY 500 (NSE), price >= 50, 20-day turnover >= 10 cr",
+  "timeframe": "1d",
+  "segment": "delivery",
+  "hypothesis": "Stocks in an uptrend that break their 20-day high on above-average volume, while outperforming NIFTY, tend to continue for a few weeks. Only trade when the index itself is in an uptrend.",
+  "rules": {
+   "score": [
+    "+2 price > 50-day SMA > 200-day SMA (uptrend); -2 if the reverse",
+    "+1 21-day SMA crossed above 50-day within 4 bars; -1 if crossed below",
+    "+1 RSI(14) between 50 and 70; -1 if between 30 and 45",
+    "+2 close above previous 20-day high with volume > 1.5x 20-day average; -2 for a 20-day low",
+    "+1 3-month return beats NIFTY; -1 if it lags"
+   ],
+   "entry": "score >= +5 AND index regime BULL (or SIDEWAYS with score >= +6); no news-risk words in last 3 days",
+   "exit": "score <= -5 (SELL), stop 2xATR below entry, target 3xATR above, trailing stop 4% once up 5%, time exit 20 bars, regime turns BEAR",
+   "sizing": "1% of equity at risk between entry and stop; <= 25% of equity; <= 5% of 20-day volume; halve size when index 20-day vol > 25%"
+  },
+  "params": {
+   "buy_score": 5,
+   "sell_score": -5,
+   "stop_atr": 2.0,
+   "target_atr": 3.0,
+   "max_hold": 20,
+   "vol_mult": 1.5,
+   "rs_lookback": 63
+  },
+  "regime_filter": true,
+  "min_capital": 200000,
+  "holding": "5-20 sessions",
+  "failure_modes": [
+   "whipsaw in sideways markets (false breakouts)",
+   "gap-downs through the stop (fill worse than stop)",
+   "regime filter is slow: late entries after long rallies",
+   "news shocks; only headline words are screened"
+  ],
+  "warmup_bars": 200,
+  "param_hash": "b81c4fa041",
+  "code": true
+ },
+ "paper_actions": {
+  "IN-SWING": [
+   "Nothing to do: no fills, no exits, no new entries."
+  ],
+  "US-SWING": [
+   "PM: no data today - untouched"
+  ],
+  "IN-OPTIONS": [
+   "HOLD NIFTY 19OCT26 22500/22300 PE DEBIT SPREAD: modeled value 102.16 vs debit 77.29, 7 days left",
+   "HOLD NIFTY 19OCT26 22350/22150 PE DEBIT SPREAD: modeled value 77.31 vs debit 77.31, 7 days left",
+   "Signal NIFTY 19OCT26 22350/22150 PE DEBIT SPREAD skipped: 2 spreads already open"
+  ],
+  "IN-BRAIN": [
+   "NO TRADE today: no opportunity passed every check. Waiting is a valid decision."
+  ],
+  "IN-VALUE": [
+   "Nothing to do: holding the long-term book."
+  ],
+  "US-VALUE": [
+   "INTU: trailing stop raised to 298.87"
+  ]
+ },
+ "rejected_dq": {
+  "USDINR": [
+   "high/low/close inconsistent",
+   "volume unreliable (many zero days)"
+  ],
+  "EURINR": [
+   "high/low/close inconsistent",
+   "volume unreliable (many zero days)"
+  ],
+  "GBPUSD": [
+   "high/low/close inconsistent",
+   "volume unreliable (many zero days)"
+  ],
+  "EURUSD": [
+   "high/low/close inconsistent",
+   "volume unreliable (many zero days)"
+  ],
+  "USDJPY": [
+   "high/low/close inconsistent",
+   "volume unreliable (many zero days)"
+  ],
+  "SPY": [
+   "high/low/close inconsistent"
+  ],
+  "JPM": [
+   "high/low/close inconsistent"
+  ],
+  "XOM": [
+   "high/low/close inconsistent"
+  ],
+  "BRK-B": [
+   "high/low/close inconsistent"
+  ],
+  "V": [
+   "high/low/close inconsistent"
+  ],
+  "MA": [
+   "high/low/close inconsistent"
+  ],
+  "UNH": [
+   "high/low/close inconsistent"
+  ],
+  "JNJ": [
+   "high/low/close inconsistent"
+  ],
+  "PG": [
+   "high/low/close inconsistent"
+  ],
+  "HD": [
+   "high/low/close inconsistent"
+  ],
+  "ABBV": [
+   "high/low/close inconsistent"
+  ],
+  "MRK": [
+   "high/low/close inconsistent"
+  ],
+  "KO": [
+   "high/low/close inconsistent"
+  ],
+  "LLY": [
+   "high/low/close inconsistent"
+  ],
+  "BAC": [
+   "high/low/close inconsistent"
+  ],
+  "CVX": [
+   "high/low/close inconsistent"
+  ],
+  "CRM": [
+   "high/low/close inconsistent"
+  ],
+  "ORCL": [
+   "high/low/close inconsistent",
+   "price jump > 25% on 2025-09-10 (corporate action or bad tick?)"
+  ],
+  "TMO": [
+   "high/low/close inconsistent"
+  ],
+  "ACN": [
+   "high/low/close inconsistent"
+  ],
+  "ABT": [
+   "high/low/close inconsistent"
+  ],
+  "DHR": [
+   "high/low/close inconsistent"
+  ],
+  "WFC": [
+   "high/low/close inconsistent"
+  ],
+  "PM": [
+   "high/low/close inconsistent"
+  ],
+  "NEE": [
+   "high/low/close inconsistent"
+  ],
+  "IBM": [
+   "high/low/close inconsistent",
+   "price jump > 25% on 2026-07-14 (corporate action or bad tick?)"
+  ],
+  "LOW": [
+   "high/low/close inconsistent"
+  ],
+  "GS": [
+   "high/low/close inconsistent"
+  ],
+  "MS": [
+   "high/low/close inconsistent"
+  ],
+  "SPGI": [
+   "high/low/close inconsistent"
+  ],
+  "BLK": [
+   "high/low/close inconsistent"
+  ],
+  "NOW": [
+   "high/low/close inconsistent"
+  ],
+  "GE": [
+   "high/low/close inconsistent"
+  ],
+  "RTX": [
+   "high/low/close inconsistent"
+  ],
+  "DE": [
+   "high/low/close inconsistent"
+  ],
+  "MDT": [
+   "high/low/close inconsistent"
+  ],
+  "LMT": [
+   "high/low/close inconsistent"
+  ],
+  "C": [
+   "high/low/close inconsistent"
+  ],
+  "CB": [
+   "high/low/close inconsistent"
+  ],
+  "MO": [
+   "high/low/close inconsistent"
+  ],
+  "DUK": [
+   "high/low/close inconsistent"
+  ],
+  "ZTS": [
+   "high/low/close inconsistent"
+  ],
+  "PGR": [
+   "high/low/close inconsistent"
+  ],
+  "BA": [
+   "high/low/close inconsistent"
+  ],
+  "COP": [
+   "high/low/close inconsistent"
+  ],
+  "VZ": [
+   "high/low/close inconsistent"
+  ],
+  "DIS": [
+   "high/low/close inconsistent"
+  ],
+  "UBER": [
+   "high/low/close inconsistent"
+  ],
+  "AXP": [
+   "high/low/close inconsistent"
+  ],
+  "ELV": [
+   "high/low/close inconsistent"
+  ],
+  "CI": [
+   "high/low/close inconsistent"
+  ],
+  "BMY": [
+   "high/low/close inconsistent"
+  ],
+  "USB": [
+   "high/low/close inconsistent"
+  ],
+  "F": [
+   "high/low/close inconsistent"
+  ]
+ },
+ "failed_download": [
+  "^CNXMIDCAP",
+  "BAGMANE.NS",
+  "DUMMYHEG.NS",
+  "MMC"
+ ],
+ "skipped": {
+  "BATAINDIA": "20-day turnover 9.8 (x1e7) below 10",
+  "BHARATCOAL": "price 30.73 below minimum 50",
+  "CIEINDIA": "20-day turnover 8.9 (x1e7) below 10",
+  "CENTRALBK": "price 30.07 below minimum 50",
+  "DOMS": "20-day turnover 4.6 (x1e7) below 10",
+  "GODREJIND": "20-day turnover 9.6 (x1e7) below 10",
+  "IRB": "price 17.88 below minimum 50",
+  "ITI": "20-day turnover 5.2 (x1e7) below 10",
+  "INDIACEM": "20-day turnover 8.9 (x1e7) below 10",
+  "IOB": "price 30.25 below minimum 50",
+  "JPPOWER": "price 14.67 below minimum 50",
+  "MMTC": "20-day turnover 5.6 (x1e7) below 10",
+  "MSUMI": "price 33.46 below minimum 50",
+  "NSLNISP": "price 39.65 below minimum 50",
+  "NUVOCO": "20-day turnover 9.1 (x1e7) below 10",
+  "OLAELEC": "price 35.68 below minimum 50",
+  "RPOWER": "price 19.85 below minimum 50",
+  "SAGILITY": "price 43.19 below minimum 50",
+  "SUZLON": "price 39.57 below minimum 50",
+  "TTML": "price 33.02 below minimum 50",
+  "TRIDENT": "price 22.01 below minimum 50",
+  "UCOBANK": "price 23.12 below minimum 50",
+  "UTIAMC": "20-day turnover 6.9 (x1e7) below 10",
+  "VISL": "price 28.76 below minimum 50",
+  "VOGL": "price 30.35 below minimum 50",
+  "VEDPOWER": "price 30.72 below minimum 50",
+  "IDEA": "price 12.67 below minimum 50",
+  "YESBANK": "price 20.44 below minimum 50",
+  "ZYDUSWELL": "20-day turnover 9.5 (x1e7) below 10"
+ }
+}

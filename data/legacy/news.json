@@ -1,0 +1,37 @@
+[
+ {
+  "t": "FIIs sold ₹3,694 cr on Friday; DIIs bought ₹2,838 cr. September so far: FIIs −₹14,837 cr, DIIs +₹49,779 cr",
+  "s": "NSE provisional data",
+  "tag": "MARKET"
+ },
+ {
+  "t": "Nifty closed at 23,140.50 (+0.34%), a small recovery after Thursday's sharp fall; structure still weak: lower highs and lower lows, below key moving averages",
+  "s": "Business Standard",
+  "tag": "MARKET"
+ },
+ {
+  "t": "Thursday 24 Sep: Nifty fell 383 points to 23,063, lowest since 6 April, on energy prices, US yields and rate-hike fears",
+  "s": "HDFC Sky",
+  "tag": "NEGATIVE"
+ },
+ {
+  "t": "India VIX fell 7.25% to 11.77 — expected near-term volatility lower",
+  "s": "Business Standard",
+  "tag": "NEUTRAL"
+ },
+ {
+  "t": "Rupee closed at 95.95, pressured by crude oil and bond yields",
+  "s": "HDFC Sky",
+  "tag": "NEGATIVE"
+ },
+ {
+  "t": "Reports of a possible phased approach to ending the US–Iran war; timing uncertain",
+  "s": "Sunday Guardian",
+  "tag": "EVENT"
+ },
+ {
+  "t": "FPIs invested ₹15,800 crore in pharma since July",
+  "s": "Business Standard",
+  "tag": "POSITIVE"
+ }
+]
