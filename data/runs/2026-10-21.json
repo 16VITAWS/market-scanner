@@ -1,0 +1,504 @@
+{
+ "engine_version": "2.8.0",
+ "run_at": "2026-10-21T19:28:56+05:30",
+ "data_date": "2026-10-21",
+ "mode": "PAPER",
+ "data_status": "OK",
+ "regime": {
+  "state": "BEAR",
+  "text": "Index below its 200-day average and 50-day below 200-day: downtrend. No new buys; protect capital.",
+  "close": 22811.35,
+  "date": "2026-10-21",
+  "sma50": 23479.08,
+  "sma200": 24158.33,
+  "rsi": 46.3,
+  "vol20_annualised_pct": 16.4,
+  "high_vol": false,
+  "ret3m": -0.05690287434648067,
+  "support": [
+   22228.55
+  ],
+  "resistance": [
+   23532.73,
+   23839.3,
+   24319.92
+  ],
+  "rule": "BULL: close>SMA200 and SMA50>SMA200; BEAR: both below; else SIDEWAYS",
+  "computed_at": "2026-10-21T19:20:14+05:30"
+ },
+ "buys": [],
+ "sells": [
+  {
+   "action": "SELL",
+   "score": -6,
+   "why": [
+    "Downtrend: close 1329.60 < SMA50 1480.29 < SMA200 1583.84",
+    "Weak momentum: RSI 31",
+    "Broke previous 20-day low 1330.10 on volume 3.3x average",
+    "Lagging NIFTY by 8.5% over 3 months"
+   ],
+   "contrib": [
+    {
+     "points": -2,
+     "rule": "Downtrend: close 1329.60 < SMA50 1480.29 < SMA200 1583.84"
+    },
+    {
+     "points": -1,
+     "rule": "Weak momentum: RSI 31"
+    },
+    {
+     "points": -2,
+     "rule": "Broke previous 20-day low 1330.10 on volume 3.3x average"
+    },
+    {
+     "points": -1,
+     "rule": "Lagging NIFTY by 8.5% over 3 months"
+    }
+   ],
+   "entry": 1329.6,
+   "stop": 1239.29,
+   "target": 1465.07,
+   "atr": 45.16,
+   "rsi": 31.3,
+   "sma50": 1480.29,
+   "sma200": 1583.84,
+   "vol_ratio": 3.27,
+   "turnover_cr": 26.2,
+   "symbol": "CHOLAHLDNG",
+   "bar": "2026-10-21",
+   "strategy": "trend_breakout_swing",
+   "version": "1.1.0",
+   "sector": "Financial Services",
+   "vol20": 168115.5,
+   "signal_id": "trend_breakout_swing|CHOLAHLDNG|2026-10-21",
+   "news": [
+    {
+     "title": "Cholamandalam Financial Holdings Share Price Today: Near Low - Univest",
+     "link": "https://news.google.com/rss/articles/CBMiqAFBVV95cUxPSmU5R1BBMGFobFpMSnY4cFhqZ0J0VEptRGgtbUphWU1DNnlvZGYwNG9WTjI5cmx2d0k0eEFNOEhLbGtCNWpIYXR1VVN6aW9UQ2EzUkVnVXRWSEtwbEI3SmdLNGp4YmtBU2hzaU9QZVpJZmc3QkJubkhkaEZhUFU0RmpzeVJKLWZnQ2dtN2ZlUkpvMEVzLWtfMTBRSXZmVGp4eTFaRlV1MGI?oc=5",
+     "published_utc": "2026-10-21T05:02:00+00:00",
+     "source": "Univest",
+     "query": "CHOLAHLDNG NSE share",
+     "id": "faf5ebf6fde1",
+     "tags": [
+      "NEUTRAL"
+     ],
+     "sentiment": "NEUTRAL",
+     "news_risk": false,
+     "method": "keyword heuristic",
+     "confidence": "low"
+    }
+   ],
+   "news_risk": false,
+   "news_status": "ok",
+   "ai_p": 0.427,
+   "ai_view": "NEUTRAL"
+  },
+  {
+   "action": "SELL",
+   "score": -6,
+   "why": [
+    "Downtrend: close 427.15 < SMA50 483.58 < SMA200 486.44",
+    "Weak momentum: RSI 31",
+    "Broke previous 20-day low 433.25 on volume 1.7x average",
+    "Lagging NIFTY by 7.0% over 3 months"
+   ],
+   "contrib": [
+    {
+     "points": -2,
+     "rule": "Downtrend: close 427.15 < SMA50 483.58 < SMA200 486.44"
+    },
+    {
+     "points": -1,
+     "rule": "Weak momentum: RSI 31"
+    },
+    {
+     "points": -2,
+     "rule": "Broke previous 20-day low 433.25 on volume 1.7x average"
+    },
+    {
+     "points": -1,
+     "rule": "Lagging NIFTY by 7.0% over 3 months"
+    }
+   ],
+   "entry": 427.15,
+   "stop": 403.86,
+   "target": 462.08,
+   "atr": 11.64,
+   "rsi": 30.8,
+   "sma50": 483.58,
+   "sma200": 486.44,
+   "vol_ratio": 1.72,
+   "turnover_cr": 48.9,
+   "symbol": "CONCOR",
+   "bar": "2026-10-21",
+   "strategy": "trend_breakout_swing",
+   "version": "1.1.0",
+   "sector": "Services",
+   "vol20": 1041002.0,
+   "signal_id": "trend_breakout_swing|CONCOR|2026-10-21",
+   "news": [],
+   "news_risk": false,
+   "news_status": "ok",
+   "ai_p": 0.393,
+   "ai_view": "NEUTRAL"
+  },
+  {
+   "action": "SELL",
+   "score": -6,
+   "why": [
+    "Downtrend: close 120880.00 < SMA50 127645.80 < SMA200 132916.48",
+    "Weak momentum: RSI 31",
+    "Broke previous 20-day low 121310.00 on volume 1.5x average",
+    "Lagging NIFTY by 4.1% over 3 months"
+   ],
+   "contrib": [
+    {
+     "points": -2,
+     "rule": "Downtrend: close 120880.00 < SMA50 127645.80 < SMA200 132916.48"
+    },
+    {
+     "points": -1,
+     "rule": "Weak momentum: RSI 31"
+    },
+    {
+     "points": -2,
+     "rule": "Broke previous 20-day low 121310.00 on volume 1.5x average"
+    },
+    {
+     "points": -1,
+     "rule": "Lagging NIFTY by 4.1% over 3 months"
+    }
+   ],
+   "entry": 120880.0,
+   "stop": 117739.45,
+   "target": 125590.83,
+   "atr": 1570.28,
+   "rsi": 30.6,
+   "sma50": 127645.8,
+   "sma200": 132916.48,
+   "vol_ratio": 1.51,
+   "turnover_cr": 31.2,
+   "symbol": "MRF",
+   "bar": "2026-10-21",
+   "strategy": "trend_breakout_swing",
+   "version": "1.1.0",
+   "sector": "Automobile and Auto Components",
+   "vol20": 2466.95,
+   "signal_id": "trend_breakout_swing|MRF|2026-10-21",
+   "news": [
+    {
+     "title": "MRF Ltd Share Price Today,, MRF Share Price NSE, BSE - Business Today",
+     "link": "https://news.google.com/rss/articles/CBMidEFVX3lxTE9Fc2NRaGQ0STk2TzJZQjhDd0xNTEdQZi1RRHVOZUQ5UXg4Wks2a1dwSDF2N1ZzVHI3dk5xendsLXJ1T0E4VGh6dkZoY3kzR3N1SXVwckN6bWZNSmh4UkQ0QW10NFBVSWVQRHNNN2N2TW4wUjBj?oc=5",
+     "published_utc": "2026-10-19T10:01:00+00:00",
+     "source": "Business Today",
+     "query": "MRF NSE share",
+     "id": "0fa7f05d961e",
+     "tags": [
+      "NEUTRAL"
+     ],
+     "sentiment": "NEUTRAL",
+     "news_risk": false,
+     "method": "keyword heuristic",
+     "confidence": "low"
+    }
+   ],
+   "news_risk": false,
+   "news_status": "ok",
+   "ai_p": 0.347,
+   "ai_view": "DISAGREES"
+  },
+  {
+   "action": "SELL",
+   "score": -6,
+   "why": [
+    "Downtrend: close 238.65 < SMA50 264.04 < SMA200 283.32",
+    "Weak momentum: RSI 35",
+    "Broke previous 20-day low 239.50 on volume 1.6x average",
+    "Lagging NIFTY by 13.4% over 3 months"
+   ],
+   "contrib": [
+    {
+     "points": -2,
+     "rule": "Downtrend: close 238.65 < SMA50 264.04 < SMA200 283.32"
+    },
+    {
+     "points": -1,
+     "rule": "Weak momentum: RSI 35"
+    },
+    {
+     "points": -2,
+     "rule": "Broke previous 20-day low 239.50 on volume 1.6x average"
+    },
+    {
+     "points": -1,
+     "rule": "Lagging NIFTY by 13.4% over 3 months"
+    }
+   ],
+   "entry": 238.65,
+   "stop": 222.33,
+   "target": 263.13,
+   "atr": 8.16,
+   "rsi": 35.4,
+   "sma50": 264.04,
+   "sma200": 283.32,
+   "vol_ratio": 1.6,
+   "turnover_cr": 29.5,
+   "symbol": "NLCINDIA",
+   "bar": "2026-10-21",
+   "strategy": "trend_breakout_swing",
+   "version": "1.1.0",
+   "sector": "Power",
+   "vol20": 1132108.75,
+   "signal_id": "trend_breakout_swing|NLCINDIA|2026-10-21",
+   "news": [],
+   "news_risk": false,
+   "news_status": "ok",
+   "ai_p": 0.446,
+   "ai_view": "NEUTRAL"
+  },
+  {
+   "action": "SELL",
+   "score": -6,
+   "why": [
+    "Downtrend: close 84.04 < SMA50 90.59 < SMA200 95.13",
+    "Weak momentum: RSI 34",
+    "Broke previous 20-day low 87.30 on volume 1.9x average",
+    "Lagging NIFTY by 3.5% over 3 months"
+   ],
+   "contrib": [
+    {
+     "points": -2,
+     "rule": "Downtrend: close 84.04 < SMA50 90.59 < SMA200 95.13"
+    },
+    {
+     "points": -1,
+     "rule": "Weak momentum: RSI 34"
+    },
+    {
+     "points": -2,
+     "rule": "Broke previous 20-day low 87.30 on volume 1.9x average"
+    },
+    {
+     "points": -1,
+     "rule": "Lagging NIFTY by 3.5% over 3 months"
+    }
+   ],
+   "entry": 84.04,
+   "stop": 78.98,
+   "target": 91.62,
+   "atr": 2.53,
+   "rsi": 33.9,
+   "sma50": 90.59,
+   "sma200": 95.13,
+   "vol_ratio": 1.93,
+   "turnover_cr": 32.3,
+   "symbol": "NTPCGREEN",
+   "bar": "2026-10-21",
+   "strategy": "trend_breakout_swing",
+   "version": "1.1.0",
+   "sector": "Power",
+   "vol20": 3400996.15,
+   "signal_id": "trend_breakout_swing|NTPCGREEN|2026-10-21",
+   "news": [],
+   "news_risk": false,
+   "news_status": "ok",
+   "ai_p": 0.399,
+   "ai_view": "NEUTRAL"
+  }
+ ],
+ "blocked": [
+  {
+   "symbol": "COHANCE",
+   "score": 5,
+   "reason": "score +5, but NIFTY regime is BEAR (close < SMA200 and SMA50 < SMA200)",
+   "why": [
+    "Uptrend: close 461.80 > SMA50 451.00 > SMA200 411.76",
+    "21-day SMA crossed above 50-day within the last 4 bars",
+    "Healthy momentum: RSI 56",
+    "Beating NIFTY by 9.3% over 3 months"
+   ],
+   "entry": 461.8,
+   "ai_p": 0.445,
+   "ai_view": "NEUTRAL"
+  },
+  {
+   "symbol": "MPHASIS",
+   "score": 5,
+   "reason": "score +5, but NIFTY regime is BEAR (close < SMA200 and SMA50 < SMA200)",
+   "why": [
+    "Uptrend: close 2575.00 > SMA50 2383.69 > SMA200 2342.02",
+    "Broke previous 20-day high 2521.70 on volume 2.1x average",
+    "Beating NIFTY by 13.9% over 3 months"
+   ],
+   "entry": 2575.0,
+   "ai_p": 0.404,
+   "ai_view": "NEUTRAL"
+  },
+  {
+   "symbol": "TECHM",
+   "score": 5,
+   "reason": "score +5, but NIFTY regime is BEAR (close < SMA200 and SMA50 < SMA200)",
+   "why": [
+    "Uptrend: close 1834.70 > SMA50 1583.91 > SMA200 1495.54",
+    "Overbought: RSI 77 (no points; do not chase)",
+    "Broke previous 20-day high 1797.00 on volume 1.5x average",
+    "Beating NIFTY by 22.1% over 3 months"
+   ],
+   "entry": 1834.7,
+   "ai_p": 0.421,
+   "ai_view": "NEUTRAL"
+  }
+ ],
+ "scanned": 469,
+ "universe": 499,
+ "universe_source": "Nifty 500 (official NSE list)",
+ "strategy": {
+  "id": "trend_breakout_swing",
+  "name": "Trend + Breakout Swing",
+  "version": "1.1.0",
+  "status": "paper-approved",
+  "universe": "NIFTY 500 (NSE), price >= 50, 20-day turnover >= 10 cr",
+  "timeframe": "1d",
+  "segment": "delivery",
+  "hypothesis": "Stocks in an uptrend that break their 20-day high on above-average volume, while outperforming NIFTY, tend to continue for a few weeks. Only trade when the index itself is in an uptrend.",
+  "rules": {
+   "score": [
+    "+2 price > 50-day SMA > 200-day SMA (uptrend); -2 if the reverse",
+    "+1 21-day SMA crossed above 50-day within 4 bars; -1 if crossed below",
+    "+1 RSI(14) between 50 and 70; -1 if between 30 and 45",
+    "+2 close above previous 20-day high with volume > 1.5x 20-day average; -2 for a 20-day low",
+    "+1 3-month return beats NIFTY; -1 if it lags"
+   ],
+   "entry": "score >= +5 AND index regime BULL (or SIDEWAYS with score >= +6); no news-risk words in last 3 days",
+   "exit": "score <= -5 (SELL), stop 2xATR below entry, target 3xATR above, trailing stop 4% once up 5%, time exit 20 bars, regime turns BEAR",
+   "sizing": "1% of equity at risk between entry and stop; <= 25% of equity; <= 5% of 20-day volume; halve size when index 20-day vol > 25%"
+  },
+  "params": {
+   "buy_score": 5,
+   "sell_score": -5,
+   "stop_atr": 2.0,
+   "target_atr": 3.0,
+   "max_hold": 20,
+   "vol_mult": 1.5,
+   "rs_lookback": 63
+  },
+  "regime_filter": true,
+  "min_capital": 200000,
+  "holding": "5-20 sessions",
+  "failure_modes": [
+   "whipsaw in sideways markets (false breakouts)",
+   "gap-downs through the stop (fill worse than stop)",
+   "regime filter is slow: late entries after long rallies",
+   "news shocks; only headline words are screened"
+  ],
+  "warmup_bars": 200,
+  "param_hash": "b81c4fa041",
+  "code": true
+ },
+ "paper_actions": {
+  "IN-SWING": [
+   "Nothing to do: no fills, no exits, no new entries."
+  ],
+  "US-SWING": [
+   "BLK: no data today - untouched",
+   "Risk engine REJECTED LLY: maximum open positions reached",
+   "Risk engine REJECTED AMGN: maximum open positions reached",
+   "Risk engine REJECTED COP: maximum open positions reached",
+   "Risk engine REJECTED DIS: maximum open positions reached"
+  ],
+  "IN-OPTIONS": [
+   "No new options trade: Regime BEAR; no options trigger (bear: close<SMA50 and RSI<45; bull: 20-day breakout)"
+  ],
+  "IN-BRAIN": [
+   "NO TRADE today: no opportunity passed every check. Waiting is a valid decision."
+  ],
+  "IN-VALUE": [
+   "Nothing to do: holding the long-term book."
+  ],
+  "US-VALUE": [
+   "ADBE: trailing stop raised to 245.90"
+  ]
+ },
+ "rejected_dq": {
+  "USDINR": [
+   "high/low/close inconsistent",
+   "volume unreliable (many zero days)"
+  ],
+  "EURINR": [
+   "high/low/close inconsistent",
+   "volume unreliable (many zero days)"
+  ],
+  "GBPUSD": [
+   "high/low/close inconsistent",
+   "volume unreliable (many zero days)"
+  ],
+  "EURUSD": [
+   "high/low/close inconsistent",
+   "volume unreliable (many zero days)"
+  ],
+  "USDJPY": [
+   "high/low/close inconsistent",
+   "volume unreliable (many zero days)"
+  ],
+  "US2Y": [
+   "non-positive price",
+   "high/low/close inconsistent"
+  ],
+  "JPM": [
+   "high/low/close inconsistent"
+  ],
+  "UNH": [
+   "high/low/close inconsistent"
+  ],
+  "DHR": [
+   "high/low/close inconsistent"
+  ],
+  "LOW": [
+   "high/low/close inconsistent"
+  ],
+  "CAT": [
+   "high/low/close inconsistent"
+  ],
+  "BLK": [
+   "high/low/close inconsistent"
+  ]
+ },
+ "failed_download": [
+  "^CNXMIDCAP",
+  "BAGMANE.NS",
+  "DUMMYHEG.NS",
+  "MMC"
+ ],
+ "skipped": {
+  "ASAHIINDIA": "20-day turnover 9.2 (x1e7) below 10",
+  "AIIL": "20-day turnover 9.1 (x1e7) below 10",
+  "BATAINDIA": "20-day turnover 7.8 (x1e7) below 10",
+  "BHARATCOAL": "price 30.34 below minimum 50",
+  "CIEINDIA": "20-day turnover 7.7 (x1e7) below 10",
+  "CENTRALBK": "price 30.43 below minimum 50",
+  "DOMS": "20-day turnover 4.5 (x1e7) below 10",
+  "FACT": "20-day turnover 7.8 (x1e7) below 10",
+  "IRB": "price 16.90 below minimum 50",
+  "ITI": "20-day turnover 5.2 (x1e7) below 10",
+  "INDIAMART": "20-day turnover 8.8 (x1e7) below 10",
+  "IOB": "price 30.39 below minimum 50",
+  "JPPOWER": "price 13.94 below minimum 50",
+  "MSUMI": "price 34.87 below minimum 50",
+  "NSLNISP": "price 39.91 below minimum 50",
+  "OLAELEC": "price 33.05 below minimum 50",
+  "RPOWER": "price 17.27 below minimum 50",
+  "SJVN": "price 49.08 below minimum 50",
+  "SAGILITY": "price 44.41 below minimum 50",
+  "SUZLON": "price 39.40 below minimum 50",
+  "TTML": "price 32.06 below minimum 50",
+  "TRIDENT": "price 21.35 below minimum 50",
+  "UCOBANK": "price 23.07 below minimum 50",
+  "UTIAMC": "20-day turnover 5.9 (x1e7) below 10",
+  "VISL": "price 28.10 below minimum 50",
+  "VOGL": "price 29.19 below minimum 50",
+  "VEDPOWER": "price 30.30 below minimum 50",
+  "IDEA": "price 11.64 below minimum 50",
+  "YESBANK": "price 16.41 below minimum 50",
+  "ZYDUSWELL": "20-day turnover 6.5 (x1e7) below 10"
+ }
+}

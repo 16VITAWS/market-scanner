@@ -1,0 +1,458 @@
+{
+ "engine_version": "2.8.0",
+ "run_at": "2026-09-30T21:54:24+05:30",
+ "data_date": "2026-09-30",
+ "mode": "PAPER",
+ "data_status": "OK",
+ "regime": {
+  "state": "BEAR",
+  "text": "Index below its 200-day average and 50-day below 200-day: downtrend. No new buys; protect capital.",
+  "close": 22620.45,
+  "date": "2026-09-30",
+  "sma50": 23901.58,
+  "sma200": 24372.85,
+  "rsi": 25.3,
+  "vol20_annualised_pct": 10.1,
+  "high_vol": false,
+  "ret3m": -0.0643311279614941,
+  "support": [],
+  "resistance": [
+   23532.73,
+   23839.3,
+   24388.19
+  ],
+  "rule": "BULL: close>SMA200 and SMA50>SMA200; BEAR: both below; else SIDEWAYS",
+  "computed_at": "2026-09-30T21:45:53+05:30"
+ },
+ "buys": [],
+ "sells": [
+  {
+   "action": "SELL",
+   "score": -6,
+   "why": [
+    "Downtrend: close 1757.00 < SMA50 1886.82 < SMA200 1890.58",
+    "Weak momentum: RSI 34",
+    "Broke previous 20-day low 1762.00 on volume 1.6x average",
+    "Lagging NIFTY by 0.4% over 3 months"
+   ],
+   "contrib": [
+    {
+     "points": -2,
+     "rule": "Downtrend: close 1757.00 < SMA50 1886.82 < SMA200 1890.58"
+    },
+    {
+     "points": -1,
+     "rule": "Weak momentum: RSI 34"
+    },
+    {
+     "points": -2,
+     "rule": "Broke previous 20-day low 1762.00 on volume 1.6x average"
+    },
+    {
+     "points": -1,
+     "rule": "Lagging NIFTY by 0.4% over 3 months"
+    }
+   ],
+   "entry": 1757.0,
+   "stop": 1697.29,
+   "target": 1846.56,
+   "atr": 29.85,
+   "rsi": 34.4,
+   "sma50": 1886.82,
+   "sma200": 1890.58,
+   "vol_ratio": 1.57,
+   "turnover_cr": 974.5,
+   "symbol": "BHARTIARTL",
+   "bar": "2026-09-30",
+   "strategy": "trend_breakout_swing",
+   "version": "1.1.0",
+   "sector": "Telecommunication",
+   "vol20": 5142702.75,
+   "signal_id": "trend_breakout_swing|BHARTIARTL|2026-09-30",
+   "news": [
+    {
+     "title": "Bharti Airtel Share Price - Live NSE: BHARTIARTL Stock Price & Chart - Upstox",
+     "link": "https://news.google.com/rss/articles/CBMibEFVX3lxTE5yVGN2YlBzbU5xc0FJSkctUlVUMzAzSHdiOENtSzV1TlJyZHhSVGZIVVVyUEw0MVpwMm1HVDRxOGM3akMyaGhNaUZUZ09TQ0N4b2Vjd3lLaW1DaEg4QXRJbU5BQjZJcjN3MGlBSQ?oc=5",
+     "published_utc": "2026-09-30T00:38:52+00:00",
+     "source": "Upstox",
+     "query": "BHARTIARTL NSE share",
+     "id": "c783879c182d",
+     "tags": [
+      "NEUTRAL"
+     ],
+     "sentiment": "NEUTRAL",
+     "news_risk": false,
+     "method": "keyword heuristic",
+     "confidence": "low"
+    },
+    {
+     "title": "Bharti Airtel stock ahead of the Xetra open with no euro price or percentage - AD HOC NEWS",
+     "link": "https://news.google.com/rss/articles/CBMiwAFBVV95cUxOTGN1WS1uQ0VnUEF4V0hZN2VDX05XYUxBZHhKbVAyNUdJSWhTNEVWRlJiSFhtMmpHekJ6Y2ZDS2lsYUdZaXZERWsxM3dtcnF3ZF9VTG5qRzBCZVM3SzhVcUstdUYxbFg0MDRSaVBnMmxoS1VDZlBDTERkT2dQTDdWMld2c0U3VzhKa1RZaGhFSUJfV040RnhyU2lTMFcyWmNEcDlaOTVpNDlPNDRqTmRCTEs0dXNSX1VJRkd5NzZBOE0?oc=5",
+     "published_utc": "2026-09-30T05:50:20+00:00",
+     "source": "AD HOC NEWS",
+     "query": "BHARTIARTL NSE share",
+     "id": "cac7f6908adb",
+     "tags": [
+      "NEUTRAL"
+     ],
+     "sentiment": "NEUTRAL",
+     "news_risk": false,
+     "method": "keyword heuristic",
+     "confidence": "low"
+    },
+    {
+     "title": "Indian Stock Market Today: Sensex, Nifty, NSE & BSE Live Share Prices - TechGraph",
+     "link": "https://news.google.com/rss/articles/CBMiW0FVX3lxTE9PMEM5MzZ5ZlBNd3ZVYmN5OXpINTdRZFVmRmJGcWpIVHhUM3JvMVVOUGJ6cXlIenZ4UkVaQmRkVTNIdTBrdnRGT3BEcXZ2MjZFV1Yzbi1iMjZ5TUE?oc=5",
+     "published_utc": "2026-09-27T20:53:30+00:00",
+     "source": "TechGraph",
+     "query": "BHARTIARTL NSE share",
+     "id": "2ae0b9ef6281",
+     "tags": [
+      "NEUTRAL"
+     ],
+     "sentiment": "NEUTRAL",
+     "news_risk": false,
+     "method": "keyword heuristic",
+     "confidence": "low"
+    }
+   ],
+   "news_risk": false,
+   "news_status": "ok",
+   "ai_p": 0.371,
+   "ai_view": "NEUTRAL"
+  },
+  {
+   "action": "SELL",
+   "score": -6,
+   "why": [
+    "Downtrend: close 2030.20 < SMA50 2208.85 < SMA200 2248.84",
+    "Weak momentum: RSI 31",
+    "Broke previous 20-day low 2033.50 on volume 1.7x average",
+    "Lagging NIFTY by 11.0% over 3 months"
+   ],
+   "contrib": [
+    {
+     "points": -2,
+     "rule": "Downtrend: close 2030.20 < SMA50 2208.85 < SMA200 2248.84"
+    },
+    {
+     "points": -1,
+     "rule": "Weak momentum: RSI 31"
+    },
+    {
+     "points": -2,
+     "rule": "Broke previous 20-day low 2033.50 on volume 1.7x average"
+    },
+    {
+     "points": -1,
+     "rule": "Lagging NIFTY by 11.0% over 3 months"
+    }
+   ],
+   "entry": 2030.2,
+   "stop": 1951.73,
+   "target": 2147.91,
+   "atr": 39.24,
+   "rsi": 31.4,
+   "sma50": 2208.85,
+   "sma200": 2248.84,
+   "vol_ratio": 1.72,
+   "turnover_cr": 135.8,
+   "symbol": "LUPIN",
+   "bar": "2026-09-30",
+   "strategy": "trend_breakout_swing",
+   "version": "1.1.0",
+   "sector": "Healthcare",
+   "vol20": 632528.3,
+   "signal_id": "trend_breakout_swing|LUPIN|2026-09-30",
+   "news": [],
+   "news_risk": false,
+   "news_status": "ok",
+   "ai_p": 0.398,
+   "ai_view": "NEUTRAL"
+  },
+  {
+   "action": "SELL",
+   "score": -5,
+   "why": [
+    "Downtrend: close 1130.70 < SMA50 1343.51 < SMA200 1360.22",
+    "Broke previous 20-day low 1155.60 on volume 1.7x average",
+    "Lagging NIFTY by 13.0% over 3 months"
+   ],
+   "contrib": [
+    {
+     "points": -2,
+     "rule": "Downtrend: close 1130.70 < SMA50 1343.51 < SMA200 1360.22"
+    },
+    {
+     "points": -2,
+     "rule": "Broke previous 20-day low 1155.60 on volume 1.7x average"
+    },
+    {
+     "points": -1,
+     "rule": "Lagging NIFTY by 13.0% over 3 months"
+    }
+   ],
+   "entry": 1130.7,
+   "stop": 1043.08,
+   "target": 1262.13,
+   "atr": 43.81,
+   "rsi": 24.8,
+   "sma50": 1343.51,
+   "sma200": 1360.22,
+   "vol_ratio": 1.68,
+   "turnover_cr": 21.6,
+   "symbol": "ABREL",
+   "bar": "2026-09-30",
+   "strategy": "trend_breakout_swing",
+   "version": "1.1.0",
+   "sector": "Realty",
+   "vol20": 164107.25,
+   "signal_id": "trend_breakout_swing|ABREL|2026-09-30",
+   "news": [],
+   "news_risk": false,
+   "news_status": "ok",
+   "ai_p": 0.464,
+   "ai_view": "NEUTRAL"
+  },
+  {
+   "action": "SELL",
+   "score": -5,
+   "why": [
+    "Downtrend: close 717.80 < SMA50 837.63 < SMA200 1036.68",
+    "Broke previous 20-day low 730.10 on volume 1.6x average",
+    "Lagging NIFTY by 17.6% over 3 months"
+   ],
+   "contrib": [
+    {
+     "points": -2,
+     "rule": "Downtrend: close 717.80 < SMA50 837.63 < SMA200 1036.68"
+    },
+    {
+     "points": -2,
+     "rule": "Broke previous 20-day low 730.10 on volume 1.6x average"
+    },
+    {
+     "points": -1,
+     "rule": "Lagging NIFTY by 17.6% over 3 months"
+    }
+   ],
+   "entry": 717.8,
+   "stop": 666.54,
+   "target": 794.68,
+   "atr": 25.63,
+   "rsi": 28.5,
+   "sma50": 837.63,
+   "sma200": 1036.68,
+   "vol_ratio": 1.61,
+   "turnover_cr": 23.1,
+   "symbol": "AVANTIFEED",
+   "bar": "2026-09-30",
+   "strategy": "trend_breakout_swing",
+   "version": "1.1.0",
+   "sector": "Fast Moving Consumer Goods",
+   "vol20": 291739.9,
+   "signal_id": "trend_breakout_swing|AVANTIFEED|2026-09-30",
+   "news": [],
+   "news_risk": false,
+   "news_status": "ok",
+   "ai_p": 0.493,
+   "ai_view": "AGREES"
+  },
+  {
+   "action": "SELL",
+   "score": -5,
+   "why": [
+    "Downtrend: close 1758.20 < SMA50 1985.36 < SMA200 2055.34",
+    "Broke previous 20-day low 1772.10 on volume 4.9x average",
+    "Lagging NIFTY by 7.1% over 3 months"
+   ],
+   "contrib": [
+    {
+     "points": -2,
+     "rule": "Downtrend: close 1758.20 < SMA50 1985.36 < SMA200 2055.34"
+    },
+    {
+     "points": -2,
+     "rule": "Broke previous 20-day low 1772.10 on volume 4.9x average"
+    },
+    {
+     "points": -1,
+     "rule": "Lagging NIFTY by 7.1% over 3 months"
+    }
+   ],
+   "entry": 1758.2,
+   "stop": 1651.21,
+   "target": 1918.69,
+   "atr": 53.5,
+   "rsi": 27.4,
+   "sma50": 1985.36,
+   "sma200": 2055.34,
+   "vol_ratio": 4.93,
+   "turnover_cr": 28.4,
+   "symbol": "COROMANDEL",
+   "bar": "2026-09-30",
+   "strategy": "trend_breakout_swing",
+   "version": "1.1.0",
+   "sector": "Chemicals",
+   "vol20": 124165.05,
+   "signal_id": "trend_breakout_swing|COROMANDEL|2026-09-30",
+   "news": [],
+   "news_risk": false,
+   "news_status": "ok",
+   "ai_p": 0.421,
+   "ai_view": "NEUTRAL"
+  }
+ ],
+ "blocked": [
+  {
+   "symbol": "CUPID",
+   "score": 6,
+   "reason": "score +6, but NIFTY regime is BEAR (close < SMA200 and SMA50 < SMA200)",
+   "why": [
+    "Uptrend: close 311.65 > SMA50 268.22 > SMA200 154.78",
+    "Healthy momentum: RSI 67",
+    "Broke previous 20-day high 292.25 on volume 3.4x average",
+    "Beating NIFTY by 63.2% over 3 months"
+   ],
+   "entry": 311.65,
+   "ai_p": 0.445,
+   "ai_view": "NEUTRAL"
+  }
+ ],
+ "scanned": 470,
+ "universe": 499,
+ "universe_source": "Nifty 500 (official NSE list)",
+ "strategy": {
+  "id": "trend_breakout_swing",
+  "name": "Trend + Breakout Swing",
+  "version": "1.1.0",
+  "status": "paper-approved",
+  "universe": "NIFTY 500 (NSE), price >= 50, 20-day turnover >= 10 cr",
+  "timeframe": "1d",
+  "segment": "delivery",
+  "hypothesis": "Stocks in an uptrend that break their 20-day high on above-average volume, while outperforming NIFTY, tend to continue for a few weeks. Only trade when the index itself is in an uptrend.",
+  "rules": {
+   "score": [
+    "+2 price > 50-day SMA > 200-day SMA (uptrend); -2 if the reverse",
+    "+1 21-day SMA crossed above 50-day within 4 bars; -1 if crossed below",
+    "+1 RSI(14) between 50 and 70; -1 if between 30 and 45",
+    "+2 close above previous 20-day high with volume > 1.5x 20-day average; -2 for a 20-day low",
+    "+1 3-month return beats NIFTY; -1 if it lags"
+   ],
+   "entry": "score >= +5 AND index regime BULL (or SIDEWAYS with score >= +6); no news-risk words in last 3 days",
+   "exit": "score <= -5 (SELL), stop 2xATR below entry, target 3xATR above, trailing stop 4% once up 5%, time exit 20 bars, regime turns BEAR",
+   "sizing": "1% of equity at risk between entry and stop; <= 25% of equity; <= 5% of 20-day volume; halve size when index 20-day vol > 25%"
+  },
+  "params": {
+   "buy_score": 5,
+   "sell_score": -5,
+   "stop_atr": 2.0,
+   "target_atr": 3.0,
+   "max_hold": 20,
+   "vol_mult": 1.5,
+   "rs_lookback": 63
+  },
+  "regime_filter": true,
+  "min_capital": 200000,
+  "holding": "5-20 sessions",
+  "failure_modes": [
+   "whipsaw in sideways markets (false breakouts)",
+   "gap-downs through the stop (fill worse than stop)",
+   "regime filter is slow: late entries after long rallies",
+   "news shocks; only headline words are screened"
+  ],
+  "warmup_bars": 200,
+  "param_hash": "b81c4fa041",
+  "code": true
+ },
+ "paper_actions": {
+  "IN-SWING": [
+   "Nothing to do: no fills, no exits, no new entries."
+  ],
+  "US-SWING": [
+   "Nothing to do: no fills, no exits, no new entries."
+  ],
+  "IN-OPTIONS": [
+   "HOLD NIFTY 06OCT26 22800/22600 PE DEBIT SPREAD: modeled value 111.65 vs debit 81.42, 6 days left",
+   "HOLD NIFTY 06OCT26 22700/22500 PE DEBIT SPREAD: modeled value 91.58 vs debit 78.18, 6 days left",
+   "Signal NIFTY 06OCT26 22600/22400 PE DEBIT SPREAD skipped: 2 spreads already open"
+  ],
+  "IN-VALUE": [
+   "Nothing to do: holding the long-term book."
+  ],
+  "US-VALUE": [
+   "Nothing to do: holding the long-term book."
+  ]
+ },
+ "rejected_dq": {
+  "USDINR": [
+   "high/low/close inconsistent",
+   "volume unreliable (many zero days)"
+  ],
+  "EURINR": [
+   "high/low/close inconsistent",
+   "volume unreliable (many zero days)"
+  ],
+  "GBPUSD": [
+   "high/low/close inconsistent",
+   "volume unreliable (many zero days)"
+  ],
+  "EURUSD": [
+   "high/low/close inconsistent",
+   "volume unreliable (many zero days)"
+  ],
+  "USDJPY": [
+   "high/low/close inconsistent",
+   "volume unreliable (many zero days)"
+  ],
+  "V": [
+   "high/low/close inconsistent"
+  ],
+  "UNH": [
+   "high/low/close inconsistent"
+  ],
+  "SPGI": [
+   "high/low/close inconsistent"
+  ],
+  "PLD": [
+   "high/low/close inconsistent"
+  ]
+ },
+ "failed_download": [
+  "^CNXMIDCAP",
+  "BAGMANE.NS",
+  "DUMMYHEG.NS",
+  "MMC"
+ ],
+ "skipped": {
+  "BATAINDIA": "20-day turnover 9.7 (x1e7) below 10",
+  "BHARATCOAL": "price 32.80 below minimum 50",
+  "CIEINDIA": "20-day turnover 9.6 (x1e7) below 10",
+  "CENTRALBK": "price 30.46 below minimum 50",
+  "DOMS": "20-day turnover 7.7 (x1e7) below 10",
+  "GALLANTT": "20-day turnover 5.2 (x1e7) below 10",
+  "GODREJIND": "20-day turnover 9.5 (x1e7) below 10",
+  "IRB": "price 17.49 below minimum 50",
+  "ITI": "20-day turnover 4.8 (x1e7) below 10",
+  "INDIACEM": "20-day turnover 6.0 (x1e7) below 10",
+  "IOB": "price 30.96 below minimum 50",
+  "JPPOWER": "price 15.13 below minimum 50",
+  "MMTC": "20-day turnover 8.3 (x1e7) below 10",
+  "MSUMI": "price 34.07 below minimum 50",
+  "NSLNISP": "price 41.32 below minimum 50",
+  "OLAELEC": "price 36.92 below minimum 50",
+  "RPOWER": "price 19.69 below minimum 50",
+  "SAGILITY": "price 42.58 below minimum 50",
+  "SOBHA": "20-day turnover 9.7 (x1e7) below 10",
+  "SUZLON": "price 39.49 below minimum 50",
+  "TTML": "price 34.30 below minimum 50",
+  "TRIDENT": "price 22.44 below minimum 50",
+  "UCOBANK": "price 23.28 below minimum 50",
+  "UTIAMC": "20-day turnover 8.6 (x1e7) below 10",
+  "VISL": "price 32.30 below minimum 50",
+  "VOGL": "price 33.11 below minimum 50",
+  "VEDPOWER": "price 32.84 below minimum 50",
+  "IDEA": "price 12.95 below minimum 50",
+  "YESBANK": "price 20.95 below minimum 50"
+ }
+}
