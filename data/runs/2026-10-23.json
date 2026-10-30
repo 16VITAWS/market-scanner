@@ -1,0 +1,598 @@
+{
+ "engine_version": "2.8.0",
+ "run_at": "2026-10-23T19:28:44+05:30",
+ "data_date": "2026-10-23",
+ "mode": "PAPER",
+ "data_status": "OK",
+ "regime": {
+  "state": "BEAR",
+  "text": "Index below its 200-day average and 50-day below 200-day: downtrend. No new buys; protect capital.",
+  "close": 22600.0,
+  "date": "2026-10-23",
+  "sma50": 23403.72,
+  "sma200": 24125.36,
+  "rsi": 42.4,
+  "vol20_annualised_pct": 16.3,
+  "high_vol": false,
+  "ret3m": -0.053188978036998735,
+  "support": [
+   22228.55
+  ],
+  "resistance": [
+   22776.1,
+   23175.25,
+   23532.73
+  ],
+  "rule": "BULL: close>SMA200 and SMA50>SMA200; BEAR: both below; else SIDEWAYS",
+  "computed_at": "2026-10-23T19:19:50+05:30"
+ },
+ "buys": [],
+ "sells": [
+  {
+   "action": "SELL",
+   "score": -6,
+   "why": [
+    "Downtrend: close 77.45 < SMA50 83.32 < SMA200 85.97",
+    "Weak momentum: RSI 31",
+    "Broke previous 20-day low 80.08 on volume 1.7x average",
+    "Lagging NIFTY by 3.4% over 3 months"
+   ],
+   "contrib": [
+    {
+     "points": -2,
+     "rule": "Downtrend: close 77.45 < SMA50 83.32 < SMA200 85.97"
+    },
+    {
+     "points": -1,
+     "rule": "Weak momentum: RSI 31"
+    },
+    {
+     "points": -2,
+     "rule": "Broke previous 20-day low 80.08 on volume 1.7x average"
+    },
+    {
+     "points": -1,
+     "rule": "Lagging NIFTY by 3.4% over 3 months"
+    }
+   ],
+   "entry": 77.45,
+   "stop": 73.48,
+   "target": 83.4,
+   "atr": 1.98,
+   "rsi": 31.3,
+   "sma50": 83.32,
+   "sma200": 85.97,
+   "vol_ratio": 1.7,
+   "turnover_cr": 32.1,
+   "symbol": "BAJAJHFL",
+   "bar": "2026-10-23",
+   "strategy": "trend_breakout_swing",
+   "version": "1.1.0",
+   "sector": "Financial Services",
+   "vol20": 3688896.8,
+   "signal_id": "trend_breakout_swing|BAJAJHFL|2026-10-23",
+   "news": [
+    {
+     "title": "Bajaj Housing Finance (NSE:BAJAJHFL) in Focus as Housing Demand Draws Attention - Kalkine India",
+     "link": "https://news.google.com/rss/articles/CBMivwFBVV95cUxQTThvS0JxMW5ZV0FFRG9jYjQtQnFPQkk3R3g1MEZhd24wc3ltMm5RQzF5bVU4dFdsOUxpMzhOdVFqbU9GdURpSWNyNWdBcHJ6WmdteXYwWFdYOEF4RmNHRjRQa1c5LTJmaXY3SVd4dnJnRDJiVmpXQkhtcTM0V05rby1ZaFRhNHZON1YwYTFGdmZXR2twRlIwY2tKV1Z6THFJbHZZQ2lqT0dybWZQMy0tLVhZd1RuLTZSQkFsQzQxRQ?oc=5",
+     "published_utc": "2026-10-21T10:21:00+00:00",
+     "source": "Kalkine India",
+     "query": "BAJAJHFL NSE share",
+     "id": "f4246438a8b3",
+     "tags": [
+      "NEUTRAL"
+     ],
+     "sentiment": "NEUTRAL",
+     "news_risk": false,
+     "method": "keyword heuristic",
+     "confidence": "low"
+    }
+   ],
+   "news_risk": false,
+   "news_status": "ok",
+   "ai_p": 0.381,
+   "ai_view": "NEUTRAL"
+  },
+  {
+   "action": "SELL",
+   "score": -6,
+   "why": [
+    "Downtrend: close 3060.20 < SMA50 3382.99 < SMA200 3491.48",
+    "Weak momentum: RSI 32",
+    "Broke previous 20-day low 3147.10 on volume 2.2x average",
+    "Lagging NIFTY by 2.2% over 3 months"
+   ],
+   "contrib": [
+    {
+     "points": -2,
+     "rule": "Downtrend: close 3060.20 < SMA50 3382.99 < SMA200 3491.48"
+    },
+    {
+     "points": -1,
+     "rule": "Weak momentum: RSI 32"
+    },
+    {
+     "points": -2,
+     "rule": "Broke previous 20-day low 3147.10 on volume 2.2x average"
+    },
+    {
+     "points": -1,
+     "rule": "Lagging NIFTY by 2.2% over 3 months"
+    }
+   ],
+   "entry": 3060.2,
+   "stop": 2864.25,
+   "target": 3354.13,
+   "atr": 97.98,
+   "rsi": 32.3,
+   "sma50": 3382.99,
+   "sma200": 3491.48,
+   "vol_ratio": 2.22,
+   "turnover_cr": 26.6,
+   "symbol": "CEATLTD",
+   "bar": "2026-10-23",
+   "strategy": "trend_breakout_swing",
+   "version": "1.1.0",
+   "sector": "Automobile and Auto Components",
+   "vol20": 74794.3,
+   "signal_id": "trend_breakout_swing|CEATLTD|2026-10-23",
+   "news": [
+    {
+     "title": "CEAT Ltd (NSE:CEATLTD): What Does the Duplicate Share Certificate Filing Mean? - Kalkine India",
+     "link": "https://news.google.com/rss/articles/CBMivgFBVV95cUxNTndzakxJcDlDTUtNc1hkelppTXBVNEs3dk1FTm8zTHRIVjQ0WWJkRUxQZGpQOTF1RGt2RnNhUHJTZ0FtcThEd0JRMGRLczRVWVU0Z0RidXRfQ0RFMWpLQ1VmLTZ1NHhkQnhzcWc0UXlnY1E3dlBna0xLRTQ3OUNfZ2tuR0dFSXZkek5sMmp3azBSZTVXaHUyOWpNUnhiaWJrdWU4bWQwTUF3M0FuYW1ISXY0a2NweVl0cHF1LU1n?oc=5",
+     "published_utc": "2026-10-21T10:22:00+00:00",
+     "source": "Kalkine India",
+     "query": "CEATLTD NSE share",
+     "id": "160b86f7914d",
+     "tags": [
+      "NEUTRAL"
+     ],
+     "sentiment": "NEUTRAL",
+     "news_risk": false,
+     "method": "keyword heuristic",
+     "confidence": "low"
+    },
+    {
+     "title": "CEAT Reports Lost Share Certificate and Replacement Request - Kalkine India",
+     "link": "https://news.google.com/rss/articles/CBMitwFBVV95cUxNYWVUY2pPQUV5UXp4OUFwUWVkS2tqZkMxd29LQVFtZ25vcjhGZnd0UjBhUjRBeUVhVmtXenBxYWpnaUpoSk1Cd2lyTDJRYlNhSUhhdVAwZk56Y2g5TDdMdUE0bGVCb2FoME14VTc2RTRjYlh0U29wT3JySkp3V1JiVDFwdHlWTzFxZzhzZ0FwT0Rubnh2VVk1ZG9GODZkU3pERXo0NW9CZGszaXBCQlBld0xWQmxQOGc?oc=5",
+     "published_utc": "2026-10-21T13:03:00+00:00",
+     "source": "Kalkine India",
+     "query": "CEATLTD NSE share",
+     "id": "5e50eb0c8e0b",
+     "tags": [
+      "NEUTRAL"
+     ],
+     "sentiment": "NEUTRAL",
+     "news_risk": false,
+     "method": "keyword heuristic",
+     "confidence": "low"
+    }
+   ],
+   "news_risk": false,
+   "news_status": "ok",
+   "ai_p": 0.416,
+   "ai_view": "NEUTRAL"
+  },
+  {
+   "action": "SELL",
+   "score": -6,
+   "why": [
+    "Downtrend: close 1605.00 < SMA50 1833.42 < SMA200 2001.46",
+    "Weak momentum: RSI 30",
+    "Broke previous 20-day low 1677.60 on volume 2.6x average",
+    "Lagging NIFTY by 17.7% over 3 months"
+   ],
+   "contrib": [
+    {
+     "points": -2,
+     "rule": "Downtrend: close 1605.00 < SMA50 1833.42 < SMA200 2001.46"
+    },
+    {
+     "points": -1,
+     "rule": "Weak momentum: RSI 30"
+    },
+    {
+     "points": -2,
+     "rule": "Broke previous 20-day low 1677.60 on volume 2.6x average"
+    },
+    {
+     "points": -1,
+     "rule": "Lagging NIFTY by 17.7% over 3 months"
+    }
+   ],
+   "entry": 1605.0,
+   "stop": 1496.21,
+   "target": 1768.19,
+   "atr": 54.4,
+   "rsi": 30.3,
+   "sma50": 1833.42,
+   "sma200": 2001.46,
+   "vol_ratio": 2.64,
+   "turnover_cr": 107.3,
+   "symbol": "COLPAL",
+   "bar": "2026-10-23",
+   "strategy": "trend_breakout_swing",
+   "version": "1.1.0",
+   "sector": "Fast Moving Consumer Goods",
+   "vol20": 547728.15,
+   "signal_id": "trend_breakout_swing|COLPAL|2026-10-23",
+   "news": [
+    {
+     "title": "Colgate Palmolive Q2 results: Profit up 4.2% YoY at Rs 342 crore, revenue rises 12.2%; declares Rs 24... - Moneycontrol.com",
+     "link": "https://news.google.com/rss/articles/CBMi_wFBVV95cUxNNzhtOXd4MGdiazhvN1lvbm91TU5rakZQY0duS2Z2dk5qWXZQOEhGTHFqWnFQQU03U2wwbVRzWFhPdUtBWTRpcmxWQmhlbU1DN2M0N1pyQXNRUHdFbV9DbHlUbkVkdU4yQnE0R1hfMTRZUlE2OHpOY3ppYmxoTDU5eGxEQS1CTkgxcV83d19WU3Raa2JkejFyNkd1anJCMjNHVWlaUFBVOXdQVGlNak5LVTN1aTAtaXhib2pfZ1V1U1JzU2pZNklUaHpKUm5WSlNxRGZMZG8zV1M3SXhvNlRzamZraEJYVGZLb0p3X296S1hWVllUWlBDa19NWWdYeW_SAYQCQVVfeXFMTnA5bmk3bnpDQ3NSU0JtQlg1dGlObVowd2NiTzk4NnpFbDl0WHV0WEpuV2FYMG5OR1BzcnVIZU1hWVd0YmpZSWJaaE1BRlVYQ0o3LUVaYmh5LUlhc0ZKRkpDUTNDb09vMG1sUDFtMkhUY0pCbzlkSHNCcmpPWkdtN3FqUG1HZFZ5MUxTR05KZXhGd1EzZ1RkSnhvTFVVbkhCcXRoMGs2WXU5LUdaYWRvMUM2cTZVZnJ1Vy1TRFBYcHd1RUpROFVqSUk1QVJSNzlDY2V1RTR3RFFDR1ZDZW9jU19yalgxQ2Q3enRPN25VQTk4MEZjTXJ6ZXZ6aWRSZmpudnhIS3U?oc=5",
+     "published_utc": "2026-10-22T12:24:18+00:00",
+     "source": "Moneycontrol.com",
+     "query": "COLPAL NSE share",
+     "id": "1363cbf16654",
+     "tags": [
+      "EVENT"
+     ],
+     "sentiment": "NEUTRAL",
+     "news_risk": true,
+     "method": "keyword heuristic",
+     "confidence": "low"
+    },
+    {
+     "title": "Colgate-Palmolive India COLPAL Q2 FY27 Results and Interim Dividend - Kalkine India",
+     "link": "https://news.google.com/rss/articles/CBMixAFBVV95cUxNeUdmXzVVd19hNHcxLUpUb2IzdHBickFzOW1rY3R3ZF9HWm93MU9hX1k4dmd2NXQ1dTEycEpQOTd1SkVkT0pTd3RLU0xfdHA0WEtRNno2RzJoYkREV3VzLUkyUVdFdXNMTTBQdUdSZmtjRzRER3EySjdyM1ZPWGt3WVM3RWRJNWZWQVllLVVNVW1rTmU5TGxGUTdCX3dPMWIwM2pFcklRSkstSlhhQ1l2UlVNbjktMGxfdUxPSkl2aHZYTlp4?oc=5",
+     "published_utc": "2026-10-22T11:08:00+00:00",
+     "source": "Kalkine India",
+     "query": "COLPAL NSE share",
+     "id": "52851c32b00b",
+     "tags": [
+      "EVENT"
+     ],
+     "sentiment": "NEUTRAL",
+     "news_risk": true,
+     "method": "keyword heuristic",
+     "confidence": "low"
+    },
+    {
+     "title": "Colgate shares fall 2% ahead of Q2 show; eyes on 1st earnings under new CEO - Business Standard",
+     "link": "https://news.google.com/rss/articles/CBMi1wFBVV95cUxQdndCRXI1T0VCTU8yU21vT2htdWNRaVZGeHRyOGU2VndiWDItc3l5YnJVUUdiZnFKSGp3OTAzelZiLUVCTFlWRDNNSjllRVJSUDVMYW0zTmZvSWktcE9zcFdwRmM0dFNWMFRvRDN3WFdhZ3ozeEptQlZ2dU12M014OEpEYnpDTElDNnZnY1VHWFdKWkY2bU9ZS0tuT0Yybm9icnZNYjJSTVVwZWN2OU4xT08tT2lhZGNmQzVBUzJGd0ZaZEdPb2xJY0ZmTDBPT1FlSTJOZjF6ONIB3AFBVV95cUxOSFBCRm9naHMzOS0xbFZkb29uVmM4U1hzbkRBTFFMRFdhZlBLRGVtbWdkX254cGd1NjZCbVZ0OWtMWHRvSU5PVHRQY2h6WGM4WFl1SWU2eTJyX0xKeUZ4b0tjeXBwM0Y3WkJPZzg4YTZuOUR2UnFoUUZNNVFtOXlXZnQyRjJFWnViWDdXTzVkbV81S3VQYTlpRllNTi1rV3FOaXZzbHQySDFGN3NlNTlDRzR1X1J1X0swbThjanUyWFhpN0ZrbFdwVjRsbG1GS0N6Q2dtTUNwNnFDc2hi?oc=5",
+     "published_utc": "2026-10-22T06:51:33+00:00",
+     "source": "Business Standard",
+     "query": "COLPAL NSE share",
+     "id": "8a3f06972710",
+     "tags": [
+      "NEGATIVE",
+      "EVENT"
+     ],
+     "sentiment": "NEGATIVE",
+     "news_risk": true,
+     "method": "keyword heuristic",
+     "confidence": "low"
+    },
+    {
+     "title": "Colgate-Palmolive shares hit 52-week low after Q2 results; why 6 brokerages cut target prices - Zee Business",
+     "link": "https://news.google.com/rss/articles/CBMi1gFBVV95cUxNUUEyMmxxVUZJRmY3UmxkOF8zRkhzUm44emdKa01fZ0dTUkRGR2t4aU9OOHFOWkx1dlpFcm9aZmNCOXRiSmxqVEJMUVZhMU8tUDJSaDBJMU1mQzA4WE9oZFJXdWRHTG1jdFpkWndiMlhTbWxfeVAzZ1BnMXF1ZTlpN0Exdk9yYl9MZ0oyLTlHMndzeGVxc2lWVW1NOC1NRC1wTnBLYTQ0TXhMeHdNOGJhRGIxOUJLR0ZNdVhzS05aZzNZcFowa0VtQmhRV0pFZ0RZdjJEQ3l3?oc=5",
+     "published_utc": "2026-10-23T04:36:02+00:00",
+     "source": "Zee Business",
+     "query": "COLPAL NSE share",
+     "id": "18627ea90f59",
+     "tags": [
+      "EVENT"
+     ],
+     "sentiment": "NEUTRAL",
+     "news_risk": true,
+     "method": "keyword heuristic",
+     "confidence": "low"
+    }
+   ],
+   "news_risk": true,
+   "news_status": "ok",
+   "ai_p": 0.453,
+   "ai_view": "NEUTRAL"
+  },
+  {
+   "action": "SELL",
+   "score": -6,
+   "why": [
+    "Downtrend: close 5723.50 < SMA50 6288.98 < SMA200 6716.30",
+    "Weak momentum: RSI 31",
+    "Broke previous 20-day low 5810.00 on volume 1.5x average",
+    "Lagging NIFTY by 9.2% over 3 months"
+   ],
+   "contrib": [
+    {
+     "points": -2,
+     "rule": "Downtrend: close 5723.50 < SMA50 6288.98 < SMA200 6716.30"
+    },
+    {
+     "points": -1,
+     "rule": "Weak momentum: RSI 31"
+    },
+    {
+     "points": -2,
+     "rule": "Broke previous 20-day low 5810.00 on volume 1.5x average"
+    },
+    {
+     "points": -1,
+     "rule": "Lagging NIFTY by 9.2% over 3 months"
+    }
+   ],
+   "entry": 5723.5,
+   "stop": 5392.75,
+   "target": 6219.63,
+   "atr": 165.38,
+   "rsi": 31.3,
+   "sma50": 6288.98,
+   "sma200": 6716.3,
+   "vol_ratio": 1.55,
+   "turnover_cr": 11.7,
+   "symbol": "LINDEINDIA",
+   "bar": "2026-10-23",
+   "strategy": "trend_breakout_swing",
+   "version": "1.1.0",
+   "sector": "Chemicals",
+   "vol20": 18359.8,
+   "signal_id": "trend_breakout_swing|LINDEINDIA|2026-10-23",
+   "news": [
+    {
+     "title": "Linde India Share Price Today Dips on Latest Price Fall - Univest",
+     "link": "https://news.google.com/rss/articles/CBMid0FVX3lxTE9pUF9POTFIQXpYeDgwdUx5dWdQR1FXRkJYY3MzNnVLT1cxSUxUeHVrOEZYX3o1OHdvd3BQVVYySWxDYVhpSkdwMzk2amM5NGpEV0RXRk9OUzFVSk44RlJJcVk2Sno5Tk5RTGZlWVpiWHc0cmVxSWww?oc=5",
+     "published_utc": "2026-10-21T23:01:11+00:00",
+     "source": "Univest",
+     "query": "LINDEINDIA NSE share",
+     "id": "f26c786dfa8e",
+     "tags": [
+      "NEGATIVE"
+     ],
+     "sentiment": "NEGATIVE",
+     "news_risk": false,
+     "method": "keyword heuristic",
+     "confidence": "low"
+    }
+   ],
+   "news_risk": false,
+   "news_status": "ok",
+   "ai_p": 0.409,
+   "ai_view": "NEUTRAL"
+  },
+  {
+   "action": "SELL",
+   "score": -6,
+   "why": [
+    "Downtrend: close 69.84 < SMA50 74.92 < SMA200 77.01",
+    "Weak momentum: RSI 35",
+    "Broke previous 20-day low 70.25 on volume 1.6x average",
+    "Lagging NIFTY by 7.4% over 3 months"
+   ],
+   "contrib": [
+    {
+     "points": -2,
+     "rule": "Downtrend: close 69.84 < SMA50 74.92 < SMA200 77.01"
+    },
+    {
+     "points": -1,
+     "rule": "Weak momentum: RSI 35"
+    },
+    {
+     "points": -2,
+     "rule": "Broke previous 20-day low 70.25 on volume 1.6x average"
+    },
+    {
+     "points": -1,
+     "rule": "Lagging NIFTY by 7.4% over 3 months"
+    }
+   ],
+   "entry": 69.84,
+   "stop": 66.67,
+   "target": 74.6,
+   "atr": 1.59,
+   "rsi": 34.8,
+   "sma50": 74.92,
+   "sma200": 77.01,
+   "vol_ratio": 1.61,
+   "turnover_cr": 64.1,
+   "symbol": "NHPC",
+   "bar": "2026-10-23",
+   "strategy": "trend_breakout_swing",
+   "version": "1.1.0",
+   "sector": "Power",
+   "vol20": 8500933.15,
+   "signal_id": "trend_breakout_swing|NHPC|2026-10-23",
+   "news": [],
+   "news_risk": false,
+   "news_status": "ok",
+   "ai_p": 0.382,
+   "ai_view": "NEUTRAL"
+  }
+ ],
+ "blocked": [
+  {
+   "symbol": "CYIENT",
+   "score": 6,
+   "reason": "score +6, but NIFTY regime is BEAR (close < SMA200 and SMA50 < SMA200)",
+   "why": [
+    "Uptrend: close 1233.00 > SMA50 1068.02 > SMA200 965.92",
+    "Healthy momentum: RSI 67",
+    "Broke previous 20-day high 1224.40 on volume 25.3x average",
+    "Beating NIFTY by 53.8% over 3 months"
+   ],
+   "entry": 1233.0,
+   "ai_p": 0.44,
+   "ai_view": "NEUTRAL"
+  },
+  {
+   "symbol": "FSL",
+   "score": 5,
+   "reason": "score +5, but NIFTY regime is BEAR (close < SMA200 and SMA50 < SMA200)",
+   "why": [
+    "Uptrend: close 290.40 > SMA50 268.88 > SMA200 259.80",
+    "21-day SMA crossed above 50-day within the last 4 bars",
+    "Healthy momentum: RSI 62",
+    "Beating NIFTY by 18.8% over 3 months"
+   ],
+   "entry": 290.4,
+   "ai_p": 0.468,
+   "ai_view": "AGREES"
+  },
+  {
+   "symbol": "PERSISTENT",
+   "score": 5,
+   "reason": "score +5, but NIFTY regime is BEAR (close < SMA200 and SMA50 < SMA200)",
+   "why": [
+    "Uptrend: close 5727.50 > SMA50 5571.04 > SMA200 5320.82",
+    "21-day SMA crossed above 50-day within the last 4 bars",
+    "Healthy momentum: RSI 54",
+    "Beating NIFTY by 20.2% over 3 months"
+   ],
+   "entry": 5727.5,
+   "ai_p": 0.421,
+   "ai_view": "NEUTRAL"
+  }
+ ],
+ "scanned": 468,
+ "universe": 499,
+ "universe_source": "Nifty 500 (official NSE list)",
+ "strategy": {
+  "id": "trend_breakout_swing",
+  "name": "Trend + Breakout Swing",
+  "version": "1.1.0",
+  "status": "paper-approved",
+  "universe": "NIFTY 500 (NSE), price >= 50, 20-day turnover >= 10 cr",
+  "timeframe": "1d",
+  "segment": "delivery",
+  "hypothesis": "Stocks in an uptrend that break their 20-day high on above-average volume, while outperforming NIFTY, tend to continue for a few weeks. Only trade when the index itself is in an uptrend.",
+  "rules": {
+   "score": [
+    "+2 price > 50-day SMA > 200-day SMA (uptrend); -2 if the reverse",
+    "+1 21-day SMA crossed above 50-day within 4 bars; -1 if crossed below",
+    "+1 RSI(14) between 50 and 70; -1 if between 30 and 45",
+    "+2 close above previous 20-day high with volume > 1.5x 20-day average; -2 for a 20-day low",
+    "+1 3-month return beats NIFTY; -1 if it lags"
+   ],
+   "entry": "score >= +5 AND index regime BULL (or SIDEWAYS with score >= +6); no news-risk words in last 3 days",
+   "exit": "score <= -5 (SELL), stop 2xATR below entry, target 3xATR above, trailing stop 4% once up 5%, time exit 20 bars, regime turns BEAR",
+   "sizing": "1% of equity at risk between entry and stop; <= 25% of equity; <= 5% of 20-day volume; halve size when index 20-day vol > 25%"
+  },
+  "params": {
+   "buy_score": 5,
+   "sell_score": -5,
+   "stop_atr": 2.0,
+   "target_atr": 3.0,
+   "max_hold": 20,
+   "vol_mult": 1.5,
+   "rs_lookback": 63
+  },
+  "regime_filter": true,
+  "min_capital": 200000,
+  "holding": "5-20 sessions",
+  "failure_modes": [
+   "whipsaw in sideways markets (false breakouts)",
+   "gap-downs through the stop (fill worse than stop)",
+   "regime filter is slow: late entries after long rallies",
+   "news shocks; only headline words are screened"
+  ],
+  "warmup_bars": 200,
+  "param_hash": "b81c4fa041",
+  "code": true
+ },
+ "paper_actions": {
+  "IN-SWING": [
+   "Nothing to do: no fills, no exits, no new entries."
+  ],
+  "US-SWING": [
+   "Risk engine REJECTED PGR: maximum open positions reached"
+  ],
+  "IN-OPTIONS": [
+   "HOLD NIFTY 27OCT26 22700/22500 PE DEBIT SPREAD: modeled value 97.43 vs debit 80.45, 4 days left",
+   "HOLD NIFTY 03NOV26 22600/22400 PE DEBIT SPREAD: modeled value 83.74 vs debit 83.74, 11 days left",
+   "Signal NIFTY 03NOV26 22600/22400 PE DEBIT SPREAD skipped: 2 spreads already open"
+  ],
+  "IN-BRAIN": [
+   "NO TRADE today: no opportunity passed every check. Waiting is a valid decision."
+  ],
+  "IN-VALUE": [
+   "Nothing to do: holding the long-term book."
+  ],
+  "US-VALUE": [
+   "ADBE: trailing stop raised to 255.90"
+  ]
+ },
+ "rejected_dq": {
+  "USDINR": [
+   "high/low/close inconsistent",
+   "volume unreliable (many zero days)"
+  ],
+  "EURINR": [
+   "high/low/close inconsistent",
+   "volume unreliable (many zero days)"
+  ],
+  "GBPUSD": [
+   "high/low/close inconsistent",
+   "volume unreliable (many zero days)"
+  ],
+  "EURUSD": [
+   "high/low/close inconsistent",
+   "volume unreliable (many zero days)"
+  ],
+  "USDJPY": [
+   "high/low/close inconsistent",
+   "volume unreliable (many zero days)"
+  ],
+  "BRENT": [
+   "high/low/close inconsistent"
+  ],
+  "NATGAS": [
+   "high/low/close inconsistent",
+   "price jump > 25% on 2026-01-29 (corporate action or bad tick?)"
+  ],
+  "US2Y": [
+   "non-positive price",
+   "high/low/close inconsistent"
+  ],
+  "DHR": [
+   "high/low/close inconsistent"
+  ],
+  "DE": [
+   "high/low/close inconsistent"
+  ],
+  "BA": [
+   "high/low/close inconsistent"
+  ],
+  "GM": [
+   "high/low/close inconsistent"
+  ]
+ },
+ "failed_download": [
+  "^CNXMIDCAP",
+  "BAGMANE.NS",
+  "DUMMYHEG.NS",
+  "MMC"
+ ],
+ "skipped": {
+  "ASAHIINDIA": "20-day turnover 8.5 (x1e7) below 10",
+  "AIIL": "20-day turnover 9.3 (x1e7) below 10",
+  "BATAINDIA": "20-day turnover 8.4 (x1e7) below 10",
+  "BHARATCOAL": "price 29.76 below minimum 50",
+  "CIEINDIA": "20-day turnover 7.6 (x1e7) below 10",
+  "CENTRALBK": "price 28.83 below minimum 50",
+  "DOMS": "20-day turnover 4.6 (x1e7) below 10",
+  "FACT": "20-day turnover 7.3 (x1e7) below 10",
+  "ICICILIFE": "20-day turnover 0.0 (x1e7) below 10",
+  "IRB": "price 16.24 below minimum 50",
+  "ITI": "20-day turnover 5.2 (x1e7) below 10",
+  "INDIAMART": "20-day turnover 8.8 (x1e7) below 10",
+  "IOB": "price 28.68 below minimum 50",
+  "JPPOWER": "price 12.67 below minimum 50",
+  "MSUMI": "price 34.60 below minimum 50",
+  "NSLNISP": "price 37.56 below minimum 50",
+  "OLAELEC": "price 29.93 below minimum 50",
+  "RPOWER": "price 16.43 below minimum 50",
+  "SJVN": "price 47.40 below minimum 50",
+  "SAGILITY": "price 44.18 below minimum 50",
+  "SUZLON": "price 37.40 below minimum 50",
+  "TTML": "price 37.68 below minimum 50",
+  "TRIDENT": "price 20.49 below minimum 50",
+  "UCOBANK": "price 21.63 below minimum 50",
+  "UTIAMC": "20-day turnover 6.5 (x1e7) below 10",
+  "VISL": "price 26.22 below minimum 50",
+  "VOGL": "price 27.17 below minimum 50",
+  "VEDPOWER": "price 28.26 below minimum 50",
+  "IDEA": "price 11.36 below minimum 50",
+  "YESBANK": "price 15.80 below minimum 50",
+  "ZYDUSWELL": "20-day turnover 6.3 (x1e7) below 10"
+ }
+}

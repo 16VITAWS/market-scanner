@@ -1,0 +1,124 @@
+{
+ "mood": {
+  "state": "BEAR",
+  "text": "Market is in a downtrend. No new buys \u2014 protect your money.",
+  "close": 23140.5,
+  "date": "2026-09-25",
+  "vol": 9.2,
+  "high_vol": false,
+  "ret3m": -0.033648274782064
+ },
+ "buys": [],
+ "sells": [
+  {
+   "symbol": "TMPV",
+   "score": -6,
+   "why": [
+    "Downtrend (price below 50 and 200 day averages)",
+    "Weak momentum (RSI 31)",
+    "Broke 20 day low on strong volume",
+    "Lagging Nifty by 14.2% over 3 months"
+   ],
+   "entry": 290.45,
+   "news": [
+    {
+     "title": "Tata Motors PV (NSE: TMPV) Down 1.54% at \u20b9290.45: EMA 51, RSI and Q1 Numbers - Kalkine India",
+     "link": "https://news.google.com/rss/articles/CBMi2wFBVV95cUxQdWh6QlJEVjU2Ui1xSkRPMDM0VFR1Y2Yxd0N0YUwySERDeU9XWnlZTGtjT05aN2dDQkJzaHp1emZNemJhLUI4dFExZHBaODZhaXFqbUZIcXZ6Ny0yQl9QWVpaOHNRQnJHd29xamxTYzVxSThYUENMdTFHMDZ4Zk91RmRfbWZlenp0NzNBRGQ1NmJZS0VfdmtfeTVvOWUybjVFQWdlMkE1ZGFNcDE1cjh2aEYwNnFibFNpS2xONU40Z0JCNm5TR1BDYmpuYmJZVnRNRG81MVgtdmlsOFU?oc=5"
+    }
+   ],
+   "news_risk": true
+  },
+  {
+   "symbol": "BEL",
+   "score": -5,
+   "why": [
+    "Downtrend (price below 50 and 200 day averages)",
+    "21 day average just crossed below 50 day",
+    "Weak momentum (RSI 43)",
+    "Lagging Nifty by 0.9% over 3 months"
+   ],
+   "entry": 393.55,
+   "news": [
+    {
+     "title": "Live: PB Fintech sees record single day fall on IRDAI draft; NSE shares list | Closing Bell - Moneycontrol.com",
+     "link": "https://news.google.com/rss/articles/CBMi8AFBVV95cUxPRzMzRlQ3ZkJ5Z0hWanY0VmFjXzJWdXpZWVBaZlNnb2RwREpKajVlbjF4WXZGUEQySkdTckgxczNjM3RoRWFMa3BPZkRJMVhrZUpzWWRXeG9VTzNGNUNhUUJlME8wanpOcDNjOGRFdFJCUU9Cc3hOS282bEdVSERUN0dtQVhFQ3JEeG1pdWp6dmtNTVZ2emozMGlObG1zX2p3QzNXUXZrel9NTFY5Z09zZDIwWUZacTFTWWZvZGt6SDE3eHd6RzVra3NNVU9pakIxV3hIazFlQlhseU1WMkswYVlVWXIyOVY0b2R0bkdjLXjSAfYBQVVfeXFMTll1SzMxMEVaZW9UWDNhZ2hNZDBYZ0RvN0hwUlNyVF9CazlFZXBZd01KRjVKNGNKNkdlQUhkT1h0SGI3ZXRyYmpncUo5T2RfR05fWnBCeEE2QzFGbHR6RXBPVzlEUjV4VFBzcHA0UjdER0s4SlJrZ25neWVZZmJOdV9fd19SZGNQOEc2RzRXeHhvZXJxWjB5R0lFdjZYVVlGT0pucVR6UU8yUVhiVWxubmlUQ2ppMDRpTFZGRGo5OHpqRnJWd2c2Q3A4NnF0SDhMSWpGVFk5enJLOGtZNDEwOG9FOTZsM2lKZ0NvbW1MSklQVkhRaDB3?oc=5"
+    }
+   ],
+   "news_risk": false
+  },
+  {
+   "symbol": "CHOLAHLDNG",
+   "score": -5,
+   "why": [
+    "Downtrend (price below 50 and 200 day averages)",
+    "Broke 20 day low on strong volume",
+    "Lagging Nifty by 12.0% over 3 months"
+   ],
+   "entry": 1400.6,
+   "news": [
+    {
+     "title": "NSE set for trading debut as India\u2019s biggest stock exchange, modest gains seen - TradingView",
+     "link": "https://news.google.com/rss/articles/CBMizwFBVV95cUxPZjh1S3p2VTdDWERnUF84bjZiSzhTMTZfZjNQSzR0QlctX25ELVFpOFZpcExPQjlndE9DTU9FWDN4Qi1uZHQwRjhKZUJVTkZETlJadERBQlVHREZOZGxPeHZtNng1dkUtNlVtN2ZMQjlINDhoR3VpS1Y3MnN0TUNnUzBTLTNwWHlNUzNQWGdMVmN2Q1ZRa09xcXhoSHRqV2dsdmRXOEt4c25LX1ZfRDUxTlB2cU1adGxNWUlSa0k4ZU5oWjA4R3NXaU5ORl9MWE0?oc=5"
+    }
+   ],
+   "news_risk": false
+  },
+  {
+   "symbol": "COCHINSHIP",
+   "score": -5,
+   "why": [
+    "Downtrend (price below 50 and 200 day averages)",
+    "21 day average just crossed below 50 day",
+    "Weak momentum (RSI 42)",
+    "Lagging Nifty by 5.2% over 3 months"
+   ],
+   "entry": 1377.0,
+   "news": [],
+   "news_risk": false
+  }
+ ],
+ "waits": [
+  {
+   "symbol": "ADANIPORTS",
+   "reason": "score +5, but market is in a downtrend"
+  },
+  {
+   "symbol": "AEGISLOG",
+   "reason": "score +5, but market is in a downtrend"
+  },
+  {
+   "symbol": "CASTROLIND",
+   "reason": "score +5, but market is in a downtrend"
+  },
+  {
+   "symbol": "ENGINERSIN",
+   "reason": "score +5, but market is in a downtrend"
+  },
+  {
+   "symbol": "ZYDUSLIFE",
+   "reason": "score +6, but market is in a downtrend"
+  }
+ ],
+ "paper": {
+  "closed": 0,
+  "wins": 0,
+  "open": 0,
+  "win_rate": null,
+  "avg_pct": null
+ },
+ "pf": {
+  "cash": 200000,
+  "start": 200000,
+  "positions": [],
+  "pending": [],
+  "equity": [],
+  "log": []
+ },
+ "actions": [
+  "Market data not updated today \u2014 no trades."
+ ],
+ "pstats": null,
+ "count": 494,
+ "source": "Nifty 500 (official NSE list)",
+ "stale": true
+}
