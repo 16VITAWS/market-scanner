@@ -1,0 +1,259 @@
+{
+ "engine_version": "2.8.0",
+ "run_at": "2026-10-07T00:04:43+05:30",
+ "data_date": "2026-10-06",
+ "mode": "PAPER",
+ "data_status": "OK",
+ "regime": {
+  "state": "BEAR",
+  "text": "Index below its 200-day average and 50-day below 200-day: downtrend. No new buys; protect capital.",
+  "close": 22776.1,
+  "date": "2026-10-06",
+  "sma50": 23823.99,
+  "sma200": 24324.14,
+  "rsi": 36.3,
+  "vol20_annualised_pct": 11.6,
+  "high_vol": false,
+  "ret3m": -0.06650352934094372,
+  "support": [
+   22217.3
+  ],
+  "resistance": [
+   23532.73,
+   23839.3,
+   24388.19
+  ],
+  "rule": "BULL: close>SMA200 and SMA50>SMA200; BEAR: both below; else SIDEWAYS",
+  "computed_at": "2026-10-06T23:55:50+05:30"
+ },
+ "buys": [],
+ "sells": [],
+ "blocked": [
+  {
+   "symbol": "AETHER",
+   "score": 6,
+   "reason": "score +6, but NIFTY regime is BEAR (close < SMA200 and SMA50 < SMA200)",
+   "why": [
+    "Uptrend: close 1799.80 > SMA50 1632.55 > SMA200 1245.31",
+    "Healthy momentum: RSI 65",
+    "Broke previous 20-day high 1798.00 on volume 5.0x average",
+    "Beating NIFTY by 34.0% over 3 months"
+   ],
+   "entry": 1799.8,
+   "ai_p": 0.427,
+   "ai_view": "NEUTRAL"
+  },
+  {
+   "symbol": "BHEL",
+   "score": 6,
+   "reason": "score +6, but NIFTY regime is BEAR (close < SMA200 and SMA50 < SMA200)",
+   "why": [
+    "Uptrend: close 452.00 > SMA50 421.10 > SMA200 350.30",
+    "Healthy momentum: RSI 65",
+    "Broke previous 20-day high 439.90 on volume 3.7x average",
+    "Beating NIFTY by 25.5% over 3 months"
+   ],
+   "entry": 452.0,
+   "ai_p": 0.391,
+   "ai_view": "NEUTRAL"
+  },
+  {
+   "symbol": "MOTILALOFS",
+   "score": 6,
+   "reason": "score +6, but NIFTY regime is BEAR (close < SMA200 and SMA50 < SMA200)",
+   "why": [
+    "Uptrend: close 1081.15 > SMA50 974.94 > SMA200 861.60",
+    "Healthy momentum: RSI 66",
+    "Broke previous 20-day high 1060.20 on volume 3.0x average",
+    "Beating NIFTY by 21.4% over 3 months"
+   ],
+   "entry": 1081.15,
+   "ai_p": 0.416,
+   "ai_view": "NEUTRAL"
+  },
+  {
+   "symbol": "PETRONET",
+   "score": 6,
+   "reason": "score +6, but NIFTY regime is BEAR (close < SMA200 and SMA50 < SMA200)",
+   "why": [
+    "Uptrend: close 297.50 > SMA50 286.17 > SMA200 279.90",
+    "Healthy momentum: RSI 61",
+    "Broke previous 20-day high 294.00 on volume 3.1x average",
+    "Beating NIFTY by 16.2% over 3 months"
+   ],
+   "entry": 297.5,
+   "ai_p": 0.381,
+   "ai_view": "NEUTRAL"
+  },
+  {
+   "symbol": "RRKABEL",
+   "score": 6,
+   "reason": "score +6, but NIFTY regime is BEAR (close < SMA200 and SMA50 < SMA200)",
+   "why": [
+    "Uptrend: close 2789.70 > SMA50 2637.41 > SMA200 1963.52",
+    "Healthy momentum: RSI 67",
+    "Broke previous 20-day high 2654.90 on volume 2.4x average",
+    "Beating NIFTY by 34.1% over 3 months"
+   ],
+   "entry": 2789.7,
+   "ai_p": 0.407,
+   "ai_view": "NEUTRAL"
+  },
+  {
+   "symbol": "STLTECH",
+   "score": 5,
+   "reason": "score +5, but NIFTY regime is BEAR (close < SMA200 and SMA50 < SMA200)",
+   "why": [
+    "Uptrend: close 1016.70 > SMA50 744.51 > SMA200 421.84",
+    "Overbought: RSI 77 (no points; do not chase)",
+    "Broke previous 20-day high 1003.10 on volume 1.6x average",
+    "Beating NIFTY by 90.1% over 3 months"
+   ],
+   "entry": 1016.7,
+   "ai_p": 0.488,
+   "ai_view": "AGREES"
+  },
+  {
+   "symbol": "TRENT",
+   "score": 6,
+   "reason": "score +6, but NIFTY regime is BEAR (close < SMA200 and SMA50 < SMA200)",
+   "why": [
+    "Uptrend: close 2906.00 > SMA50 2862.53 > SMA200 2825.49",
+    "Healthy momentum: RSI 63",
+    "Broke previous 20-day high 2847.90 on volume 10.0x average",
+    "Beating NIFTY by 6.7% over 3 months"
+   ],
+   "entry": 2906.0,
+   "ai_p": 0.364,
+   "ai_view": "DISAGREES"
+  }
+ ],
+ "scanned": 469,
+ "universe": 499,
+ "universe_source": "Nifty 500 (official NSE list)",
+ "strategy": {
+  "id": "trend_breakout_swing",
+  "name": "Trend + Breakout Swing",
+  "version": "1.1.0",
+  "status": "paper-approved",
+  "universe": "NIFTY 500 (NSE), price >= 50, 20-day turnover >= 10 cr",
+  "timeframe": "1d",
+  "segment": "delivery",
+  "hypothesis": "Stocks in an uptrend that break their 20-day high on above-average volume, while outperforming NIFTY, tend to continue for a few weeks. Only trade when the index itself is in an uptrend.",
+  "rules": {
+   "score": [
+    "+2 price > 50-day SMA > 200-day SMA (uptrend); -2 if the reverse",
+    "+1 21-day SMA crossed above 50-day within 4 bars; -1 if crossed below",
+    "+1 RSI(14) between 50 and 70; -1 if between 30 and 45",
+    "+2 close above previous 20-day high with volume > 1.5x 20-day average; -2 for a 20-day low",
+    "+1 3-month return beats NIFTY; -1 if it lags"
+   ],
+   "entry": "score >= +5 AND index regime BULL (or SIDEWAYS with score >= +6); no news-risk words in last 3 days",
+   "exit": "score <= -5 (SELL), stop 2xATR below entry, target 3xATR above, trailing stop 4% once up 5%, time exit 20 bars, regime turns BEAR",
+   "sizing": "1% of equity at risk between entry and stop; <= 25% of equity; <= 5% of 20-day volume; halve size when index 20-day vol > 25%"
+  },
+  "params": {
+   "buy_score": 5,
+   "sell_score": -5,
+   "stop_atr": 2.0,
+   "target_atr": 3.0,
+   "max_hold": 20,
+   "vol_mult": 1.5,
+   "rs_lookback": 63
+  },
+  "regime_filter": true,
+  "min_capital": 200000,
+  "holding": "5-20 sessions",
+  "failure_modes": [
+   "whipsaw in sideways markets (false breakouts)",
+   "gap-downs through the stop (fill worse than stop)",
+   "regime filter is slow: late entries after long rallies",
+   "news shocks; only headline words are screened"
+  ],
+  "warmup_bars": 200,
+  "param_hash": "b81c4fa041",
+  "code": true
+ },
+ "paper_actions": {
+  "IN-SWING": [
+   "Nothing to do: no fills, no exits, no new entries."
+  ],
+  "US-SWING": [
+   "Nothing to do: no fills, no exits, no new entries."
+  ],
+  "IN-OPTIONS": [
+   "HOLD NIFTY 13OCT26 22550/22350 PE DEBIT SPREAD: modeled value 41.48 vs debit 78.81, 7 days left",
+   "HOLD NIFTY 13OCT26 22800/22600 PE DEBIT SPREAD: modeled value 81.52 vs debit 81.52, 7 days left",
+   "Signal NIFTY 13OCT26 22800/22600 PE DEBIT SPREAD skipped: 2 spreads already open"
+  ],
+  "IN-BRAIN": [
+   "NO TRADE today: no opportunity passed every check. Waiting is a valid decision."
+  ],
+  "IN-VALUE": [
+   "Nothing to do: holding the long-term book."
+  ],
+  "US-VALUE": [
+   "Nothing to do: holding the long-term book."
+  ]
+ },
+ "rejected_dq": {
+  "USDINR": [
+   "high/low/close inconsistent",
+   "volume unreliable (many zero days)"
+  ],
+  "EURINR": [
+   "high/low/close inconsistent",
+   "volume unreliable (many zero days)"
+  ],
+  "GBPUSD": [
+   "high/low/close inconsistent",
+   "volume unreliable (many zero days)"
+  ],
+  "EURUSD": [
+   "high/low/close inconsistent",
+   "volume unreliable (many zero days)"
+  ],
+  "USDJPY": [
+   "high/low/close inconsistent",
+   "volume unreliable (many zero days)"
+  ]
+ },
+ "failed_download": [
+  "^CNXMIDCAP",
+  "BAGMANE.NS",
+  "DUMMYHEG.NS",
+  "MMC"
+ ],
+ "skipped": {
+  "BATAINDIA": "20-day turnover 9.7 (x1e7) below 10",
+  "BHARATCOAL": "price 32.05 below minimum 50",
+  "CIEINDIA": "20-day turnover 8.8 (x1e7) below 10",
+  "CENTRALBK": "price 30.19 below minimum 50",
+  "DOMS": "20-day turnover 6.8 (x1e7) below 10",
+  "GALLANTT": "20-day turnover 4.4 (x1e7) below 10",
+  "GODREJIND": "20-day turnover 9.5 (x1e7) below 10",
+  "HEXT": "20-day turnover 7.8 (x1e7) below 10",
+  "IRB": "price 17.84 below minimum 50",
+  "ITI": "20-day turnover 5.0 (x1e7) below 10",
+  "INDIACEM": "20-day turnover 6.5 (x1e7) below 10",
+  "IOB": "price 31.46 below minimum 50",
+  "JPPOWER": "price 15.00 below minimum 50",
+  "MMTC": "20-day turnover 5.3 (x1e7) below 10",
+  "MSUMI": "price 33.31 below minimum 50",
+  "NSLNISP": "price 40.90 below minimum 50",
+  "NUVOCO": "20-day turnover 9.4 (x1e7) below 10",
+  "OLAELEC": "price 35.96 below minimum 50",
+  "RPOWER": "price 20.49 below minimum 50",
+  "SAGILITY": "price 43.88 below minimum 50",
+  "SUZLON": "price 39.16 below minimum 50",
+  "TTML": "price 34.18 below minimum 50",
+  "TRIDENT": "price 22.56 below minimum 50",
+  "UCOBANK": "price 23.27 below minimum 50",
+  "UTIAMC": "20-day turnover 7.2 (x1e7) below 10",
+  "VISL": "price 30.75 below minimum 50",
+  "VOGL": "price 31.41 below minimum 50",
+  "VEDPOWER": "price 32.53 below minimum 50",
+  "IDEA": "price 13.21 below minimum 50",
+  "YESBANK": "price 20.86 below minimum 50"
+ }
+}

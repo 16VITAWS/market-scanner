@@ -1,0 +1,525 @@
+{
+ "engine_version": "2.8.0",
+ "run_at": "2026-10-22T19:31:53+05:30",
+ "data_date": "2026-10-22",
+ "mode": "PAPER",
+ "data_status": "OK",
+ "regime": {
+  "state": "BEAR",
+  "text": "Index below its 200-day average and 50-day below 200-day: downtrend. No new buys; protect capital.",
+  "close": 22687.65,
+  "date": "2026-10-22",
+  "sma50": 23441.16,
+  "sma200": 24142.06,
+  "rsi": 44.0,
+  "vol20_annualised_pct": 16.5,
+  "high_vol": false,
+  "ret3m": -0.0545335045840496,
+  "support": [
+   22228.55
+  ],
+  "resistance": [
+   22776.1,
+   23175.25,
+   23532.73
+  ],
+  "rule": "BULL: close>SMA200 and SMA50>SMA200; BEAR: both below; else SIDEWAYS",
+  "computed_at": "2026-10-22T19:23:06+05:30"
+ },
+ "buys": [],
+ "sells": [
+  {
+   "action": "SELL",
+   "score": -5,
+   "why": [
+    "Downtrend: close 3166.00 < SMA50 3731.08 < SMA200 3972.05",
+    "Broke previous 20-day low 3224.50 on volume 1.8x average",
+    "Lagging NIFTY by 15.4% over 3 months"
+   ],
+   "contrib": [
+    {
+     "points": -2,
+     "rule": "Downtrend: close 3166.00 < SMA50 3731.08 < SMA200 3972.05"
+    },
+    {
+     "points": -2,
+     "rule": "Broke previous 20-day low 3224.50 on volume 1.8x average"
+    },
+    {
+     "points": -1,
+     "rule": "Lagging NIFTY by 15.4% over 3 months"
+    }
+   ],
+   "entry": 3166.0,
+   "stop": 2989.85,
+   "target": 3430.22,
+   "atr": 88.07,
+   "rsi": 22.2,
+   "sma50": 3731.08,
+   "sma200": 3972.05,
+   "vol_ratio": 1.8,
+   "turnover_cr": 273.2,
+   "symbol": "DMART",
+   "bar": "2026-10-22",
+   "strategy": "trend_breakout_swing",
+   "version": "1.1.0",
+   "sector": "Consumer Services",
+   "vol20": 737207.35,
+   "signal_id": "trend_breakout_swing|DMART|2026-10-22",
+   "news": [],
+   "news_risk": false,
+   "news_status": "ok",
+   "ai_p": 0.405,
+   "ai_view": "NEUTRAL"
+  },
+  {
+   "action": "SELL",
+   "score": -5,
+   "why": [
+    "Downtrend: close 158.44 < SMA50 171.08 < SMA200 175.63",
+    "21-day SMA crossed below 50-day within the last 4 bars",
+    "Weak momentum: RSI 40",
+    "Lagging NIFTY by 2.4% over 3 months"
+   ],
+   "contrib": [
+    {
+     "points": -2,
+     "rule": "Downtrend: close 158.44 < SMA50 171.08 < SMA200 175.63"
+    },
+    {
+     "points": -1,
+     "rule": "21-day SMA crossed below 50-day within the last 4 bars"
+    },
+    {
+     "points": -1,
+     "rule": "Weak momentum: RSI 40"
+    },
+    {
+     "points": -1,
+     "rule": "Lagging NIFTY by 2.4% over 3 months"
+    }
+   ],
+   "entry": 158.44,
+   "stop": 145.13,
+   "target": 178.4,
+   "atr": 6.65,
+   "rsi": 39.8,
+   "sma50": 171.08,
+   "sma200": 175.63,
+   "vol_ratio": 0.35,
+   "turnover_cr": 249.0,
+   "symbol": "BANDHANBNK",
+   "bar": "2026-10-22",
+   "strategy": "trend_breakout_swing",
+   "version": "1.1.0",
+   "sector": "Financial Services",
+   "vol20": 15193323.65,
+   "signal_id": "trend_breakout_swing|BANDHANBNK|2026-10-22",
+   "news": [
+    {
+     "title": "Bandhan Bank Share Price News: Price Fall and Valuation - Univest",
+     "link": "https://news.google.com/rss/articles/CBMieEFVX3lxTFBqNkw2LXZ2cjdEX25UMzJONXFZdmNRRkJwaV80UDRmSnlTcTg2ZkV0OEZYZllnakpOVlpHM1pHbzZfYkVoM2tRTHpUSnVuVjdSajNQR3NEcDFTR2xOUEVYZ25JX3I5cEpnN2d6bUdCOXIyTlZaVFZJUQ?oc=5",
+     "published_utc": "2026-10-21T23:37:59+00:00",
+     "source": "Univest",
+     "query": "BANDHANBNK NSE share",
+     "id": "70e63f513292",
+     "tags": [
+      "NEGATIVE"
+     ],
+     "sentiment": "NEGATIVE",
+     "news_risk": true,
+     "method": "keyword heuristic",
+     "confidence": "low"
+    }
+   ],
+   "news_risk": true,
+   "news_status": "ok",
+   "ai_p": 0.439,
+   "ai_view": "NEUTRAL"
+  },
+  {
+   "action": "SELL",
+   "score": -5,
+   "why": [
+    "Downtrend: close 1955.80 < SMA50 2369.99 < SMA200 2512.52",
+    "Broke previous 20-day low 2000.00 on volume 3.9x average",
+    "Lagging NIFTY by 18.8% over 3 months"
+   ],
+   "contrib": [
+    {
+     "points": -2,
+     "rule": "Downtrend: close 1955.80 < SMA50 2369.99 < SMA200 2512.52"
+    },
+    {
+     "points": -2,
+     "rule": "Broke previous 20-day low 2000.00 on volume 3.9x average"
+    },
+    {
+     "points": -1,
+     "rule": "Lagging NIFTY by 18.8% over 3 months"
+    }
+   ],
+   "entry": 1955.8,
+   "stop": 1813.73,
+   "target": 2168.9,
+   "atr": 71.03,
+   "rsi": 26.8,
+   "sma50": 2369.99,
+   "sma200": 2512.52,
+   "vol_ratio": 3.91,
+   "turnover_cr": 86.1,
+   "symbol": "GRSE",
+   "bar": "2026-10-22",
+   "strategy": "trend_breakout_swing",
+   "version": "1.1.0",
+   "sector": "Capital Goods",
+   "vol20": 366684.9,
+   "signal_id": "trend_breakout_swing|GRSE|2026-10-22",
+   "news": [],
+   "news_risk": false,
+   "news_status": "ok",
+   "ai_p": 0.465,
+   "ai_view": "AGREES"
+  },
+  {
+   "action": "SELL",
+   "score": -5,
+   "why": [
+    "Downtrend: close 694.05 < SMA50 716.85 < SMA200 790.48",
+    "21-day SMA crossed below 50-day within the last 4 bars",
+    "Weak momentum: RSI 41",
+    "Lagging NIFTY by 2.4% over 3 months"
+   ],
+   "contrib": [
+    {
+     "points": -2,
+     "rule": "Downtrend: close 694.05 < SMA50 716.85 < SMA200 790.48"
+    },
+    {
+     "points": -1,
+     "rule": "21-day SMA crossed below 50-day within the last 4 bars"
+    },
+    {
+     "points": -1,
+     "rule": "Weak momentum: RSI 41"
+    },
+    {
+     "points": -1,
+     "rule": "Lagging NIFTY by 2.4% over 3 months"
+    }
+   ],
+   "entry": 694.05,
+   "stop": 663.2,
+   "target": 740.33,
+   "atr": 15.43,
+   "rsi": 41.3,
+   "sma50": 716.85,
+   "sma200": 790.48,
+   "vol_ratio": 1.99,
+   "turnover_cr": 2243.5,
+   "symbol": "HDFCBANK",
+   "bar": "2026-10-22",
+   "strategy": "trend_breakout_swing",
+   "version": "1.1.0",
+   "sector": "Financial Services",
+   "vol20": 30222673.6,
+   "signal_id": "trend_breakout_swing|HDFCBANK|2026-10-22",
+   "news": [
+    {
+     "title": "HDFCBANK Share Price Today - HDFC Bank on NSE/BSE - scanx.trade",
+     "link": "https://news.google.com/rss/articles/CBMiU0FVX3lxTE1TQy1XYndZWDl2dzR6OXFVU085ZFEtUml4dHY0eHJuTUZOSHZPNEgwZW1mUTlidlREQXUxOE1YeWtfaWFkUS1BbFlUcERVMDFacjZZ?oc=5",
+     "published_utc": "2026-10-20T11:31:56+00:00",
+     "source": "scanx.trade",
+     "query": "HDFCBANK NSE share",
+     "id": "73318fe5e5a2",
+     "tags": [
+      "NEGATIVE"
+     ],
+     "sentiment": "NEGATIVE",
+     "news_risk": true,
+     "method": "keyword heuristic",
+     "confidence": "low"
+    },
+    {
+     "title": "HDFC Bank shares stock fall despite profit growth as street stays unimpressed - BusinessLine",
+     "link": "https://news.google.com/rss/articles/CBMi0gFBVV95cUxNVUxZUHpBMHZxdkFiVzUwNXkyOF80a2lYdjJhckFxdXdTLU5mYmZnLWJMV2UzRmxkQ2d2d2wwNXRQVThtSGNDeE9tUlJJUUI2elFwQlFuU1JIQ2lNbVFydExKbEI5aFpMRDBUWTlHdXU5MGQ2enplczNvRjc5Q2g3UW5CYVEtMUozQTkyTnRpNUFxaWFiRG96a1pBb3Z3RUJLdFh0RExwdUp2bWpzbHkzQTRJVE56T3dkNmJ1M3Q3Q0NtYTRUSmVDbXR4WktCM19Vb0HSAdgBQVVfeXFMUFhDdHBhR19QR3NuOXdnXzhUYUh5UG02c3RwWUZzMDdxWVdFOWotRHZzU01Vdk1yWjA0V2tfUGVWZjJPZW9senhqblkzRjMxMTc1MmVEeTlvX01yMVo3QnBsNjBocUF6QXhXekJJNGxOdTlEWWluMXVSUDdUeGEyZnR2ZUktV1FQRnVaTDdTSDlHV0lRRDFld3lINFZIeUcxNVZVclBhTWZkQmxwWXNvRDNLV3lZay13T3Jidzl6NDA3RDg4Vzk4YWx1RDVJSGZ3c2FFS2c0aTBy?oc=5",
+     "published_utc": "2026-10-21T06:48:50+00:00",
+     "source": "BusinessLine",
+     "query": "HDFCBANK NSE share",
+     "id": "2199b0a71c3e",
+     "tags": [
+      "NEGATIVE"
+     ],
+     "sentiment": "NEGATIVE",
+     "news_risk": true,
+     "method": "keyword heuristic",
+     "confidence": "low"
+    },
+    {
+     "title": "HDFC Bank stock dips 2% on huge volume; trades lower for third straight day - Business Standard",
+     "link": "https://news.google.com/rss/articles/CBMi1wFBVV95cUxPa21wZk1ZS1dXbmxPZ281ZS15djJyc2RPNldpYm9WTEFrQU5nS0lrdG5tSkNocHhQNF96WTVPRlJLbGFhRGZEc2V5WmdxODQ1OFZzY1N6d2x3UmFwYVV1S25vQW5SMXphZGVuUGRHUVdlX3h5YWkxV2xoSnVNVlJIZGlNU3F0SjNVV01ZUml3SVFPcUNhVFdLM1FMRzFNb2VRakJoanZoTzUzdE15MDRWR2xWNUtWMHM2UGJCcEduZkdrTjRzM1VBS0p5VldpTGlEbF9DOEduVdIB3AFBVV95cUxPenhtcUtSSEg1Z2hyRG55azZUV1hYc1BfQUFRRV8wVWJHMUpBQ2pFMER0UExiTzVma1BkQlk5Mm1udUxqVnJIQ2NHMEdzcWtrVFhnaVAwdjAtd0xMVEZmX0JfMFJQUUtuSVh1YnYzOGJ1cVp6Z2JHTnVZaE9DelBHTXl1ZEg1U1JkamNHNV9qZjlsZko0dGRtTXRPMGM4RTY2ejFXUkNwS2RrY0pMd3E4eHJRdE5JTEhrSTYtRWFzVkJ4T3lwLWMtd2RhWVhuVTVBTmZlS3Q4cTZzS1Fx?oc=5",
+     "published_utc": "2026-10-22T09:42:40+00:00",
+     "source": "Business Standard",
+     "query": "HDFCBANK NSE share",
+     "id": "176cb30df0d8",
+     "tags": [
+      "NEGATIVE"
+     ],
+     "sentiment": "NEGATIVE",
+     "news_risk": true,
+     "method": "keyword heuristic",
+     "confidence": "low"
+    },
+    {
+     "title": "HDFC Bank shares near 52-week low as insider leak probe rattles investors - BusinessLine",
+     "link": "https://news.google.com/rss/articles/CBMi5wFBVV95cUxNSElKR0xUT0tTT0N5dks3MzQ0TWZzN0psbkRmUHBNMUlWTTh0bExPaDVMb0pOSG5XVGk0c3BLeVBDRnJxX0txajJTM3VQQnRCLXdhekk0b1NWdVlGN19VYW95ZVB1QThYUlpwS1gtajJwdG5kc3hadFVQNFVBY3NIMUpaT2x3ckUxVENmRHRIMEZYUzhYNGgzUWhjN0ZvLUVhLXNDREE2YmQ5andRUWhKNDY3dENwLVJ5Z2dTODNCalVwLVYzZjF5bHNEdmhXQi1BMXdkb3NvQzB3aUVVOFB4OFhtSjl3cUHSAe4BQVVfeXFMTTNRTVdTU2tXYlJlemNuMWl4c2l0UFN4Z1B6VkFPQ2ZSSHItX0Y0ZDc1RjU3NlBROVFUMG5wT2tkc29FX0lWTkEwSVFodjdOQmdtenJvOFZ6S2dodk1Sc3dmZVVkdTh5aFAycVM3Y2hYU1dyMjdmOTVZMDFWc3V2YjB0bXh4Nkc2SzF5NXNaeEk2SV9xQzI5UEgyRzNuajg1QzVtcHZNeFdhYUo5QlBHMnFmODhjQ3dHWXRyNnRKMU9keXRISnhDWWl3blREZXFoV1FhczRVcnlEZ3BSZ1Bhc2g2ZG03a0RjV1d4NUUyQQ?oc=5",
+     "published_utc": "2026-10-22T06:21:39+00:00",
+     "source": "BusinessLine",
+     "query": "HDFCBANK NSE share",
+     "id": "9f609442dbba",
+     "tags": [
+      "NEGATIVE"
+     ],
+     "sentiment": "NEGATIVE",
+     "news_risk": true,
+     "method": "keyword heuristic",
+     "confidence": "low"
+    }
+   ],
+   "news_risk": true,
+   "news_status": "ok",
+   "ai_p": 0.386,
+   "ai_view": "NEUTRAL"
+  },
+  {
+   "action": "SELL",
+   "score": -5,
+   "why": [
+    "Downtrend: close 110.97 < SMA50 125.41 < SMA200 127.43",
+    "Broke previous 20-day low 112.98 on volume 1.7x average",
+    "Lagging NIFTY by 5.3% over 3 months"
+   ],
+   "contrib": [
+    {
+     "points": -2,
+     "rule": "Downtrend: close 110.97 < SMA50 125.41 < SMA200 127.43"
+    },
+    {
+     "points": -2,
+     "rule": "Broke previous 20-day low 112.98 on volume 1.7x average"
+    },
+    {
+     "points": -1,
+     "rule": "Lagging NIFTY by 5.3% over 3 months"
+    }
+   ],
+   "entry": 110.97,
+   "stop": 103.19,
+   "target": 122.64,
+   "atr": 3.89,
+   "rsi": 30.0,
+   "sma50": 125.41,
+   "sma200": 127.43,
+   "vol_ratio": 1.72,
+   "turnover_cr": 22.9,
+   "symbol": "JMFINANCIL",
+   "bar": "2026-10-22",
+   "strategy": "trend_breakout_swing",
+   "version": "1.1.0",
+   "sector": "Financial Services",
+   "vol20": 1799533.75,
+   "signal_id": "trend_breakout_swing|JMFINANCIL|2026-10-22",
+   "news": [],
+   "news_risk": false,
+   "news_status": "ok",
+   "ai_p": 0.427,
+   "ai_view": "NEUTRAL"
+  }
+ ],
+ "blocked": [
+  {
+   "symbol": "CRISIL",
+   "score": 6,
+   "reason": "score +6, but NIFTY regime is BEAR (close < SMA200 and SMA50 < SMA200)",
+   "why": [
+    "Uptrend: close 4777.20 > SMA50 4572.08 > SMA200 4323.67",
+    "Healthy momentum: RSI 64",
+    "Broke previous 20-day high 4706.20 on volume 5.2x average",
+    "Beating NIFTY by 12.0% over 3 months"
+   ],
+   "entry": 4777.2,
+   "ai_p": 0.412,
+   "ai_view": "NEUTRAL"
+  },
+  {
+   "symbol": "FSL",
+   "score": 5,
+   "reason": "score +5, but NIFTY regime is BEAR (close < SMA200 and SMA50 < SMA200)",
+   "why": [
+    "Uptrend: close 289.40 > SMA50 268.66 > SMA200 259.99",
+    "21-day SMA crossed above 50-day within the last 4 bars",
+    "Healthy momentum: RSI 62",
+    "Beating NIFTY by 15.0% over 3 months"
+   ],
+   "entry": 289.4,
+   "ai_p": 0.462,
+   "ai_view": "AGREES"
+  },
+  {
+   "symbol": "INDHOTEL",
+   "score": 6,
+   "reason": "score +6, but NIFTY regime is BEAR (close < SMA200 and SMA50 < SMA200)",
+   "why": [
+    "Uptrend: close 782.30 > SMA50 727.63 > SMA200 687.62",
+    "Healthy momentum: RSI 66",
+    "Broke previous 20-day high 776.15 on volume 5.1x average",
+    "Beating NIFTY by 13.4% over 3 months"
+   ],
+   "entry": 782.3,
+   "ai_p": 0.403,
+   "ai_view": "NEUTRAL"
+  }
+ ],
+ "scanned": 468,
+ "universe": 499,
+ "universe_source": "Nifty 500 (official NSE list)",
+ "strategy": {
+  "id": "trend_breakout_swing",
+  "name": "Trend + Breakout Swing",
+  "version": "1.1.0",
+  "status": "paper-approved",
+  "universe": "NIFTY 500 (NSE), price >= 50, 20-day turnover >= 10 cr",
+  "timeframe": "1d",
+  "segment": "delivery",
+  "hypothesis": "Stocks in an uptrend that break their 20-day high on above-average volume, while outperforming NIFTY, tend to continue for a few weeks. Only trade when the index itself is in an uptrend.",
+  "rules": {
+   "score": [
+    "+2 price > 50-day SMA > 200-day SMA (uptrend); -2 if the reverse",
+    "+1 21-day SMA crossed above 50-day within 4 bars; -1 if crossed below",
+    "+1 RSI(14) between 50 and 70; -1 if between 30 and 45",
+    "+2 close above previous 20-day high with volume > 1.5x 20-day average; -2 for a 20-day low",
+    "+1 3-month return beats NIFTY; -1 if it lags"
+   ],
+   "entry": "score >= +5 AND index regime BULL (or SIDEWAYS with score >= +6); no news-risk words in last 3 days",
+   "exit": "score <= -5 (SELL), stop 2xATR below entry, target 3xATR above, trailing stop 4% once up 5%, time exit 20 bars, regime turns BEAR",
+   "sizing": "1% of equity at risk between entry and stop; <= 25% of equity; <= 5% of 20-day volume; halve size when index 20-day vol > 25%"
+  },
+  "params": {
+   "buy_score": 5,
+   "sell_score": -5,
+   "stop_atr": 2.0,
+   "target_atr": 3.0,
+   "max_hold": 20,
+   "vol_mult": 1.5,
+   "rs_lookback": 63
+  },
+  "regime_filter": true,
+  "min_capital": 200000,
+  "holding": "5-20 sessions",
+  "failure_modes": [
+   "whipsaw in sideways markets (false breakouts)",
+   "gap-downs through the stop (fill worse than stop)",
+   "regime filter is slow: late entries after long rallies",
+   "news shocks; only headline words are screened"
+  ],
+  "warmup_bars": 200,
+  "param_hash": "b81c4fa041",
+  "code": true
+ },
+ "paper_actions": {
+  "IN-SWING": [
+   "Nothing to do: no fills, no exits, no new entries."
+  ],
+  "US-SWING": [
+   "Risk engine REJECTED AMGN: maximum open positions reached"
+  ],
+  "IN-OPTIONS": [
+   "HOLD NIFTY 27OCT26 22700/22500 PE DEBIT SPREAD: modeled value 80.45 vs debit 80.45, 5 days left",
+   "Already holding NIFTY 27OCT26 22700/22500 PE DEBIT SPREAD"
+  ],
+  "IN-BRAIN": [
+   "NO TRADE today: no opportunity passed every check. Waiting is a valid decision."
+  ],
+  "IN-VALUE": [
+   "Nothing to do: holding the long-term book."
+  ],
+  "US-VALUE": [
+   "ADBE: trailing stop raised to 250.81",
+   "CB: trailing stop raised to 345.01"
+  ]
+ },
+ "rejected_dq": {
+  "USDINR": [
+   "high/low/close inconsistent",
+   "volume unreliable (many zero days)"
+  ],
+  "EURINR": [
+   "high/low/close inconsistent",
+   "volume unreliable (many zero days)"
+  ],
+  "GBPUSD": [
+   "high/low/close inconsistent",
+   "volume unreliable (many zero days)"
+  ],
+  "EURUSD": [
+   "high/low/close inconsistent",
+   "volume unreliable (many zero days)"
+  ],
+  "USDJPY": [
+   "high/low/close inconsistent",
+   "volume unreliable (many zero days)"
+  ],
+  "US2Y": [
+   "non-positive price",
+   "high/low/close inconsistent"
+  ],
+  "SPGI": [
+   "high/low/close inconsistent"
+  ],
+  "ZTS": [
+   "high/low/close inconsistent"
+  ],
+  "DIS": [
+   "high/low/close inconsistent"
+  ]
+ },
+ "failed_download": [
+  "^CNXMIDCAP",
+  "BAGMANE.NS",
+  "DUMMYHEG.NS",
+  "MMC"
+ ],
+ "skipped": {
+  "AAVAS": "20-day turnover 9.9 (x1e7) below 10",
+  "ASAHIINDIA": "20-day turnover 9.2 (x1e7) below 10",
+  "AIIL": "20-day turnover 9.2 (x1e7) below 10",
+  "BATAINDIA": "20-day turnover 8.2 (x1e7) below 10",
+  "BHARATCOAL": "price 30.19 below minimum 50",
+  "CIEINDIA": "20-day turnover 7.6 (x1e7) below 10",
+  "CENTRALBK": "price 30.01 below minimum 50",
+  "DOMS": "20-day turnover 4.5 (x1e7) below 10",
+  "FACT": "20-day turnover 7.6 (x1e7) below 10",
+  "IRB": "price 16.79 below minimum 50",
+  "ITI": "20-day turnover 5.2 (x1e7) below 10",
+  "INDIAMART": "20-day turnover 8.9 (x1e7) below 10",
+  "IOB": "price 29.86 below minimum 50",
+  "JPPOWER": "price 13.60 below minimum 50",
+  "MSUMI": "price 34.95 below minimum 50",
+  "NSLNISP": "price 39.08 below minimum 50",
+  "OLAELEC": "price 31.94 below minimum 50",
+  "RPOWER": "price 17.05 below minimum 50",
+  "SJVN": "price 48.25 below minimum 50",
+  "SAGILITY": "price 45.39 below minimum 50",
+  "SUZLON": "price 38.57 below minimum 50",
+  "TTML": "price 38.01 below minimum 50",
+  "TRIDENT": "price 20.99 below minimum 50",
+  "UCOBANK": "price 22.55 below minimum 50",
+  "UTIAMC": "20-day turnover 5.8 (x1e7) below 10",
+  "VISL": "price 27.15 below minimum 50",
+  "VOGL": "price 28.56 below minimum 50",
+  "VEDPOWER": "price 29.51 below minimum 50",
+  "IDEA": "price 11.53 below minimum 50",
+  "YESBANK": "price 16.05 below minimum 50",
+  "ZYDUSWELL": "20-day turnover 6.3 (x1e7) below 10"
+ }
+}

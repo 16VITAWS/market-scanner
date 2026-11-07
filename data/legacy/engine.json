@@ -1,0 +1,76 @@
+{
+ "date": "2026-09-25",
+ "run": "26 Sep 2026, 8:32 pm",
+ "count": 494,
+ "buys": [],
+ "sells": [
+  {
+   "s": "TMPV",
+   "score": -6,
+   "px": 290.45,
+   "why": [
+    "Downtrend",
+    "Weak momentum (RSI 31)",
+    "Broke 20-day low on strong volume",
+    "Lagging Nifty by 14.2%"
+   ]
+  },
+  {
+   "s": "BEL",
+   "score": -5,
+   "px": 393.55,
+   "why": [
+    "Downtrend",
+    "21-day avg crossed below 50-day",
+    "Weak momentum (RSI 43)"
+   ]
+  },
+  {
+   "s": "CHOLAHLDNG",
+   "score": -5,
+   "px": 1400.6,
+   "why": [
+    "Downtrend",
+    "Broke 20-day low on strong volume",
+    "Lagging Nifty by 12.0%"
+   ]
+  },
+  {
+   "s": "COCHINSHIP",
+   "score": -5,
+   "px": 1377,
+   "why": [
+    "Downtrend",
+    "21-day avg crossed below 50-day",
+    "Weak momentum (RSI 42)"
+   ]
+  }
+ ],
+ "blocked": [
+  [
+   "ADANIPORTS",
+   5
+  ],
+  [
+   "AEGISLOG",
+   5
+  ],
+  [
+   "CASTROLIND",
+   5
+  ],
+  [
+   "ENGINERSIN",
+   5
+  ],
+  [
+   "ZYDUSLIFE",
+   6
+  ]
+ ],
+ "portfolio": {
+  "value": 200000,
+  "cash": 200000,
+  "positions": 0
+ }
+}

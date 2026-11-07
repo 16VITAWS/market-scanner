@@ -1,0 +1,694 @@
+{
+ "engine_version": "2.8.0",
+ "run_at": "2026-11-07T16:11:34+05:30",
+ "data_date": "2026-11-06",
+ "mode": "PAPER",
+ "data_status": "OK",
+ "regime": {
+  "state": "SIDEWAYS",
+  "text": "Averages disagree: no clear direction. Only the strongest buys, half size.",
+  "close": 25030.35,
+  "date": "2026-11-06",
+  "sma50": 23248.02,
+  "sma200": 23998.93,
+  "rsi": 78.6,
+  "vol20_annualised_pct": 16.3,
+  "high_vol": false,
+  "ret3m": 0.01600704697901456,
+  "support": [
+   23801.54,
+   24025.65,
+   24265.95
+  ],
+  "resistance": [],
+  "rule": "BULL: close>SMA200 and SMA50>SMA200; BEAR: both below; else SIDEWAYS",
+  "computed_at": "2026-11-07T16:01:33+05:30"
+ },
+ "buys": [
+  {
+   "action": "BUY",
+   "score": 6,
+   "why": [
+    "Uptrend: close 1102.00 > SMA50 1016.82 > SMA200 877.96",
+    "Healthy momentum: RSI 64",
+    "Broke previous 20-day high 1095.85 on volume 1.8x average",
+    "Beating NIFTY by 24.5% over 3 months"
+   ],
+   "contrib": [
+    {
+     "points": 2,
+     "rule": "Uptrend: close 1102.00 > SMA50 1016.82 > SMA200 877.96"
+    },
+    {
+     "points": 1,
+     "rule": "Healthy momentum: RSI 64"
+    },
+    {
+     "points": 2,
+     "rule": "Broke previous 20-day high 1095.85 on volume 1.8x average"
+    },
+    {
+     "points": 1,
+     "rule": "Beating NIFTY by 24.5% over 3 months"
+    }
+   ],
+   "entry": 1102.0,
+   "stop": 1013.47,
+   "target": 1234.79,
+   "atr": 44.26,
+   "rsi": 63.6,
+   "sma50": 1016.82,
+   "sma200": 877.96,
+   "vol_ratio": 1.82,
+   "turnover_cr": 114.5,
+   "symbol": "MOTILALOFS",
+   "bar": "2026-11-06",
+   "strategy": "trend_breakout_swing",
+   "version": "1.1.0",
+   "sector": "Financial Services",
+   "vol20": 1067386.9,
+   "signal_id": "trend_breakout_swing|MOTILALOFS|2026-11-06",
+   "news": [],
+   "news_risk": false,
+   "news_status": "ok",
+   "event_flags": [],
+   "ai_p": 0.431,
+   "ai_view": "NEUTRAL"
+  }
+ ],
+ "sells": [
+  {
+   "action": "SELL",
+   "score": -6,
+   "why": [
+    "Downtrend: close 1253.60 < SMA50 1416.38 < SMA200 1496.09",
+    "Weak momentum: RSI 32",
+    "Broke previous 20-day low 1333.00 on volume 13.2x average",
+    "Lagging NIFTY by 14.5% over 3 months"
+   ],
+   "contrib": [
+    {
+     "points": -2,
+     "rule": "Downtrend: close 1253.60 < SMA50 1416.38 < SMA200 1496.09"
+    },
+    {
+     "points": -1,
+     "rule": "Weak momentum: RSI 32"
+    },
+    {
+     "points": -2,
+     "rule": "Broke previous 20-day low 1333.00 on volume 13.2x average"
+    },
+    {
+     "points": -1,
+     "rule": "Lagging NIFTY by 14.5% over 3 months"
+    }
+   ],
+   "entry": 1253.6,
+   "stop": 1158.44,
+   "target": 1396.34,
+   "atr": 47.58,
+   "rsi": 31.7,
+   "sma50": 1416.38,
+   "sma200": 1496.09,
+   "vol_ratio": 13.17,
+   "turnover_cr": 77.8,
+   "symbol": "ASTRAL",
+   "bar": "2026-11-06",
+   "strategy": "trend_breakout_swing",
+   "version": "1.1.0",
+   "sector": "Capital Goods",
+   "vol20": 368958.45,
+   "signal_id": "trend_breakout_swing|ASTRAL|2026-11-06",
+   "news": [
+    {
+     "title": "Astral share price tumbles over 12% post Q2 earnings - Business Standard",
+     "link": "https://news.google.com/rss/articles/CBMiugFBVV95cUxQd21oVDY4aFl3QnlJQTdWOW4wekQ5dDM3NWJDQWlVc2tvWWU1c09fSWRDd1NvNGRVUy1Jb2w3R1hvOWVkYUxhV3JfcWJNLThNWVhENy1vXy1iRFVTdUlQaHE1MXBQYzNxMzhkSE1vYTlrOFJSd3E2aWVWTlRZSlN5SGgxYzBFQlFxTmtDaF9oVlZHVzVqSXdoM2xpTVlaNGpxVjV4SUpyakV1b1VvRFdHQm4tX1VQVlRaT3fSAb8BQVVfeXFMTjZYdGFnOEdDZ1I3T0d6RURwYTRKeWZLNGFNTFI4cWJvdWxvaXktd3JJZTFVTk1iNDl6SEJBSEZYVGJub0ttY09MTlozV0RjQ25uMnlYWnhpQ0p6VU54RVBjZDB6TGpIc3pGemZINDctb3lQU1dhU0hTR1F2M05JRUhWU0xxQkNEVlJNekdENVg5N3gxcFpIcXNqZlRjcTF2bGdkSE9uVElhLUZ2ZXoxZjZTX01nWWpEVEtRLVRUek0?oc=5",
+     "published_utc": "2026-11-06T05:00:12+00:00",
+     "source": "Business Standard",
+     "query": "ASTRAL NSE share",
+     "id": "efe1ecfca953",
+     "tags": [
+      "EVENT"
+     ],
+     "sentiment": "NEUTRAL",
+     "news_risk": true,
+     "method": "keyword heuristic",
+     "confidence": "low"
+    },
+    {
+     "title": "Astral shares crash 10% lower after Q2 earnings miss; brokerages JPMorgan, CLSA, Motilal Oswal revise... - Moneycontrol.com",
+     "link": "https://news.google.com/rss/articles/CBMihwJBVV95cUxOTE5yM2p5TDJoZUt3aWhwY3VPaldHTmVKTGlpRzdPcWg5OGduY1JaUTViZFpLOGpFcWIzbjl1NERjUVF6ME5nVFVwN05xbktfenRsY0FzaEtnUUt4OUozRXhoMHJLTFlqR0N2UHE5LXVxZXZNUE5LbmxkQWZpai1SczIwWUU0UE9HN0QxaU5YZzdmc29tRXY4MUgzTm82R205cEcxdnpMNnFtRlJhdkpwWVJRUGxqWjZyU1E5bXAzVXdjR2FhRmhLRnUydGFOYi1OTzRYV3pVU3AzTDJmcm9PSGlaSnROcHVJS0dJSnc4S0JJc2ZJRW1qeGhfZFU0cGl0MXRpZmFJRdIBjAJBVV95cUxPN0ZaUmk5Zk9oOG5MOXBnRXM3M2VYMm8xdm8xcV9rUi01TmJRVnVjUDYxVzRSYTlqMXZSLUZmWU81aHZYeVd0b3NEdnJwYk5abXRybXVFU0U3amVlSWJRcXJxUEVDeF9PX1ZFaHNkWWwxQ1pLZi1YdlFHOFJtNGk0SFQ4ZWFxMWFiMUpLb1B6MGt5SXFsSFd0X3lRNkFrc0lzTl9kaHZYalp3cFdvNHltSnZWMTJMZXY4M3E1bnBIZ0pPODZyWU9SVFlydjZ2eFJjWWNTeFV0NEYyeUpPREd4QWV2RzJTaFIxaXJkOHE4N1lkejVTQlBnWkJuaVZUbnp6aXBac083MEhZdTEy?oc=5",
+     "published_utc": "2026-11-06T11:06:48+00:00",
+     "source": "Moneycontrol.com",
+     "query": "ASTRAL NSE share",
+     "id": "82071313c3e5",
+     "tags": [
+      "NEGATIVE",
+      "EVENT"
+     ],
+     "sentiment": "NEGATIVE",
+     "news_risk": true,
+     "method": "keyword heuristic",
+     "confidence": "low"
+    },
+    {
+     "title": "Astral Share Price Hits 52-Week Low After Q2 Results - Business Outreach Magazine",
+     "link": "https://news.google.com/rss/articles/CBMif0FVX3lxTE84ZmhDNkNnU1lGYkJmUjc1NVZ5SzVJaVpWVm15Zk1XRFBPeUczQkZ1RUNfTUJ1WnZOTGZ4Z195bUdEUTM0QXRaVGh2cU9NQ3FwQTVxNVNvRDFVWFhEdEpVRy0tNjJFWGhmZHZqVzBTVm9yRThLUUhoeGMyeUtjNUU?oc=5",
+     "published_utc": "2026-11-06T06:45:35+00:00",
+     "source": "Business Outreach Magazine",
+     "query": "ASTRAL NSE share",
+     "id": "416b416c387c",
+     "tags": [
+      "EVENT"
+     ],
+     "sentiment": "NEUTRAL",
+     "news_risk": true,
+     "method": "keyword heuristic",
+     "confidence": "low"
+    },
+    {
+     "title": "ASTRAL POLY Share Price Today Down 11% - Equitymaster",
+     "link": "https://news.google.com/rss/articles/CBMiqwJBVV95cUxQdlZpV0ZkdkZYMFNERmRkVEpKY0xHVWR3Y2dKX0lYTzNXX1hkWV93dkY1NWhzQzV5c2JmV1cxc1pDeGVMY0p4NzNyOXc2N0NKRy1SbnFMNEtKYnNrbmxlMlJVc2ZOVmRiYjBIWWFxS0xhX09ZMWhXZGRNc2hIcHVUQlh6ZEN2Q0hIdlpXODJ0NHdmbGNrVUJlbDF0TEV2NklvSXRDV0c2WkE4QXRHbzBKeTJrTWN2RVNHV1NZRTVXTDZJM3puM3NpY3JySkMxbk9sWENpT3BVRDNYbGlQVm1ld1Y0N0xlSjNWYjRQMXhabVNySFNIbHNzTDNwVW1JSF9LNEUzcWV5NWM3ZEpjMjg2M1Y3WUc1ZjVMZ2dyWURoTmtRa1M5R2djOU14dw?oc=5",
+     "published_utc": "2026-11-06T05:32:00+00:00",
+     "source": "Equitymaster",
+     "query": "ASTRAL NSE share",
+     "id": "b1d7a671a3c7",
+     "tags": [
+      "NEUTRAL"
+     ],
+     "sentiment": "NEUTRAL",
+     "news_risk": false,
+     "method": "keyword heuristic",
+     "confidence": "low"
+    }
+   ],
+   "news_risk": true,
+   "news_status": "ok",
+   "ai_p": 0.416,
+   "ai_view": "NEUTRAL"
+  },
+  {
+   "action": "SELL",
+   "score": -5,
+   "why": [
+    "Downtrend: close 174.88 < SMA50 228.14 < SMA200 248.55",
+    "Broke previous 20-day low 177.38 on volume 8.9x average",
+    "Lagging NIFTY by 34.5% over 3 months"
+   ],
+   "contrib": [
+    {
+     "points": -2,
+     "rule": "Downtrend: close 174.88 < SMA50 228.14 < SMA200 248.55"
+    },
+    {
+     "points": -2,
+     "rule": "Broke previous 20-day low 177.38 on volume 8.9x average"
+    },
+    {
+     "points": -1,
+     "rule": "Lagging NIFTY by 34.5% over 3 months"
+    }
+   ],
+   "entry": 174.88,
+   "stop": 156.3,
+   "target": 202.74,
+   "atr": 9.29,
+   "rsi": 27.1,
+   "sma50": 228.14,
+   "sma200": 248.55,
+   "vol_ratio": 8.87,
+   "turnover_cr": 73.2,
+   "symbol": "APTUS",
+   "bar": "2026-11-06",
+   "strategy": "trend_breakout_swing",
+   "version": "1.1.0",
+   "sector": "Financial Services",
+   "vol20": 2736679.35,
+   "signal_id": "trend_breakout_swing|APTUS|2026-11-06",
+   "news": [
+    {
+     "title": "Aptus Pharma Ltd Share Price Today - Aptus Pharma Stock Analysis - Equitypandit",
+     "link": "https://news.google.com/rss/articles/CBMiWkFVX3lxTE10bGU4QVdTc2RpeXBhWnRIeWZOcWRaeHVZcmhVU2swaV9CeWJnR0d4U0VwNTRRU0hkd3N3VjFndjhQc0picmIyR3ZCN21XMEpkZ2NQTDlBU3Jndw?oc=5",
+     "published_utc": "2026-11-04T11:09:11+00:00",
+     "source": "Equitypandit",
+     "query": "APTUS NSE share",
+     "id": "4861f1783bfa",
+     "tags": [
+      "NEUTRAL"
+     ],
+     "sentiment": "NEUTRAL",
+     "news_risk": false,
+     "method": "keyword heuristic",
+     "confidence": "low"
+    },
+    {
+     "title": "Aptus Housing Finance Share Price and Q2 Results - Kalkine India",
+     "link": "https://news.google.com/rss/articles/CBMi6AFBVV95cUxQbVNoX1k4cUVHcnFVdV9DbFZaNWxBSmk5MG5UaFI5bXFNdHRLMWtVcThhRkFjYVlEdzVLVE5ucVBhTWlMN0NpLV9nYjMwYkpMZmEzN0ZlTnp2YlpkRW1OX1E5UEh0Mktsa1VPeEMtcWZ6WUZEM1BWaHRxU2s3Nk5zQzNHdGVueWpCQVd5dHQzQWd3U0NOZGZOZFpjMDA5OTJ0dW02LVVNOTFrMGhQcEpSeVV3RlRjLWsyXzNnN2Z4YlRKeWdXd21KTXNDTUlEZy12UTVEemx5c2JwUFNDWWlzSXBJTC1HclRq?oc=5",
+     "published_utc": "2026-11-05T10:45:00+00:00",
+     "source": "Kalkine India",
+     "query": "APTUS NSE share",
+     "id": "eef6c716441e",
+     "tags": [
+      "EVENT"
+     ],
+     "sentiment": "NEUTRAL",
+     "news_risk": true,
+     "method": "keyword heuristic",
+     "confidence": "low"
+    }
+   ],
+   "news_risk": true,
+   "news_status": "ok",
+   "ai_p": 0.459,
+   "ai_view": "AGREES"
+  },
+  {
+   "action": "SELL",
+   "score": -5,
+   "why": [
+    "Downtrend: close 1735.00 < SMA50 2242.85 < SMA200 2719.57",
+    "Broke previous 20-day low 1749.50 on volume 1.7x average",
+    "Lagging NIFTY by 39.3% over 3 months"
+   ],
+   "contrib": [
+    {
+     "points": -2,
+     "rule": "Downtrend: close 1735.00 < SMA50 2242.85 < SMA200 2719.57"
+    },
+    {
+     "points": -2,
+     "rule": "Broke previous 20-day low 1749.50 on volume 1.7x average"
+    },
+    {
+     "points": -1,
+     "rule": "Lagging NIFTY by 39.3% over 3 months"
+    }
+   ],
+   "entry": 1735.0,
+   "stop": 1557.67,
+   "target": 2001.0,
+   "atr": 88.67,
+   "rsi": 25.1,
+   "sma50": 2242.85,
+   "sma200": 2719.57,
+   "vol_ratio": 1.75,
+   "turnover_cr": 169.0,
+   "symbol": "PIIND",
+   "bar": "2026-11-06",
+   "strategy": "trend_breakout_swing",
+   "version": "1.1.0",
+   "sector": "Chemicals",
+   "vol20": 831231.05,
+   "signal_id": "trend_breakout_swing|PIIND|2026-11-06",
+   "news": [],
+   "news_risk": false,
+   "news_status": "ok",
+   "ai_p": 0.439,
+   "ai_view": "NEUTRAL"
+  },
+  {
+   "action": "SELL",
+   "score": -5,
+   "why": [
+    "Downtrend: close 2746.30 < SMA50 3414.89 < SMA200 3792.53",
+    "Broke previous 20-day low 3022.60 on volume 17.3x average",
+    "Lagging NIFTY by 32.8% over 3 months"
+   ],
+   "contrib": [
+    {
+     "points": -2,
+     "rule": "Downtrend: close 2746.30 < SMA50 3414.89 < SMA200 3792.53"
+    },
+    {
+     "points": -2,
+     "rule": "Broke previous 20-day low 3022.60 on volume 17.3x average"
+    },
+    {
+     "points": -1,
+     "rule": "Lagging NIFTY by 32.8% over 3 months"
+    }
+   ],
+   "entry": 2746.3,
+   "stop": 2445.99,
+   "target": 3196.76,
+   "atr": 150.15,
+   "rsi": 28.7,
+   "sma50": 3414.89,
+   "sma200": 3792.53,
+   "vol_ratio": 17.28,
+   "turnover_cr": 92.8,
+   "symbol": "THERMAX",
+   "bar": "2026-11-06",
+   "strategy": "trend_breakout_swing",
+   "version": "1.1.0",
+   "sector": "Capital Goods",
+   "vol20": 167626.65,
+   "signal_id": "trend_breakout_swing|THERMAX|2026-11-06",
+   "news": [
+    {
+     "title": "Earnings To Watch: Thermax Ltd (NSE:THERMAX) Q2 2027 -- GF Value Sees 53% Upside - Yahoo Finance",
+     "link": "https://news.google.com/rss/articles/CBMimwFBVV95cUxPTmtIajRORG9DdHdibmxRcmFUZWNCNXk1anY3ekRBRnRHN2pTczRkTWNGQWdJcFVndjJaOGdQXzRqUzFXLUdUN2NKLWhRRVJrd29KUlV6RFJHemhVbE9EZF9udW1MWUhPUW9OU3Y0azI4QWlVRGtadUpfNmJzRkIyYVFxZWRDdU5mSDVWbUVpVnR0YkE3MkdvV1ZOVQ?oc=5",
+     "published_utc": "2026-11-05T12:20:03+00:00",
+     "source": "Yahoo Finance",
+     "query": "THERMAX NSE share",
+     "id": "a755715027f2",
+     "tags": [
+      "EVENT"
+     ],
+     "sentiment": "NEUTRAL",
+     "news_risk": true,
+     "method": "keyword heuristic",
+     "confidence": "low"
+    },
+    {
+     "title": "Earnings To Watch: Thermax Ltd (NSE:THERMAX) Q2 2027 -- GF Value Sees 59% Upside - Yahoo Finance",
+     "link": "https://news.google.com/rss/articles/CBMimwFBVV95cUxObUgtb3gtM3ZKci04WGFROFBxbW5leTNGVDhIZjRPME4wcUM1TVg5Um1ONVMyYlctTXJranJyWU5ydzJmNzZwcy1DTWIxSXVsZm5QRWlrd0NKYlpjWDhtMnJ5UVdUem5ETmRGMGswaUlLVnF1SWI0dFFlRElteTcxUWVoRVhjTUdRZ2xnalRQdzA3cmUwVGhtWjE3UQ?oc=5",
+     "published_utc": "2026-11-04T12:20:59+00:00",
+     "source": "Yahoo Finance",
+     "query": "THERMAX NSE share",
+     "id": "931843e85127",
+     "tags": [
+      "EVENT"
+     ],
+     "sentiment": "NEUTRAL",
+     "news_risk": true,
+     "method": "keyword heuristic",
+     "confidence": "low"
+    },
+    {
+     "title": "Thermax shares fall 18% on missing Q2 estimates - Moneycontrol.com",
+     "link": "https://news.google.com/rss/articles/CBMisAFBVV95cUxOVEh2dmFpLThTQXAwYUNiUHFSb3JCQlgzbkFwaW4xbnlodEJWYUNtNkdlNjlUNzFKZ3F1UU0xT1UyUmgwbnRvUjNtWC1ENW1KTW9fRHlYb3pXbmRWY3hkd0JEZ09WRVVwUzVSYkJYakxPNTFVOVZMR0pna01OWGh6cXNYRC04WHZ2cGhtTVRYY3c1dEdwQkFETVZmTUdNczJHdENVWFNDLWdheGIyOTFnT9IBtgFBVV95cUxQY1JDTEpUVXFEbGl0Q0dBWEd0eUFUS2hvRnpNWUR6N2Q2YzNkRldyX0VzcnBKR3Nkd1hlOGxRTjVkakJvNmZsQzg0YnRCWVR6RVNPalptTjVjNHowVnJ1Vk05UVA3ZjVpOElmYmVJWFNnZzV3cUl6VUxINENmdjBSQlhVMmVuckNTWnR0VHlqN2tWMFRfbXlNVHNULVRwVjNCWGdmdU9yY2ZkZnhIY254Y2xrZUpSUQ?oc=5",
+     "published_utc": "2026-11-06T07:36:26+00:00",
+     "source": "Moneycontrol.com",
+     "query": "THERMAX NSE share",
+     "id": "90bb2254eccd",
+     "tags": [
+      "NEGATIVE",
+      "EVENT"
+     ],
+     "sentiment": "NEGATIVE",
+     "news_risk": true,
+     "method": "keyword heuristic",
+     "confidence": "low"
+    },
+    {
+     "title": "Thermax plunges 15%, nears 52-week low on weak Q2 operational performance - Business Standard",
+     "link": "https://news.google.com/rss/articles/CBMi1AFBVV95cUxPN3FjX1pIT0ppUXFFblZ4c0l0ZDE5aC15VWlDakJOWlJ0N253UUMySWtyX2xoZDgtcDI2RTEyV3piQzFoTkxGOWFIUUdDZXljUU9BOUJiM24wNDFVbllENU1YUjlKY182enlMY0RoUkgyUjJ5VGExRU9FUWxULXR6YUFfT0o5ZG11Ym9mQjBtcGtjVHRIdmhUbm96UVI4d2t5bkhyMmRQYjlsOWVPUlEwd2FXeDUzNzJDaXMxM1J2bFRjZzhFeEN0VkFQRVRHc0EtYVlLVdIB2gFBVV95cUxOd0ZYVnB0MjBod29XcXNWTDkyaHlUQkdud2U5WHNxSFJOcHlsSEU2Q3dLSTJQUzJEdVEtUTNNVHVaeTlmSk1UMUUtRk81VjFsYWF6d0NKcXNVMUt1a09NSUxDblJHVXY4N0JPUU5RN2hsQk9LTVJqdUdpOE5ZUGl2ajBlNFhzS254VENWMW9mMElrbU45ckhEQWxvdVF2S0dwWjh4cmlDU3pKSWZPalQ4VmdyVU4xaFgxS2tmNW5vbGVad2IwQTlIc0RNWENyd1dDbEV1RjFpQlhidw?oc=5",
+     "published_utc": "2026-11-06T04:25:30+00:00",
+     "source": "Business Standard",
+     "query": "THERMAX NSE share",
+     "id": "72b2e90ecc96",
+     "tags": [
+      "NEGATIVE",
+      "EVENT"
+     ],
+     "sentiment": "NEGATIVE",
+     "news_risk": true,
+     "method": "keyword heuristic",
+     "confidence": "low"
+    }
+   ],
+   "news_risk": true,
+   "news_status": "ok",
+   "ai_p": 0.427,
+   "ai_view": "NEUTRAL"
+  }
+ ],
+ "blocked": [
+  {
+   "symbol": "ADANIGREEN",
+   "score": 5,
+   "reason": "score +5, not strong enough for a SIDEWAYS regime (needs +6)",
+   "why": [
+    "Uptrend: close 1424.10 > SMA50 1293.42 > SMA200 1232.26",
+    "21-day SMA crossed above 50-day within the last 4 bars",
+    "Healthy momentum: RSI 66",
+    "Beating NIFTY by 2.2% over 3 months"
+   ],
+   "entry": 1424.1,
+   "ai_p": 0.41,
+   "ai_view": "NEUTRAL"
+  },
+  {
+   "symbol": "ASAHIINDIA",
+   "score": 5,
+   "reason": "score +5, not strong enough for a SIDEWAYS regime (needs +6)",
+   "why": [
+    "Uptrend: close 1034.45 > SMA50 948.98 > SMA200 901.11",
+    "Broke previous 20-day high 1033.30 on volume 1.6x average",
+    "Beating NIFTY by 11.8% over 3 months"
+   ],
+   "entry": 1034.45,
+   "ai_p": 0.429,
+   "ai_view": "NEUTRAL"
+  },
+  {
+   "symbol": "ATHERENERG",
+   "score": 5,
+   "reason": "score +5, not strong enough for a SIDEWAYS regime (needs +6)",
+   "why": [
+    "Uptrend: close 1821.70 > SMA50 1565.70 > SMA200 1110.25",
+    "21-day SMA crossed above 50-day within the last 4 bars",
+    "Healthy momentum: RSI 69",
+    "Beating NIFTY by 23.8% over 3 months"
+   ],
+   "entry": 1821.7,
+   "ai_p": 0.37,
+   "ai_view": "NEUTRAL"
+  },
+  {
+   "symbol": "ETERNAL",
+   "score": 5,
+   "reason": "score +5, not strong enough for a SIDEWAYS regime (needs +6)",
+   "why": [
+    "Uptrend: close 363.15 > SMA50 327.88 > SMA200 282.08",
+    "21-day SMA crossed above 50-day within the last 4 bars",
+    "Healthy momentum: RSI 69",
+    "Beating NIFTY by 13.2% over 3 months"
+   ],
+   "entry": 363.15,
+   "ai_p": 0.374,
+   "ai_view": "NEUTRAL"
+  },
+  {
+   "symbol": "GLENMARK",
+   "score": 5,
+   "reason": "score +5, not strong enough for a SIDEWAYS regime (needs +6)",
+   "why": [
+    "Uptrend: close 2590.00 > SMA50 2367.86 > SMA200 2233.11",
+    "Broke previous 20-day high 2542.20 on volume 8.0x average",
+    "Beating NIFTY by 12.6% over 3 months"
+   ],
+   "entry": 2590.0,
+   "ai_p": 0.406,
+   "ai_view": "NEUTRAL"
+  },
+  {
+   "symbol": "PPLPHARMA",
+   "score": 5,
+   "reason": "score +5, not strong enough for a SIDEWAYS regime (needs +6)",
+   "why": [
+    "Uptrend: close 239.32 > SMA50 210.48 > SMA200 178.77",
+    "21-day SMA crossed above 50-day within the last 4 bars",
+    "Healthy momentum: RSI 70",
+    "Beating NIFTY by 13.3% over 3 months"
+   ],
+   "entry": 239.32,
+   "ai_p": 0.394,
+   "ai_view": "NEUTRAL"
+  },
+  {
+   "symbol": "SAILIFE",
+   "score": 5,
+   "reason": "score +5, not strong enough for a SIDEWAYS regime (needs +6)",
+   "why": [
+    "Uptrend: close 1785.10 > SMA50 1530.60 > SMA200 1213.12",
+    "Overbought: RSI 79 (no points; do not chase)",
+    "Broke previous 20-day high 1599.00 on volume 27.5x average",
+    "Beating NIFTY by 24.7% over 3 months"
+   ],
+   "entry": 1785.1,
+   "ai_p": 0.374,
+   "ai_view": "NEUTRAL"
+  },
+  {
+   "symbol": "SHYAMMETL",
+   "score": 5,
+   "reason": "score +5, not strong enough for a SIDEWAYS regime (needs +6)",
+   "why": [
+    "Uptrend: close 1300.60 > SMA50 1112.52 > SMA200 955.38",
+    "Broke previous 20-day high 1283.70 on volume 2.5x average",
+    "Beating NIFTY by 26.8% over 3 months"
+   ],
+   "entry": 1300.6,
+   "ai_p": 0.409,
+   "ai_view": "NEUTRAL"
+  },
+  {
+   "symbol": "UNIONBANK",
+   "score": 5,
+   "reason": "score +5, not strong enough for a SIDEWAYS regime (needs +6)",
+   "why": [
+    "Uptrend: close 187.00 > SMA50 179.50 > SMA200 173.94",
+    "21-day SMA crossed above 50-day within the last 4 bars",
+    "Healthy momentum: RSI 61",
+    "Beating NIFTY by 0.9% over 3 months"
+   ],
+   "entry": 187.0,
+   "ai_p": 0.346,
+   "ai_view": "DISAGREES"
+  },
+  {
+   "symbol": "MAHABANK",
+   "score": 6,
+   "reason": "news-risk word in a headline from the last 3 days; check before acting",
+   "why": [
+    "Uptrend: close 86.91 > SMA50 82.01 > SMA200 76.82",
+    "Healthy momentum: RSI 63",
+    "Broke previous 20-day high 85.34 on volume 1.6x average",
+    "Beating NIFTY by 9.6% over 3 months"
+   ],
+   "entry": 86.91,
+   "ai_p": 0.411,
+   "ai_view": "NEUTRAL"
+  },
+  {
+   "symbol": "ICICIBANK",
+   "score": 6,
+   "reason": "news-risk word in a headline from the last 3 days; check before acting",
+   "why": [
+    "Uptrend: close 1571.20 > SMA50 1382.70 > SMA200 1348.44",
+    "21-day SMA crossed above 50-day within the last 4 bars",
+    "Overbought: RSI 80 (no points; do not chase)",
+    "Broke previous 20-day high 1501.40 on volume 3.0x average",
+    "Beating NIFTY by 6.2% over 3 months"
+   ],
+   "entry": 1571.2,
+   "ai_p": 0.352,
+   "ai_view": "DISAGREES"
+  }
+ ],
+ "scanned": 475,
+ "universe": 499,
+ "universe_source": "Nifty 500 (official NSE list)",
+ "strategy": {
+  "id": "trend_breakout_swing",
+  "name": "Trend + Breakout Swing",
+  "version": "1.1.0",
+  "status": "paper-approved",
+  "universe": "NIFTY 500 (NSE), price >= 50, 20-day turnover >= 10 cr",
+  "timeframe": "1d",
+  "segment": "delivery",
+  "hypothesis": "Stocks in an uptrend that break their 20-day high on above-average volume, while outperforming NIFTY, tend to continue for a few weeks. Only trade when the index itself is in an uptrend.",
+  "rules": {
+   "score": [
+    "+2 price > 50-day SMA > 200-day SMA (uptrend); -2 if the reverse",
+    "+1 21-day SMA crossed above 50-day within 4 bars; -1 if crossed below",
+    "+1 RSI(14) between 50 and 70; -1 if between 30 and 45",
+    "+2 close above previous 20-day high with volume > 1.5x 20-day average; -2 for a 20-day low",
+    "+1 3-month return beats NIFTY; -1 if it lags"
+   ],
+   "entry": "score >= +5 AND index regime BULL (or SIDEWAYS with score >= +6); no news-risk words in last 3 days",
+   "exit": "score <= -5 (SELL), stop 2xATR below entry, target 3xATR above, trailing stop 4% once up 5%, time exit 20 bars, regime turns BEAR",
+   "sizing": "1% of equity at risk between entry and stop; <= 25% of equity; <= 5% of 20-day volume; halve size when index 20-day vol > 25%"
+  },
+  "params": {
+   "buy_score": 5,
+   "sell_score": -5,
+   "stop_atr": 2.0,
+   "target_atr": 3.0,
+   "max_hold": 20,
+   "vol_mult": 1.5,
+   "rs_lookback": 63
+  },
+  "regime_filter": true,
+  "min_capital": 200000,
+  "holding": "5-20 sessions",
+  "failure_modes": [
+   "whipsaw in sideways markets (false breakouts)",
+   "gap-downs through the stop (fill worse than stop)",
+   "regime filter is slow: late entries after long rallies",
+   "news shocks; only headline words are screened"
+  ],
+  "warmup_bars": 200,
+  "param_hash": "b81c4fa041",
+  "code": true
+ },
+ "paper_actions": {
+  "IN-SWING": [
+   "Risk engine REJECTED MOTILALOFS: sector exposure limit for Financial Services"
+  ],
+  "US-SWING": [
+   "ABNB: duplicate order blocked",
+   "Risk engine REJECTED ABT: already holding this symbol",
+   "VRTX: duplicate order blocked"
+  ],
+  "IN-OPTIONS": [
+   "No new options trade: Regime SIDEWAYS; no options trigger (bear: close<SMA50 and RSI<45; bull: 20-day breakout)"
+  ],
+  "IN-BRAIN": [
+   "NO TRADE today: no opportunity passed every check. Waiting is a valid decision."
+  ],
+  "IN-VALUE": [
+   "Nothing to do: holding the long-term book."
+  ],
+  "US-VALUE": [
+   "Nothing to do: holding the long-term book."
+  ]
+ },
+ "rejected_dq": {
+  "USDINR": [
+   "high/low/close inconsistent",
+   "volume unreliable (many zero days)"
+  ],
+  "EURINR": [
+   "high/low/close inconsistent",
+   "volume unreliable (many zero days)"
+  ],
+  "GBPUSD": [
+   "high/low/close inconsistent",
+   "volume unreliable (many zero days)"
+  ],
+  "EURUSD": [
+   "high/low/close inconsistent",
+   "volume unreliable (many zero days)"
+  ],
+  "USDJPY": [
+   "high/low/close inconsistent",
+   "volume unreliable (many zero days)"
+  ]
+ },
+ "failed_download": [
+  "^CNXMIDCAP",
+  "BAGMANE.NS",
+  "DUMMYHEG.NS",
+  "MMC"
+ ],
+ "skipped": {
+  "BHARATCOAL": "price 31.56 below minimum 50",
+  "CIEINDIA": "20-day turnover 8.5 (x1e7) below 10",
+  "CENTRALBK": "price 30.63 below minimum 50",
+  "DOMS": "20-day turnover 9.8 (x1e7) below 10",
+  "IRB": "price 17.02 below minimum 50",
+  "IOB": "price 30.56 below minimum 50",
+  "JPPOWER": "price 13.86 below minimum 50",
+  "MSUMI": "price 39.14 below minimum 50",
+  "NSLNISP": "price 39.60 below minimum 50",
+  "NAVA": "20-day turnover 9.9 (x1e7) below 10",
+  "OLAELEC": "price 34.21 below minimum 50",
+  "RHIM": "20-day turnover 8.8 (x1e7) below 10",
+  "RPOWER": "price 18.43 below minimum 50",
+  "SAGILITY": "price 43.46 below minimum 50",
+  "SUZLON": "price 38.80 below minimum 50",
+  "TTML": "price 39.77 below minimum 50",
+  "TRIDENT": "price 23.88 below minimum 50",
+  "UCOBANK": "price 23.84 below minimum 50",
+  "UTIAMC": "20-day turnover 7.6 (x1e7) below 10",
+  "VISL": "price 26.81 below minimum 50",
+  "VOGL": "price 30.74 below minimum 50",
+  "VEDPOWER": "price 35.33 below minimum 50",
+  "IDEA": "price 12.76 below minimum 50",
+  "YESBANK": "price 17.20 below minimum 50"
+ }
+}

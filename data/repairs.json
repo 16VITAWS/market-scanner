@@ -1,0 +1,7 @@
+[
+ {
+  "restored": "ledger-20260929-0020.json",
+  "at": "2026-09-29T00:56:20+05:30",
+  "reason": "Run at 00:30 IST on 29 Sep 2026 used a stale Yahoo bar (25 Sep) after 28 Sep had been processed; it closed and reopened the options paper position on old data. Ledger restored to the state before that run."
+ }
+]
