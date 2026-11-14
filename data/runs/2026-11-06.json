@@ -1,0 +1,494 @@
+{
+ "engine_version": "2.8.0",
+ "run_at": "2026-11-10T04:39:46+05:30",
+ "data_date": "2026-11-06",
+ "mode": "PAPER",
+ "data_status": "OK",
+ "regime": {
+  "state": "SIDEWAYS",
+  "text": "Averages disagree: no clear direction. Only the strongest buys, half size.",
+  "close": 25030.35,
+  "date": "2026-11-06",
+  "sma50": 23248.02,
+  "sma200": 23998.93,
+  "rsi": 78.6,
+  "vol20_annualised_pct": 16.3,
+  "high_vol": false,
+  "ret3m": 0.01600704697901456,
+  "support": [
+   23801.54,
+   24025.65,
+   24265.95
+  ],
+  "resistance": [],
+  "rule": "BULL: close>SMA200 and SMA50>SMA200; BEAR: both below; else SIDEWAYS",
+  "computed_at": "2026-11-10T04:29:42+05:30"
+ },
+ "buys": [
+  {
+   "action": "BUY",
+   "score": 6,
+   "why": [
+    "Uptrend: close 87.68 > SMA50 82.06 > SMA200 76.94",
+    "Healthy momentum: RSI 64",
+    "Broke previous 20-day high 86.91 on volume 1.6x average",
+    "Beating NIFTY by 10.4% over 3 months"
+   ],
+   "contrib": [
+    {
+     "points": 2,
+     "rule": "Uptrend: close 87.68 > SMA50 82.06 > SMA200 76.94"
+    },
+    {
+     "points": 1,
+     "rule": "Healthy momentum: RSI 64"
+    },
+    {
+     "points": 2,
+     "rule": "Broke previous 20-day high 86.91 on volume 1.6x average"
+    },
+    {
+     "points": 1,
+     "rule": "Beating NIFTY by 10.4% over 3 months"
+    }
+   ],
+   "entry": 87.68,
+   "stop": 82.23,
+   "target": 95.86,
+   "atr": 2.73,
+   "rsi": 64.1,
+   "sma50": 82.06,
+   "sma200": 76.94,
+   "vol_ratio": 1.62,
+   "turnover_cr": 136.3,
+   "symbol": "MAHABANK",
+   "bar": "2026-11-09",
+   "strategy": "trend_breakout_swing",
+   "version": "1.1.0",
+   "sector": "Financial Services",
+   "vol20": 15957581.5,
+   "signal_id": "trend_breakout_swing|MAHABANK|2026-11-09",
+   "news": [],
+   "news_risk": false,
+   "news_status": "ok",
+   "event_flags": [],
+   "ai_p": 0.402,
+   "ai_view": "NEUTRAL"
+  },
+  {
+   "action": "BUY",
+   "score": 6,
+   "why": [
+    "Uptrend: close 2668.30 > SMA50 2401.01 > SMA200 2322.76",
+    "Healthy momentum: RSI 69",
+    "Broke previous 20-day high 2561.20 on volume 2.1x average",
+    "Beating NIFTY by 7.0% over 3 months"
+   ],
+   "contrib": [
+    {
+     "points": 2,
+     "rule": "Uptrend: close 2668.30 > SMA50 2401.01 > SMA200 2322.76"
+    },
+    {
+     "points": 1,
+     "rule": "Healthy momentum: RSI 69"
+    },
+    {
+     "points": 2,
+     "rule": "Broke previous 20-day high 2561.20 on volume 2.1x average"
+    },
+    {
+     "points": 1,
+     "rule": "Beating NIFTY by 7.0% over 3 months"
+    }
+   ],
+   "entry": 2668.3,
+   "stop": 2512.47,
+   "target": 2902.04,
+   "atr": 77.91,
+   "rsi": 68.7,
+   "sma50": 2401.01,
+   "sma200": 2322.76,
+   "vol_ratio": 2.05,
+   "turnover_cr": 194.1,
+   "symbol": "MANKIND",
+   "bar": "2026-11-09",
+   "strategy": "trend_breakout_swing",
+   "version": "1.1.0",
+   "sector": "Healthcare",
+   "vol20": 737925.05,
+   "signal_id": "trend_breakout_swing|MANKIND|2026-11-09",
+   "news": [
+    {
+     "title": "Mankind Pharma Share Price - Live NSE: MANKIND Stock Price & Chart - Upstox",
+     "link": "https://news.google.com/rss/articles/CBMibkFVX3lxTE0tdFYzdXFCMXZJVVdQU3J3WHk3ZV90UDVkLWNkd0J4bU5iekJheWR4U01TRTZyZHV2d1g5Wk8wYjF4Uk1HTzdZbWJmcHlZMGZ3d0xYX1VOU3NVelBMQ3c4enpaUGllcV9ZT1Q1OTF3?oc=5",
+     "published_utc": "2026-11-08T14:09:00+00:00",
+     "source": "Upstox",
+     "query": "MANKIND NSE share",
+     "id": "c0b68802832d",
+     "tags": [
+      "NEUTRAL"
+     ],
+     "sentiment": "NEUTRAL",
+     "news_risk": false,
+     "method": "keyword heuristic",
+     "confidence": "low"
+    }
+   ],
+   "news_risk": false,
+   "news_status": "ok",
+   "event_flags": [],
+   "ai_p": 0.396,
+   "ai_view": "NEUTRAL"
+  },
+  {
+   "action": "BUY",
+   "score": 6,
+   "why": [
+    "Uptrend: close 4653.40 > SMA50 4181.60 > SMA200 3054.20",
+    "Healthy momentum: RSI 65",
+    "Broke previous 20-day high 4544.00 on volume 3.0x average",
+    "Beating NIFTY by 19.0% over 3 months"
+   ],
+   "contrib": [
+    {
+     "points": 2,
+     "rule": "Uptrend: close 4653.40 > SMA50 4181.60 > SMA200 3054.20"
+    },
+    {
+     "points": 1,
+     "rule": "Healthy momentum: RSI 65"
+    },
+    {
+     "points": 2,
+     "rule": "Broke previous 20-day high 4544.00 on volume 3.0x average"
+    },
+    {
+     "points": 1,
+     "rule": "Beating NIFTY by 19.0% over 3 months"
+    }
+   ],
+   "entry": 4653.4,
+   "stop": 4251.89,
+   "target": 5255.67,
+   "atr": 200.76,
+   "rsi": 64.9,
+   "sma50": 4181.6,
+   "sma200": 3054.2,
+   "vol_ratio": 3.04,
+   "turnover_cr": 92.3,
+   "symbol": "SANSERA",
+   "bar": "2026-11-09",
+   "strategy": "trend_breakout_swing",
+   "version": "1.1.0",
+   "sector": "Automobile and Auto Components",
+   "vol20": 200068.15,
+   "signal_id": "trend_breakout_swing|SANSERA|2026-11-09",
+   "news": [],
+   "news_risk": false,
+   "news_status": "ok",
+   "event_flags": [],
+   "ai_p": 0.422,
+   "ai_view": "NEUTRAL"
+  }
+ ],
+ "sells": [
+  {
+   "action": "SELL",
+   "score": -5,
+   "why": [
+    "Downtrend: close 1712.90 < SMA50 2226.94 < SMA200 2711.78",
+    "Broke previous 20-day low 1716.40 on volume 1.8x average",
+    "Lagging NIFTY by 39.9% over 3 months"
+   ],
+   "contrib": [
+    {
+     "points": -2,
+     "rule": "Downtrend: close 1712.90 < SMA50 2226.94 < SMA200 2711.78"
+    },
+    {
+     "points": -2,
+     "rule": "Broke previous 20-day low 1716.40 on volume 1.8x average"
+    },
+    {
+     "points": -1,
+     "rule": "Lagging NIFTY by 39.9% over 3 months"
+    }
+   ],
+   "entry": 1712.9,
+   "stop": 1542.12,
+   "target": 1969.07,
+   "atr": 85.39,
+   "rsi": 24.4,
+   "sma50": 2226.94,
+   "sma200": 2711.78,
+   "vol_ratio": 1.8,
+   "turnover_cr": 181.5,
+   "symbol": "PIIND",
+   "bar": "2026-11-09",
+   "strategy": "trend_breakout_swing",
+   "version": "1.1.0",
+   "sector": "Chemicals",
+   "vol20": 891508.35,
+   "signal_id": "trend_breakout_swing|PIIND|2026-11-09",
+   "news": [],
+   "news_risk": false,
+   "news_status": "ok",
+   "ai_p": 0.428,
+   "ai_view": "NEUTRAL"
+  }
+ ],
+ "blocked": [
+  {
+   "symbol": "ANTHEM",
+   "score": 5,
+   "reason": "score +5, not strong enough for a SIDEWAYS regime (needs +6)",
+   "why": [
+    "Uptrend: close 958.15 > SMA50 882.90 > SMA200 773.66",
+    "Broke previous 20-day high 922.00 on volume 4.2x average",
+    "Beating NIFTY by 12.3% over 3 months"
+   ],
+   "entry": 958.15,
+   "ai_p": 0.394,
+   "ai_view": "NEUTRAL"
+  },
+  {
+   "symbol": "AUROPHARMA",
+   "score": 5,
+   "reason": "score +5, not strong enough for a SIDEWAYS regime (needs +6)",
+   "why": [
+    "Uptrend: close 1855.30 > SMA50 1679.02 > SMA200 1474.46",
+    "Broke previous 20-day high 1805.00 on volume 2.3x average",
+    "Beating NIFTY by 10.3% over 3 months"
+   ],
+   "entry": 1855.3,
+   "ai_p": 0.365,
+   "ai_view": "NEUTRAL"
+  },
+  {
+   "symbol": "DIVISLAB",
+   "score": 5,
+   "reason": "score +5, not strong enough for a SIDEWAYS regime (needs +6)",
+   "why": [
+    "Uptrend: close 11565.50 > SMA50 9455.74 > SMA200 7412.35",
+    "Overbought: RSI 85 (no points; do not chase)",
+    "Broke previous 20-day high 10320.50 on volume 3.8x average",
+    "Beating NIFTY by 38.2% over 3 months"
+   ],
+   "entry": 11565.5,
+   "ai_p": 0.371,
+   "ai_view": "NEUTRAL"
+  },
+  {
+   "symbol": "GLAND",
+   "score": 5,
+   "reason": "score +5, not strong enough for a SIDEWAYS regime (needs +6)",
+   "why": [
+    "Uptrend: close 3302.40 > SMA50 2981.81 > SMA200 2306.92",
+    "Broke previous 20-day high 3208.60 on volume 6.9x average",
+    "Beating NIFTY by 26.3% over 3 months"
+   ],
+   "entry": 3302.4,
+   "ai_p": 0.397,
+   "ai_view": "NEUTRAL"
+  },
+  {
+   "symbol": "ICICIBANK",
+   "score": 5,
+   "reason": "score +5, not strong enough for a SIDEWAYS regime (needs +6)",
+   "why": [
+    "Uptrend: close 1589.00 > SMA50 1385.88 > SMA200 1349.36",
+    "Overbought: RSI 81 (no points; do not chase)",
+    "Broke previous 20-day high 1571.20 on volume 1.8x average",
+    "Beating NIFTY by 10.2% over 3 months"
+   ],
+   "entry": 1589.0,
+   "ai_p": 0.364,
+   "ai_view": "NEUTRAL"
+  },
+  {
+   "symbol": "LAURUSLABS",
+   "score": 5,
+   "reason": "score +5, not strong enough for a SIDEWAYS regime (needs +6)",
+   "why": [
+    "Uptrend: close 2454.00 > SMA50 2044.07 > SMA200 1487.13",
+    "Overbought: RSI 75 (no points; do not chase)",
+    "Broke previous 20-day high 2440.86 on volume 1.8x average",
+    "Beating NIFTY by 31.5% over 3 months"
+   ],
+   "entry": 2454.0,
+   "ai_p": 0.381,
+   "ai_view": "NEUTRAL"
+  },
+  {
+   "symbol": "PNB",
+   "score": 5,
+   "reason": "score +5, not strong enough for a SIDEWAYS regime (needs +6)",
+   "why": [
+    "Uptrend: close 132.17 > SMA50 117.84 > SMA200 112.59",
+    "Broke previous 20-day high 126.85 on volume 2.2x average",
+    "Beating NIFTY by 13.5% over 3 months"
+   ],
+   "entry": 132.17,
+   "ai_p": 0.377,
+   "ai_view": "NEUTRAL"
+  },
+  {
+   "symbol": "SAILIFE",
+   "score": 5,
+   "reason": "score +5, not strong enough for a SIDEWAYS regime (needs +6)",
+   "why": [
+    "Uptrend: close 1836.80 > SMA50 1538.12 > SMA200 1217.78",
+    "Overbought: RSI 81 (no points; do not chase)",
+    "Broke previous 20-day high 1814.90 on volume 9.1x average",
+    "Beating NIFTY by 32.9% over 3 months"
+   ],
+   "entry": 1836.8,
+   "ai_p": 0.409,
+   "ai_view": "NEUTRAL"
+  },
+  {
+   "symbol": "UNOMINDA",
+   "score": 5,
+   "reason": "score +5, not strong enough for a SIDEWAYS regime (needs +6)",
+   "why": [
+    "Uptrend: close 1353.80 > SMA50 1175.68 > SMA200 1148.52",
+    "Overbought: RSI 77 (no points; do not chase)",
+    "Broke previous 20-day high 1342.00 on volume 1.5x average",
+    "Beating NIFTY by 3.8% over 3 months"
+   ],
+   "entry": 1353.8,
+   "ai_p": 0.394,
+   "ai_view": "NEUTRAL"
+  }
+ ],
+ "scanned": 475,
+ "universe": 499,
+ "universe_source": "Nifty 500 (official NSE list)",
+ "strategy": {
+  "id": "trend_breakout_swing",
+  "name": "Trend + Breakout Swing",
+  "version": "1.1.0",
+  "status": "paper-approved",
+  "universe": "NIFTY 500 (NSE), price >= 50, 20-day turnover >= 10 cr",
+  "timeframe": "1d",
+  "segment": "delivery",
+  "hypothesis": "Stocks in an uptrend that break their 20-day high on above-average volume, while outperforming NIFTY, tend to continue for a few weeks. Only trade when the index itself is in an uptrend.",
+  "rules": {
+   "score": [
+    "+2 price > 50-day SMA > 200-day SMA (uptrend); -2 if the reverse",
+    "+1 21-day SMA crossed above 50-day within 4 bars; -1 if crossed below",
+    "+1 RSI(14) between 50 and 70; -1 if between 30 and 45",
+    "+2 close above previous 20-day high with volume > 1.5x 20-day average; -2 for a 20-day low",
+    "+1 3-month return beats NIFTY; -1 if it lags"
+   ],
+   "entry": "score >= +5 AND index regime BULL (or SIDEWAYS with score >= +6); no news-risk words in last 3 days",
+   "exit": "score <= -5 (SELL), stop 2xATR below entry, target 3xATR above, trailing stop 4% once up 5%, time exit 20 bars, regime turns BEAR",
+   "sizing": "1% of equity at risk between entry and stop; <= 25% of equity; <= 5% of 20-day volume; halve size when index 20-day vol > 25%"
+  },
+  "params": {
+   "buy_score": 5,
+   "sell_score": -5,
+   "stop_atr": 2.0,
+   "target_atr": 3.0,
+   "max_hold": 20,
+   "vol_mult": 1.5,
+   "rs_lookback": 63
+  },
+  "regime_filter": true,
+  "min_capital": 200000,
+  "holding": "5-20 sessions",
+  "failure_modes": [
+   "whipsaw in sideways markets (false breakouts)",
+   "gap-downs through the stop (fill worse than stop)",
+   "regime filter is slow: late entries after long rallies",
+   "news shocks; only headline words are screened"
+  ],
+  "warmup_bars": 200,
+  "param_hash": "b81c4fa041",
+  "code": true
+ },
+ "paper_actions": {
+  "IN-SWING": [
+   "Risk engine REJECTED MAHABANK: already holding this symbol",
+   "MANKIND: duplicate order blocked",
+   "SANSERA: duplicate order blocked"
+  ],
+  "US-SWING": [
+   "Risk engine REJECTED VRTX: maximum open positions reached",
+   "Risk engine REJECTED GM: maximum open positions reached"
+  ],
+  "IN-OPTIONS": [
+   "No new options trade: Regime SIDEWAYS; no options trigger (bear: close<SMA50 and RSI<45; bull: 20-day breakout)"
+  ],
+  "IN-BRAIN": [
+   "NO TRADE today: no opportunity passed every check. Waiting is a valid decision."
+  ],
+  "IN-VALUE": [
+   "Nothing to do: holding the long-term book."
+  ],
+  "US-VALUE": [
+   "Nothing to do: holding the long-term book."
+  ]
+ },
+ "rejected_dq": {
+  "USDINR": [
+   "high/low/close inconsistent",
+   "volume unreliable (many zero days)"
+  ],
+  "EURINR": [
+   "high/low/close inconsistent",
+   "volume unreliable (many zero days)"
+  ],
+  "GBPUSD": [
+   "high/low/close inconsistent",
+   "volume unreliable (many zero days)"
+  ],
+  "EURUSD": [
+   "high/low/close inconsistent",
+   "volume unreliable (many zero days)"
+  ],
+  "USDJPY": [
+   "high/low/close inconsistent",
+   "volume unreliable (many zero days)"
+  ],
+  "STOXX50": [
+   "non-positive price",
+   "high/low/close inconsistent",
+   "3 expected sessions absent (holiday list unverified or feed gap)"
+  ]
+ },
+ "failed_download": [
+  "^CNXMIDCAP",
+  "^CNXFMCG",
+  "BAGMANE.NS",
+  "DUMMYHEG.NS",
+  "MMC"
+ ],
+ "skipped": {
+  "BHARATCOAL": "price 31.52 below minimum 50",
+  "CIEINDIA": "20-day turnover 8.5 (x1e7) below 10",
+  "CENTRALBK": "price 31.23 below minimum 50",
+  "DOMS": "20-day turnover 9.7 (x1e7) below 10",
+  "IRB": "price 18.27 below minimum 50",
+  "IOB": "price 31.12 below minimum 50",
+  "JPPOWER": "price 13.99 below minimum 50",
+  "MSUMI": "price 38.96 below minimum 50",
+  "NSLNISP": "price 40.44 below minimum 50",
+  "NAVA": "20-day turnover 9.4 (x1e7) below 10",
+  "OLAELEC": "price 33.96 below minimum 50",
+  "RHIM": "20-day turnover 8.7 (x1e7) below 10",
+  "RPOWER": "price 18.80 below minimum 50",
+  "SAGILITY": "price 44.70 below minimum 50",
+  "SUZLON": "price 38.91 below minimum 50",
+  "TTML": "price 39.33 below minimum 50",
+  "TRIDENT": "price 23.57 below minimum 50",
+  "UCOBANK": "price 24.19 below minimum 50",
+  "UTIAMC": "20-day turnover 7.7 (x1e7) below 10",
+  "VISL": "price 26.64 below minimum 50",
+  "VOGL": "price 31.08 below minimum 50",
+  "VEDPOWER": "price 35.10 below minimum 50",
+  "IDEA": "price 12.67 below minimum 50",
+  "YESBANK": "price 17.03 below minimum 50"
+ }
+}

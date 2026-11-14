@@ -1,0 +1,570 @@
+{
+ "engine_version": "2.8.0",
+ "run_at": "2026-10-08T19:13:37+05:30",
+ "data_date": "2026-10-08",
+ "mode": "PAPER",
+ "data_status": "OK",
+ "regime": {
+  "state": "BEAR",
+  "text": "Index below its 200-day average and 50-day below 200-day: downtrend. No new buys; protect capital.",
+  "close": 22231.8,
+  "date": "2026-10-08",
+  "sma50": 23761.06,
+  "sma200": 24287.94,
+  "rsi": 27.6,
+  "vol20_annualised_pct": 12.7,
+  "high_vol": false,
+  "ret3m": -0.07223696494419984,
+  "support": [
+   22217.3
+  ],
+  "resistance": [
+   22776.1,
+   23532.73,
+   23839.3
+  ],
+  "rule": "BULL: close>SMA200 and SMA50>SMA200; BEAR: both below; else SIDEWAYS",
+  "computed_at": "2026-10-08T19:04:36+05:30"
+ },
+ "buys": [],
+ "sells": [
+  {
+   "action": "SELL",
+   "score": -6,
+   "why": [
+    "Downtrend: close 326.60 < SMA50 359.75 < SMA200 377.41",
+    "Weak momentum: RSI 32",
+    "Broke previous 20-day low 337.20 on volume 3.5x average",
+    "Lagging NIFTY by 5.1% over 3 months"
+   ],
+   "contrib": [
+    {
+     "points": -2,
+     "rule": "Downtrend: close 326.60 < SMA50 359.75 < SMA200 377.41"
+    },
+    {
+     "points": -1,
+     "rule": "Weak momentum: RSI 32"
+    },
+    {
+     "points": -2,
+     "rule": "Broke previous 20-day low 337.20 on volume 3.5x average"
+    },
+    {
+     "points": -1,
+     "rule": "Lagging NIFTY by 5.1% over 3 months"
+    }
+   ],
+   "entry": 326.6,
+   "stop": 309.46,
+   "target": 352.31,
+   "atr": 8.57,
+   "rsi": 31.8,
+   "sma50": 359.75,
+   "sma200": 377.41,
+   "vol_ratio": 3.49,
+   "turnover_cr": 135.6,
+   "symbol": "HINDPETRO",
+   "bar": "2026-10-08",
+   "strategy": "trend_breakout_swing",
+   "version": "1.1.0",
+   "sector": "Oil Gas & Consumable Fuels",
+   "vol20": 3453214.95,
+   "signal_id": "trend_breakout_swing|HINDPETRO|2026-10-08",
+   "news": [],
+   "news_risk": false,
+   "news_status": "ok",
+   "ai_p": 0.377,
+   "ai_view": "NEUTRAL"
+  },
+  {
+   "action": "SELL",
+   "score": -6,
+   "why": [
+    "Downtrend: close 126.25 < SMA50 136.48 < SMA200 145.77",
+    "Weak momentum: RSI 32",
+    "Broke previous 20-day low 129.55 on volume 1.6x average",
+    "Lagging NIFTY by 1.8% over 3 months"
+   ],
+   "contrib": [
+    {
+     "points": -2,
+     "rule": "Downtrend: close 126.25 < SMA50 136.48 < SMA200 145.77"
+    },
+    {
+     "points": -1,
+     "rule": "Weak momentum: RSI 32"
+    },
+    {
+     "points": -2,
+     "rule": "Broke previous 20-day low 129.55 on volume 1.6x average"
+    },
+    {
+     "points": -1,
+     "rule": "Lagging NIFTY by 1.8% over 3 months"
+    }
+   ],
+   "entry": 126.25,
+   "stop": 120.89,
+   "target": 134.3,
+   "atr": 2.68,
+   "rsi": 32.1,
+   "sma50": 136.48,
+   "sma200": 145.77,
+   "vol_ratio": 1.58,
+   "turnover_cr": 106.6,
+   "symbol": "IOC",
+   "bar": "2026-10-08",
+   "strategy": "trend_breakout_swing",
+   "version": "1.1.0",
+   "sector": "Oil Gas & Consumable Fuels",
+   "vol20": 7709095.95,
+   "signal_id": "trend_breakout_swing|IOC|2026-10-08",
+   "news": [],
+   "news_risk": false,
+   "news_status": "ok",
+   "ai_p": 0.388,
+   "ai_view": "NEUTRAL"
+  },
+  {
+   "action": "SELL",
+   "score": -6,
+   "why": [
+    "Downtrend: close 309.70 < SMA50 330.39 < SMA200 354.64",
+    "Weak momentum: RSI 31",
+    "Broke previous 20-day low 313.05 on volume 1.8x average",
+    "Lagging NIFTY by 3.8% over 3 months"
+   ],
+   "contrib": [
+    {
+     "points": -2,
+     "rule": "Downtrend: close 309.70 < SMA50 330.39 < SMA200 354.64"
+    },
+    {
+     "points": -1,
+     "rule": "Weak momentum: RSI 31"
+    },
+    {
+     "points": -2,
+     "rule": "Broke previous 20-day low 313.05 on volume 1.8x average"
+    },
+    {
+     "points": -1,
+     "rule": "Lagging NIFTY by 3.8% over 3 months"
+    }
+   ],
+   "entry": 309.7,
+   "stop": 298.81,
+   "target": 326.04,
+   "atr": 5.45,
+   "rsi": 31.1,
+   "sma50": 330.39,
+   "sma200": 354.64,
+   "vol_ratio": 1.81,
+   "turnover_cr": 227.5,
+   "symbol": "NTPC",
+   "bar": "2026-10-08",
+   "strategy": "trend_breakout_swing",
+   "version": "1.1.0",
+   "sector": "Power",
+   "vol20": 6777195.25,
+   "signal_id": "trend_breakout_swing|NTPC|2026-10-08",
+   "news": [],
+   "news_risk": false,
+   "news_status": "ok",
+   "ai_p": 0.371,
+   "ai_view": "NEUTRAL"
+  },
+  {
+   "action": "SELL",
+   "score": -6,
+   "why": [
+    "Downtrend: close 97.00 < SMA50 105.04 < SMA200 115.65",
+    "Weak momentum: RSI 38",
+    "Broke previous 20-day low 98.00 on volume 1.8x average",
+    "Lagging NIFTY by 9.3% over 3 months"
+   ],
+   "contrib": [
+    {
+     "points": -2,
+     "rule": "Downtrend: close 97.00 < SMA50 105.04 < SMA200 115.65"
+    },
+    {
+     "points": -1,
+     "rule": "Weak momentum: RSI 38"
+    },
+    {
+     "points": -2,
+     "rule": "Broke previous 20-day low 98.00 on volume 1.8x average"
+    },
+    {
+     "points": -1,
+     "rule": "Lagging NIFTY by 9.3% over 3 months"
+    }
+   ],
+   "entry": 97.0,
+   "stop": 91.2,
+   "target": 105.7,
+   "atr": 2.9,
+   "rsi": 37.9,
+   "sma50": 105.04,
+   "sma200": 115.65,
+   "vol_ratio": 1.81,
+   "turnover_cr": 106.7,
+   "symbol": "VMM",
+   "bar": "2026-10-08",
+   "strategy": "trend_breakout_swing",
+   "version": "1.1.0",
+   "sector": "Consumer Services",
+   "vol20": 9818382.8,
+   "signal_id": "trend_breakout_swing|VMM|2026-10-08",
+   "news": [],
+   "news_risk": false,
+   "news_status": "ok",
+   "ai_p": 0.425,
+   "ai_view": "NEUTRAL"
+  },
+  {
+   "action": "SELL",
+   "score": -5,
+   "why": [
+    "Downtrend: close 341.00 < SMA50 399.83 < SMA200 448.64",
+    "Broke previous 20-day low 352.45 on volume 1.5x average",
+    "Lagging NIFTY by 13.9% over 3 months"
+   ],
+   "contrib": [
+    {
+     "points": -2,
+     "rule": "Downtrend: close 341.00 < SMA50 399.83 < SMA200 448.64"
+    },
+    {
+     "points": -2,
+     "rule": "Broke previous 20-day low 352.45 on volume 1.5x average"
+    },
+    {
+     "points": -1,
+     "rule": "Lagging NIFTY by 13.9% over 3 months"
+    }
+   ],
+   "entry": 341.0,
+   "stop": 323.13,
+   "target": 367.81,
+   "atr": 8.94,
+   "rsi": 23.5,
+   "sma50": 399.83,
+   "sma200": 448.64,
+   "vol_ratio": 1.55,
+   "turnover_cr": 61.7,
+   "symbol": "AMBUJACEM",
+   "bar": "2026-10-08",
+   "strategy": "trend_breakout_swing",
+   "version": "1.1.0",
+   "sector": "Construction Materials",
+   "vol20": 1607522.95,
+   "signal_id": "trend_breakout_swing|AMBUJACEM|2026-10-08",
+   "news": [
+    {
+     "title": "Ambuja Cements (NSEI:AMBUJACEM) Stock Forecast & Analyst Predictions - Simply Wall Street",
+     "link": "https://news.google.com/rss/articles/CBMijAFBVV95cUxQTGF1aEFzSlpjSnhhZHBCb0RySVlUN3JsTEJCQk1TeFYwd1V4VnpObGtfbDNmVl9jeTU4R1RVMU01aklMYkFxRlNuS0Y4djRvZy16UHpXcWNVOUV3S2MxdVluRjFwNWdJWTM1andpd05LWWhOMndjNXZzSnhXUDh5NGpxZTlBbUhyMk1qSQ?oc=5",
+     "published_utc": "2026-10-06T07:00:00+00:00",
+     "source": "Simply Wall Street",
+     "query": "AMBUJACEM NSE share",
+     "id": "aeec0b5778ac",
+     "tags": [
+      "NEUTRAL"
+     ],
+     "sentiment": "NEUTRAL",
+     "news_risk": false,
+     "method": "keyword heuristic",
+     "confidence": "low"
+    },
+    {
+     "title": "BHEL Share Price - Upstox",
+     "link": "https://news.google.com/rss/articles/CBMiVkFVX3lxTE82NlR3TGFGUVl3bXBURmlHaklBdDhROTVtQS1lRU5fem1qWmw2LXNPVzlOXzFLdEM2MlFUUlFqTElBOHlOd3dRWllfV2FRUVF5Y0RRS3dn?oc=5",
+     "published_utc": "2026-10-07T02:36:23+00:00",
+     "source": "Upstox",
+     "query": "AMBUJACEM NSE share",
+     "id": "1999e6baa60b",
+     "tags": [
+      "NEUTRAL"
+     ],
+     "sentiment": "NEUTRAL",
+     "news_risk": false,
+     "method": "keyword heuristic",
+     "confidence": "low"
+    }
+   ],
+   "news_risk": false,
+   "news_status": "ok",
+   "ai_p": 0.401,
+   "ai_view": "NEUTRAL"
+  }
+ ],
+ "blocked": [],
+ "scanned": 468,
+ "universe": 499,
+ "universe_source": "Nifty 500 (official NSE list)",
+ "strategy": {
+  "id": "trend_breakout_swing",
+  "name": "Trend + Breakout Swing",
+  "version": "1.1.0",
+  "status": "paper-approved",
+  "universe": "NIFTY 500 (NSE), price >= 50, 20-day turnover >= 10 cr",
+  "timeframe": "1d",
+  "segment": "delivery",
+  "hypothesis": "Stocks in an uptrend that break their 20-day high on above-average volume, while outperforming NIFTY, tend to continue for a few weeks. Only trade when the index itself is in an uptrend.",
+  "rules": {
+   "score": [
+    "+2 price > 50-day SMA > 200-day SMA (uptrend); -2 if the reverse",
+    "+1 21-day SMA crossed above 50-day within 4 bars; -1 if crossed below",
+    "+1 RSI(14) between 50 and 70; -1 if between 30 and 45",
+    "+2 close above previous 20-day high with volume > 1.5x 20-day average; -2 for a 20-day low",
+    "+1 3-month return beats NIFTY; -1 if it lags"
+   ],
+   "entry": "score >= +5 AND index regime BULL (or SIDEWAYS with score >= +6); no news-risk words in last 3 days",
+   "exit": "score <= -5 (SELL), stop 2xATR below entry, target 3xATR above, trailing stop 4% once up 5%, time exit 20 bars, regime turns BEAR",
+   "sizing": "1% of equity at risk between entry and stop; <= 25% of equity; <= 5% of 20-day volume; halve size when index 20-day vol > 25%"
+  },
+  "params": {
+   "buy_score": 5,
+   "sell_score": -5,
+   "stop_atr": 2.0,
+   "target_atr": 3.0,
+   "max_hold": 20,
+   "vol_mult": 1.5,
+   "rs_lookback": 63
+  },
+  "regime_filter": true,
+  "min_capital": 200000,
+  "holding": "5-20 sessions",
+  "failure_modes": [
+   "whipsaw in sideways markets (false breakouts)",
+   "gap-downs through the stop (fill worse than stop)",
+   "regime filter is slow: late entries after long rallies",
+   "news shocks; only headline words are screened"
+  ],
+  "warmup_bars": 200,
+  "param_hash": "b81c4fa041",
+  "code": true
+ },
+ "paper_actions": {
+  "IN-SWING": [
+   "Nothing to do: no fills, no exits, no new entries."
+  ],
+  "US-SWING": [
+   "PM: no data today - untouched"
+  ],
+  "IN-OPTIONS": [
+   "HOLD NIFTY 13OCT26 22200/22000 PE DEBIT SPREAD: modeled value 71.10 vs debit 75.98, 5 days left",
+   "HOLD NIFTY 13OCT26 22250/22050 PE DEBIT SPREAD: modeled value 80.60 vs debit 80.60, 5 days left",
+   "Signal NIFTY 13OCT26 22250/22050 PE DEBIT SPREAD skipped: 2 spreads already open"
+  ],
+  "IN-BRAIN": [
+   "NO TRADE today: no opportunity passed every check. Waiting is a valid decision."
+  ],
+  "IN-VALUE": [
+   "Nothing to do: holding the long-term book."
+  ],
+  "US-VALUE": [
+   "INTU: trailing stop raised to 286.80"
+  ]
+ },
+ "rejected_dq": {
+  "USDINR": [
+   "high/low/close inconsistent",
+   "volume unreliable (many zero days)"
+  ],
+  "EURINR": [
+   "high/low/close inconsistent",
+   "volume unreliable (many zero days)"
+  ],
+  "GBPUSD": [
+   "high/low/close inconsistent",
+   "volume unreliable (many zero days)"
+  ],
+  "EURUSD": [
+   "high/low/close inconsistent",
+   "volume unreliable (many zero days)"
+  ],
+  "USDJPY": [
+   "high/low/close inconsistent",
+   "volume unreliable (many zero days)"
+  ],
+  "SPY": [
+   "high/low/close inconsistent"
+  ],
+  "XOM": [
+   "high/low/close inconsistent"
+  ],
+  "V": [
+   "high/low/close inconsistent"
+  ],
+  "MA": [
+   "high/low/close inconsistent"
+  ],
+  "PG": [
+   "high/low/close inconsistent"
+  ],
+  "ABBV": [
+   "high/low/close inconsistent"
+  ],
+  "KO": [
+   "high/low/close inconsistent"
+  ],
+  "CVX": [
+   "high/low/close inconsistent"
+  ],
+  "CRM": [
+   "high/low/close inconsistent"
+  ],
+  "ORCL": [
+   "high/low/close inconsistent",
+   "price jump > 25% on 2025-09-10 (corporate action or bad tick?)"
+  ],
+  "TMO": [
+   "high/low/close inconsistent"
+  ],
+  "ACN": [
+   "high/low/close inconsistent"
+  ],
+  "MCD": [
+   "high/low/close inconsistent"
+  ],
+  "WFC": [
+   "high/low/close inconsistent"
+  ],
+  "PM": [
+   "high/low/close inconsistent"
+  ],
+  "NEE": [
+   "high/low/close inconsistent"
+  ],
+  "UNP": [
+   "high/low/close inconsistent"
+  ],
+  "IBM": [
+   "high/low/close inconsistent",
+   "price jump > 25% on 2026-07-14 (corporate action or bad tick?)"
+  ],
+  "LOW": [
+   "high/low/close inconsistent"
+  ],
+  "CAT": [
+   "high/low/close inconsistent"
+  ],
+  "SPGI": [
+   "high/low/close inconsistent"
+  ],
+  "BLK": [
+   "high/low/close inconsistent"
+  ],
+  "GE": [
+   "high/low/close inconsistent"
+  ],
+  "RTX": [
+   "high/low/close inconsistent"
+  ],
+  "DE": [
+   "high/low/close inconsistent"
+  ],
+  "PLD": [
+   "high/low/close inconsistent"
+  ],
+  "MDT": [
+   "high/low/close inconsistent"
+  ],
+  "LMT": [
+   "high/low/close inconsistent"
+  ],
+  "SYK": [
+   "high/low/close inconsistent"
+  ],
+  "C": [
+   "high/low/close inconsistent"
+  ],
+  "CB": [
+   "high/low/close inconsistent"
+  ],
+  "MO": [
+   "high/low/close inconsistent"
+  ],
+  "PGR": [
+   "high/low/close inconsistent"
+  ],
+  "BA": [
+   "high/low/close inconsistent"
+  ],
+  "UPS": [
+   "high/low/close inconsistent"
+  ],
+  "COP": [
+   "high/low/close inconsistent"
+  ],
+  "VZ": [
+   "high/low/close inconsistent"
+  ],
+  "DIS": [
+   "high/low/close inconsistent"
+  ],
+  "NKE": [
+   "high/low/close inconsistent"
+  ],
+  "AXP": [
+   "high/low/close inconsistent"
+  ],
+  "ELV": [
+   "high/low/close inconsistent"
+  ],
+  "CI": [
+   "high/low/close inconsistent"
+  ],
+  "USB": [
+   "high/low/close inconsistent"
+  ],
+  "F": [
+   "high/low/close inconsistent"
+  ],
+  "GM": [
+   "high/low/close inconsistent"
+  ]
+ },
+ "failed_download": [
+  "^CNXMIDCAP",
+  "BAGMANE.NS",
+  "DUMMYHEG.NS",
+  "MMC"
+ ],
+ "skipped": {
+  "BATAINDIA": "20-day turnover 9.3 (x1e7) below 10",
+  "BHARATCOAL": "price 31.31 below minimum 50",
+  "CIEINDIA": "20-day turnover 8.4 (x1e7) below 10",
+  "CENTRALBK": "price 29.99 below minimum 50",
+  "DOMS": "20-day turnover 6.3 (x1e7) below 10",
+  "GALLANTT": "20-day turnover 4.4 (x1e7) below 10",
+  "GODREJIND": "20-day turnover 9.2 (x1e7) below 10",
+  "HEXT": "20-day turnover 8.3 (x1e7) below 10",
+  "IRB": "price 17.53 below minimum 50",
+  "ITI": "20-day turnover 4.9 (x1e7) below 10",
+  "INDIACEM": "20-day turnover 8.4 (x1e7) below 10",
+  "IOB": "price 30.48 below minimum 50",
+  "JPPOWER": "price 14.31 below minimum 50",
+  "MMTC": "20-day turnover 5.1 (x1e7) below 10",
+  "MSUMI": "price 32.97 below minimum 50",
+  "NSLNISP": "price 39.10 below minimum 50",
+  "NUVOCO": "20-day turnover 9.1 (x1e7) below 10",
+  "OLAELEC": "price 34.63 below minimum 50",
+  "RPOWER": "price 19.80 below minimum 50",
+  "SAGILITY": "price 43.35 below minimum 50",
+  "SUZLON": "price 36.43 below minimum 50",
+  "TTML": "price 32.95 below minimum 50",
+  "TRIDENT": "price 21.83 below minimum 50",
+  "UCOBANK": "price 22.96 below minimum 50",
+  "UTIAMC": "20-day turnover 6.6 (x1e7) below 10",
+  "VISL": "price 28.46 below minimum 50",
+  "VOGL": "price 29.87 below minimum 50",
+  "VEDPOWER": "price 31.89 below minimum 50",
+  "IDEA": "price 12.80 below minimum 50",
+  "YESBANK": "price 20.45 below minimum 50",
+  "ZYDUSWELL": "20-day turnover 9.0 (x1e7) below 10"
+ }
+}
