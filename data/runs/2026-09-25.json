@@ -1,0 +1,418 @@
+{
+ "engine_version": "2.4.0",
+ "run_at": "2026-09-29T00:55:16+05:30",
+ "data_date": "2026-09-25",
+ "mode": "PAPER",
+ "data_status": "OK",
+ "regime": {
+  "state": "BEAR",
+  "text": "Index below its 200-day average and 50-day below 200-day: downtrend. No new buys; protect capital.",
+  "close": 23140.5,
+  "date": "2026-09-25",
+  "sma50": 23994.46,
+  "sma200": 24423.17,
+  "rsi": 34.2,
+  "vol20_annualised_pct": 9.2,
+  "high_vol": false,
+  "ret3m": -0.033648274782064,
+  "support": [],
+  "resistance": [
+   23532.73,
+   23839.3,
+   24388.19
+  ],
+  "rule": "BULL: close>SMA200 and SMA50>SMA200; BEAR: both below; else SIDEWAYS",
+  "computed_at": "2026-09-29T00:46:47+05:30"
+ },
+ "buys": [],
+ "sells": [
+  {
+   "action": "SELL",
+   "score": -6,
+   "why": [
+    "Downtrend: close 290.45 < SMA50 320.76 < SMA200 344.15",
+    "Weak momentum: RSI 31",
+    "Broke previous 20-day low 295.00 on volume 2.7x average",
+    "Lagging NIFTY by 14.2% over 3 months"
+   ],
+   "contrib": [
+    {
+     "points": -2,
+     "rule": "Downtrend: close 290.45 < SMA50 320.76 < SMA200 344.15"
+    },
+    {
+     "points": -1,
+     "rule": "Weak momentum: RSI 31"
+    },
+    {
+     "points": -2,
+     "rule": "Broke previous 20-day low 295.00 on volume 2.7x average"
+    },
+    {
+     "points": -1,
+     "rule": "Lagging NIFTY by 14.2% over 3 months"
+    }
+   ],
+   "entry": 290.45,
+   "stop": 275.32,
+   "target": 313.15,
+   "atr": 7.57,
+   "rsi": 31.2,
+   "sma50": 320.76,
+   "sma200": 344.15,
+   "vol_ratio": 2.72,
+   "turnover_cr": 278.1,
+   "symbol": "TMPV",
+   "bar": "2026-09-25",
+   "strategy": "trend_breakout_swing",
+   "version": "1.1.0",
+   "sector": "Automobile and Auto Components",
+   "vol20": 8334505.4,
+   "signal_id": "trend_breakout_swing|TMPV|2026-09-25",
+   "news": [],
+   "news_risk": false,
+   "news_status": "ok",
+   "ai_p": 0.404,
+   "ai_view": "NEUTRAL"
+  },
+  {
+   "action": "SELL",
+   "score": -5,
+   "why": [
+    "Downtrend: close 393.55 < SMA50 402.34 < SMA200 417.42",
+    "21-day SMA crossed below 50-day within the last 4 bars",
+    "Weak momentum: RSI 43",
+    "Lagging NIFTY by 0.9% over 3 months"
+   ],
+   "contrib": [
+    {
+     "points": -2,
+     "rule": "Downtrend: close 393.55 < SMA50 402.34 < SMA200 417.42"
+    },
+    {
+     "points": -1,
+     "rule": "21-day SMA crossed below 50-day within the last 4 bars"
+    },
+    {
+     "points": -1,
+     "rule": "Weak momentum: RSI 43"
+    },
+    {
+     "points": -1,
+     "rule": "Lagging NIFTY by 0.9% over 3 months"
+    }
+   ],
+   "entry": 393.55,
+   "stop": 379.78,
+   "target": 414.21,
+   "atr": 6.89,
+   "rsi": 43.2,
+   "sma50": 402.34,
+   "sma200": 417.42,
+   "vol_ratio": 0.65,
+   "turnover_cr": 373.5,
+   "symbol": "BEL",
+   "bar": "2026-09-25",
+   "strategy": "trend_breakout_swing",
+   "version": "1.1.0",
+   "sector": "Capital Goods",
+   "vol20": 9415985.25,
+   "signal_id": "trend_breakout_swing|BEL|2026-09-25",
+   "news": [],
+   "news_risk": false,
+   "news_status": "ok",
+   "ai_p": 0.368,
+   "ai_view": "NEUTRAL"
+  },
+  {
+   "action": "SELL",
+   "score": -5,
+   "why": [
+    "Downtrend: close 1400.60 < SMA50 1532.57 < SMA200 1616.63",
+    "Broke previous 20-day low 1405.40 on volume 2.1x average",
+    "Lagging NIFTY by 12.0% over 3 months"
+   ],
+   "contrib": [
+    {
+     "points": -2,
+     "rule": "Downtrend: close 1400.60 < SMA50 1532.57 < SMA200 1616.63"
+    },
+    {
+     "points": -2,
+     "rule": "Broke previous 20-day low 1405.40 on volume 2.1x average"
+    },
+    {
+     "points": -1,
+     "rule": "Lagging NIFTY by 12.0% over 3 months"
+    }
+   ],
+   "entry": 1400.6,
+   "stop": 1313.34,
+   "target": 1531.48,
+   "atr": 43.63,
+   "rsi": 26.3,
+   "sma50": 1532.57,
+   "sma200": 1616.63,
+   "vol_ratio": 2.12,
+   "turnover_cr": 24.0,
+   "symbol": "CHOLAHLDNG",
+   "bar": "2026-09-25",
+   "strategy": "trend_breakout_swing",
+   "version": "1.1.0",
+   "sector": "Financial Services",
+   "vol20": 155388.7,
+   "signal_id": "trend_breakout_swing|CHOLAHLDNG|2026-09-25",
+   "news": [],
+   "news_risk": false,
+   "news_status": "ok",
+   "ai_p": 0.444,
+   "ai_view": "NEUTRAL"
+  },
+  {
+   "action": "SELL",
+   "score": -5,
+   "why": [
+    "Downtrend: close 1377.00 < SMA50 1447.08 < SMA200 1491.38",
+    "21-day SMA crossed below 50-day within the last 4 bars",
+    "Weak momentum: RSI 42",
+    "Lagging NIFTY by 5.2% over 3 months"
+   ],
+   "contrib": [
+    {
+     "points": -2,
+     "rule": "Downtrend: close 1377.00 < SMA50 1447.08 < SMA200 1491.38"
+    },
+    {
+     "points": -1,
+     "rule": "21-day SMA crossed below 50-day within the last 4 bars"
+    },
+    {
+     "points": -1,
+     "rule": "Weak momentum: RSI 42"
+    },
+    {
+     "points": -1,
+     "rule": "Lagging NIFTY by 5.2% over 3 months"
+    }
+   ],
+   "entry": 1377.0,
+   "stop": 1298.3,
+   "target": 1495.05,
+   "atr": 39.35,
+   "rsi": 41.9,
+   "sma50": 1447.08,
+   "sma200": 1491.38,
+   "vol_ratio": 0.4,
+   "turnover_cr": 147.7,
+   "symbol": "COCHINSHIP",
+   "bar": "2026-09-25",
+   "strategy": "trend_breakout_swing",
+   "version": "1.1.0",
+   "sector": "Capital Goods",
+   "vol20": 1047616.6,
+   "signal_id": "trend_breakout_swing|COCHINSHIP|2026-09-25",
+   "news": [],
+   "news_risk": false,
+   "news_status": "ok",
+   "ai_p": 0.374,
+   "ai_view": "NEUTRAL"
+  }
+ ],
+ "blocked": [
+  {
+   "symbol": "ADANIPORTS",
+   "score": 5,
+   "reason": "score +5, but NIFTY regime is BEAR (close < SMA200 and SMA50 < SMA200)",
+   "why": [
+    "Uptrend: close 1788.00 > SMA50 1725.12 > SMA200 1623.60",
+    "21-day SMA crossed above 50-day within the last 4 bars",
+    "Healthy momentum: RSI 57",
+    "Beating NIFTY by 2.1% over 3 months"
+   ],
+   "entry": 1788.0,
+   "ai_p": 0.348,
+   "ai_view": "DISAGREES"
+  },
+  {
+   "symbol": "AEGISLOG",
+   "score": 5,
+   "reason": "score +5, but NIFTY regime is BEAR (close < SMA200 and SMA50 < SMA200)",
+   "why": [
+    "Uptrend: close 1365.40 > SMA50 1330.10 > SMA200 914.49",
+    "21-day SMA crossed above 50-day within the last 4 bars",
+    "Healthy momentum: RSI 52",
+    "Beating NIFTY by 20.3% over 3 months"
+   ],
+   "entry": 1365.4,
+   "ai_p": 0.423,
+   "ai_view": "NEUTRAL"
+  },
+  {
+   "symbol": "CASTROLIND",
+   "score": 5,
+   "reason": "score +5, but NIFTY regime is BEAR (close < SMA200 and SMA50 < SMA200)",
+   "why": [
+    "Uptrend: close 201.67 > SMA50 186.50 > SMA200 178.82",
+    "Broke previous 20-day high 197.85 on volume 5.1x average",
+    "Beating NIFTY by 16.4% over 3 months"
+   ],
+   "entry": 201.67,
+   "ai_p": 0.358,
+   "ai_view": "DISAGREES"
+  },
+  {
+   "symbol": "ENGINERSIN",
+   "score": 5,
+   "reason": "score +5, but NIFTY regime is BEAR (close < SMA200 and SMA50 < SMA200)",
+   "why": [
+    "Uptrend: close 315.65 > SMA50 251.63 > SMA200 223.48",
+    "Overbought: RSI 75 (no points; do not chase)",
+    "Broke previous 20-day high 306.97 on volume 2.5x average",
+    "Beating NIFTY by 35.6% over 3 months"
+   ],
+   "entry": 315.65,
+   "ai_p": 0.448,
+   "ai_view": "NEUTRAL"
+  },
+  {
+   "symbol": "ZYDUSLIFE",
+   "score": 6,
+   "reason": "score +6, but NIFTY regime is BEAR (close < SMA200 and SMA50 < SMA200)",
+   "why": [
+    "Uptrend: close 1203.90 > SMA50 1137.39 > SMA200 1007.86",
+    "Healthy momentum: RSI 65",
+    "Broke previous 20-day high 1198.90 on volume 1.6x average",
+    "Beating NIFTY by 11.7% over 3 months"
+   ],
+   "entry": 1203.9,
+   "ai_p": 0.393,
+   "ai_view": "NEUTRAL"
+  }
+ ],
+ "scanned": 467,
+ "universe": 500,
+ "universe_source": "Nifty 500 (official NSE list)",
+ "strategy": {
+  "id": "trend_breakout_swing",
+  "name": "Trend + Breakout Swing",
+  "version": "1.1.0",
+  "status": "paper-approved",
+  "universe": "NIFTY 500 (NSE), price >= 50, 20-day turnover >= 10 cr",
+  "timeframe": "1d",
+  "segment": "delivery",
+  "hypothesis": "Stocks in an uptrend that break their 20-day high on above-average volume, while outperforming NIFTY, tend to continue for a few weeks. Only trade when the index itself is in an uptrend.",
+  "rules": {
+   "score": [
+    "+2 price > 50-day SMA > 200-day SMA (uptrend); -2 if the reverse",
+    "+1 21-day SMA crossed above 50-day within 4 bars; -1 if crossed below",
+    "+1 RSI(14) between 50 and 70; -1 if between 30 and 45",
+    "+2 close above previous 20-day high with volume > 1.5x 20-day average; -2 for a 20-day low",
+    "+1 3-month return beats NIFTY; -1 if it lags"
+   ],
+   "entry": "score >= +5 AND index regime BULL (or SIDEWAYS with score >= +6); no news-risk words in last 3 days",
+   "exit": "score <= -5 (SELL), stop 2xATR below entry, target 3xATR above, trailing stop 4% once up 5%, time exit 20 bars, regime turns BEAR",
+   "sizing": "1% of equity at risk between entry and stop; <= 25% of equity; <= 5% of 20-day volume; halve size when index 20-day vol > 25%"
+  },
+  "params": {
+   "buy_score": 5,
+   "sell_score": -5,
+   "stop_atr": 2.0,
+   "target_atr": 3.0,
+   "max_hold": 20,
+   "vol_mult": 1.5,
+   "rs_lookback": 63
+  },
+  "regime_filter": true,
+  "min_capital": 200000,
+  "holding": "5-20 sessions",
+  "failure_modes": [
+   "whipsaw in sideways markets (false breakouts)",
+   "gap-downs through the stop (fill worse than stop)",
+   "regime filter is slow: late entries after long rallies",
+   "news shocks; only headline words are screened"
+  ],
+  "warmup_bars": 200,
+  "param_hash": "b81c4fa041",
+  "code": true
+ },
+ "paper_actions": {
+  "IN-SWING": [
+   "Nothing to do: no fills, no exits, no new entries."
+  ],
+  "US-SWING": [
+   "Nothing to do: no fills, no exits, no new entries."
+  ],
+  "IN-OPTIONS": [
+   "HOLD NIFTY 06OCT26 23150/22950 PE DEBIT SPREAD: modeled value 78.86 vs debit 78.86, 11 days left",
+   "Already holding NIFTY 06OCT26 23150/22950 PE DEBIT SPREAD"
+  ]
+ },
+ "rejected_dq": {
+  "USDINR": [
+   "high/low/close inconsistent",
+   "volume unreliable (many zero days)"
+  ],
+  "EURINR": [
+   "high/low/close inconsistent",
+   "volume unreliable (many zero days)"
+  ],
+  "GBPUSD": [
+   "high/low/close inconsistent",
+   "volume unreliable (many zero days)"
+  ],
+  "EURUSD": [
+   "high/low/close inconsistent",
+   "volume unreliable (many zero days)"
+  ],
+  "USDJPY": [
+   "high/low/close inconsistent",
+   "volume unreliable (many zero days)"
+  ],
+  "COP": [
+   "high/low/close inconsistent"
+  ],
+  "T": [
+   "high/low/close inconsistent"
+  ]
+ },
+ "failed_download": [
+  "^CNXMIDCAP",
+  "DUMMYHEG.NS",
+  "MMC"
+ ],
+ "skipped": {
+  "ABFRL": "price 49.14 below minimum 50",
+  "ABLBL": "20-day turnover 5.5 (x1e7) below 10",
+  "BAYERCROP": "20-day turnover 9.9 (x1e7) below 10",
+  "BLUEDART": "20-day turnover 4.1 (x1e7) below 10",
+  "CIEINDIA": "20-day turnover 9.8 (x1e7) below 10",
+  "CENTRALBK": "price 31.18 below minimum 50",
+  "DCMSHRIRAM": "20-day turnover 5.6 (x1e7) below 10",
+  "DOMS": "20-day turnover 8.9 (x1e7) below 10",
+  "EIHOTEL": "20-day turnover 9.7 (x1e7) below 10",
+  "ERIS": "20-day turnover 6.9 (x1e7) below 10",
+  "GALLANTT": "20-day turnover 5.3 (x1e7) below 10",
+  "IRB": "price 17.68 below minimum 50",
+  "ITI": "20-day turnover 3.7 (x1e7) below 10",
+  "INDIACEM": "20-day turnover 6.3 (x1e7) below 10",
+  "IOB": "price 31.98 below minimum 50",
+  "JSWDULUX": "20-day turnover 8.8 (x1e7) below 10",
+  "JPPOWER": "price 15.87 below minimum 50",
+  "MMTC": "20-day turnover 8.2 (x1e7) below 10",
+  "MSUMI": "price 34.29 below minimum 50",
+  "NSLNISP": "price 42.17 below minimum 50",
+  "NIVABUPA": "20-day turnover 5.8 (x1e7) below 10",
+  "OLAELEC": "price 38.48 below minimum 50",
+  "RITES": "20-day turnover 6.8 (x1e7) below 10",
+  "RPOWER": "price 20.57 below minimum 50",
+  "SAGILITY": "price 44.69 below minimum 50",
+  "SOBHA": "20-day turnover 9.9 (x1e7) below 10",
+  "SUZLON": "price 40.80 below minimum 50",
+  "TTML": "price 34.44 below minimum 50",
+  "TRAVELFOOD": "20-day turnover 4.1 (x1e7) below 10",
+  "TRIDENT": "price 23.12 below minimum 50",
+  "UCOBANK": "price 23.90 below minimum 50",
+  "IDEA": "price 14.26 below minimum 50",
+  "YESBANK": "price 22.50 below minimum 50"
+ }
+}
