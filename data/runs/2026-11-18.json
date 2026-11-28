@@ -1,0 +1,485 @@
+{
+ "engine_version": "2.8.0",
+ "run_at": "2026-11-19T03:07:13+05:30",
+ "data_date": "2026-11-18",
+ "mode": "PAPER",
+ "data_status": "OK",
+ "regime": {
+  "state": "SIDEWAYS",
+  "text": "Averages disagree: no clear direction. Only the strongest buys, half size.",
+  "close": 25227.95,
+  "date": "2026-11-18",
+  "sma50": 23413.05,
+  "sma200": 23993.81,
+  "rsi": 73.3,
+  "vol20_annualised_pct": 14.2,
+  "high_vol": false,
+  "ret3m": 0.03871513276302574,
+  "support": [
+   24025.65,
+   24265.95,
+   25054.4
+  ],
+  "resistance": [
+   25424.35
+  ],
+  "rule": "BULL: close>SMA200 and SMA50>SMA200; BEAR: both below; else SIDEWAYS",
+  "computed_at": "2026-11-19T02:57:23+05:30"
+ },
+ "buys": [
+  {
+   "action": "BUY",
+   "score": 6,
+   "why": [
+    "Uptrend: close 524.50 > SMA50 465.83 > SMA200 398.72",
+    "21-day SMA crossed above 50-day within the last 4 bars",
+    "Broke previous 20-day high 524.00 on volume 2.8x average",
+    "Beating NIFTY by 5.7% over 3 months"
+   ],
+   "contrib": [
+    {
+     "points": 2,
+     "rule": "Uptrend: close 524.50 > SMA50 465.83 > SMA200 398.72"
+    },
+    {
+     "points": 1,
+     "rule": "21-day SMA crossed above 50-day within the last 4 bars"
+    },
+    {
+     "points": 2,
+     "rule": "Broke previous 20-day high 524.00 on volume 2.8x average"
+    },
+    {
+     "points": 1,
+     "rule": "Beating NIFTY by 5.7% over 3 months"
+    }
+   ],
+   "entry": 524.5,
+   "stop": 487.13,
+   "target": 580.56,
+   "atr": 18.69,
+   "rsi": 72.1,
+   "sma50": 465.83,
+   "sma200": 398.72,
+   "vol_ratio": 2.82,
+   "turnover_cr": 76.9,
+   "symbol": "HONASA",
+   "bar": "2026-11-18",
+   "strategy": "trend_breakout_swing",
+   "version": "1.1.0",
+   "sector": "Fast Moving Consumer Goods",
+   "vol20": 1429775.15,
+   "signal_id": "trend_breakout_swing|HONASA|2026-11-18",
+   "news": [],
+   "news_risk": false,
+   "news_status": "fetch failed: not well-formed (invalid token): line 1, column 252",
+   "event_flags": [],
+   "ai_p": 0.391,
+   "ai_view": "NEUTRAL"
+  },
+  {
+   "action": "BUY",
+   "score": 6,
+   "why": [
+    "Uptrend: close 2123.20 > SMA50 2030.56 > SMA200 1683.68",
+    "Healthy momentum: RSI 62",
+    "Broke previous 20-day high 2056.30 on volume 16.0x average",
+    "Beating NIFTY by 5.0% over 3 months"
+   ],
+   "contrib": [
+    {
+     "points": 2,
+     "rule": "Uptrend: close 2123.20 > SMA50 2030.56 > SMA200 1683.68"
+    },
+    {
+     "points": 1,
+     "rule": "Healthy momentum: RSI 62"
+    },
+    {
+     "points": 2,
+     "rule": "Broke previous 20-day high 2056.30 on volume 16.0x average"
+    },
+    {
+     "points": 1,
+     "rule": "Beating NIFTY by 5.0% over 3 months"
+    }
+   ],
+   "entry": 2123.2,
+   "stop": 1929.37,
+   "target": 2413.95,
+   "atr": 96.92,
+   "rsi": 62.0,
+   "sma50": 2030.56,
+   "sma200": 1683.68,
+   "vol_ratio": 16.02,
+   "turnover_cr": 70.1,
+   "symbol": "INOXINDIA",
+   "bar": "2026-11-18",
+   "strategy": "trend_breakout_swing",
+   "version": "1.1.0",
+   "sector": "Capital Goods",
+   "vol20": 196627.0,
+   "signal_id": "trend_breakout_swing|INOXINDIA|2026-11-18",
+   "news": [],
+   "news_risk": false,
+   "news_status": "fetch failed: not well-formed (invalid token): line 1, column 252",
+   "event_flags": [],
+   "ai_p": 0.395,
+   "ai_view": "NEUTRAL"
+  },
+  {
+   "action": "BUY",
+   "score": 6,
+   "why": [
+    "Uptrend: close 696.35 > SMA50 572.25 > SMA200 542.54",
+    "Healthy momentum: RSI 69",
+    "Broke previous 20-day high 672.00 on volume 3.9x average",
+    "Beating NIFTY by 41.1% over 3 months"
+   ],
+   "contrib": [
+    {
+     "points": 2,
+     "rule": "Uptrend: close 696.35 > SMA50 572.25 > SMA200 542.54"
+    },
+    {
+     "points": 1,
+     "rule": "Healthy momentum: RSI 69"
+    },
+    {
+     "points": 2,
+     "rule": "Broke previous 20-day high 672.00 on volume 3.9x average"
+    },
+    {
+     "points": 1,
+     "rule": "Beating NIFTY by 41.1% over 3 months"
+    }
+   ],
+   "entry": 696.35,
+   "stop": 638.09,
+   "target": 783.73,
+   "atr": 29.13,
+   "rsi": 69.2,
+   "sma50": 572.25,
+   "sma200": 542.54,
+   "vol_ratio": 3.91,
+   "turnover_cr": 57.2,
+   "symbol": "SUNTV",
+   "bar": "2026-11-18",
+   "strategy": "trend_breakout_swing",
+   "version": "1.1.0",
+   "sector": "Media Entertainment & Publication",
+   "vol20": 764928.55,
+   "signal_id": "trend_breakout_swing|SUNTV|2026-11-18",
+   "news": [],
+   "news_risk": false,
+   "news_status": "fetch failed: not well-formed (invalid token): line 1, column 252",
+   "event_flags": [],
+   "ai_p": 0.447,
+   "ai_view": "NEUTRAL"
+  }
+ ],
+ "sells": [
+  {
+   "action": "SELL",
+   "score": -6,
+   "why": [
+    "Downtrend: close 7307.50 < SMA50 8061.87 < SMA200 8443.31",
+    "Weak momentum: RSI 33",
+    "Broke previous 20-day low 7372.50 on volume 2.7x average",
+    "Lagging NIFTY by 25.9% over 3 months"
+   ],
+   "contrib": [
+    {
+     "points": -2,
+     "rule": "Downtrend: close 7307.50 < SMA50 8061.87 < SMA200 8443.31"
+    },
+    {
+     "points": -1,
+     "rule": "Weak momentum: RSI 33"
+    },
+    {
+     "points": -2,
+     "rule": "Broke previous 20-day low 7372.50 on volume 2.7x average"
+    },
+    {
+     "points": -1,
+     "rule": "Lagging NIFTY by 25.9% over 3 months"
+    }
+   ],
+   "entry": 7307.5,
+   "stop": 6801.49,
+   "target": 8066.51,
+   "atr": 253.0,
+   "rsi": 32.5,
+   "sma50": 8061.87,
+   "sma200": 8443.31,
+   "vol_ratio": 2.68,
+   "turnover_cr": 271.7,
+   "symbol": "POLYCAB",
+   "bar": "2026-11-18",
+   "strategy": "trend_breakout_swing",
+   "version": "1.1.0",
+   "sector": "Capital Goods",
+   "vol20": 322075.9,
+   "signal_id": "trend_breakout_swing|POLYCAB|2026-11-18",
+   "news": [],
+   "news_risk": false,
+   "news_status": "fetch failed: not well-formed (invalid token): line 1, column 252",
+   "ai_p": 0.436,
+   "ai_view": "NEUTRAL"
+  }
+ ],
+ "blocked": [
+  {
+   "symbol": "CDSL",
+   "score": 5,
+   "reason": "score +5, not strong enough for a SIDEWAYS regime (needs +6)",
+   "why": [
+    "Uptrend: close 1416.60 > SMA50 1315.17 > SMA200 1296.38",
+    "21-day SMA crossed above 50-day within the last 4 bars",
+    "Healthy momentum: RSI 64",
+    "Beating NIFTY by 0.5% over 3 months"
+   ],
+   "entry": 1416.6,
+   "ai_p": 0.372,
+   "ai_view": "NEUTRAL"
+  },
+  {
+   "symbol": "LALPATHLAB",
+   "score": 5,
+   "reason": "score +5, not strong enough for a SIDEWAYS regime (needs +6)",
+   "why": [
+    "Uptrend: close 1965.40 > SMA50 1926.25 > SMA200 1663.58",
+    "21-day SMA crossed above 50-day within the last 4 bars",
+    "Healthy momentum: RSI 53",
+    "Beating NIFTY by 1.1% over 3 months"
+   ],
+   "entry": 1965.4,
+   "ai_p": 0.374,
+   "ai_view": "NEUTRAL"
+  },
+  {
+   "symbol": "GAIL",
+   "score": 5,
+   "reason": "score +5, not strong enough for a SIDEWAYS regime (needs +6)",
+   "why": [
+    "Uptrend: close 190.00 > SMA50 174.01 > SMA200 166.75",
+    "Broke previous 20-day high 189.90 on volume 1.6x average",
+    "Beating NIFTY by 6.8% over 3 months"
+   ],
+   "entry": 190.0,
+   "ai_p": 0.358,
+   "ai_view": "DISAGREES"
+  },
+  {
+   "symbol": "GLENMARK",
+   "score": 5,
+   "reason": "score +5, not strong enough for a SIDEWAYS regime (needs +6)",
+   "why": [
+    "Uptrend: close 2646.10 > SMA50 2393.21 > SMA200 2256.68",
+    "21-day SMA crossed above 50-day within the last 4 bars",
+    "Healthy momentum: RSI 69",
+    "Beating NIFTY by 9.9% over 3 months"
+   ],
+   "entry": 2646.1,
+   "ai_p": 0.384,
+   "ai_view": "NEUTRAL"
+  },
+  {
+   "symbol": "KPRMILL",
+   "score": 5,
+   "reason": "score +5, not strong enough for a SIDEWAYS regime (needs +6)",
+   "why": [
+    "Uptrend: close 1207.50 > SMA50 1113.74 > SMA200 1023.27",
+    "21-day SMA crossed above 50-day within the last 4 bars",
+    "Healthy momentum: RSI 67",
+    "Beating NIFTY by 2.5% over 3 months"
+   ],
+   "entry": 1207.5,
+   "ai_p": 0.395,
+   "ai_view": "NEUTRAL"
+  },
+  {
+   "symbol": "KALYANKJIL",
+   "score": 5,
+   "reason": "score +5, not strong enough for a SIDEWAYS regime (needs +6)",
+   "why": [
+    "Uptrend: close 650.00 > SMA50 575.37 > SMA200 474.39",
+    "21-day SMA crossed above 50-day within the last 4 bars",
+    "Healthy momentum: RSI 61",
+    "Beating NIFTY by 3.1% over 3 months"
+   ],
+   "entry": 650.0,
+   "ai_p": 0.411,
+   "ai_view": "NEUTRAL"
+  },
+  {
+   "symbol": "LENSKART",
+   "score": 5,
+   "reason": "score +5, not strong enough for a SIDEWAYS regime (needs +6)",
+   "why": [
+    "Uptrend: close 732.10 > SMA50 682.51 > SMA200 566.43",
+    "21-day SMA crossed above 50-day within the last 4 bars",
+    "Healthy momentum: RSI 65",
+    "Beating NIFTY by 16.6% over 3 months"
+   ],
+   "entry": 732.1
+  },
+  {
+   "symbol": "NAVINFLUOR",
+   "score": 5,
+   "reason": "score +5, not strong enough for a SIDEWAYS regime (needs +6)",
+   "why": [
+    "Uptrend: close 10278.00 > SMA50 8593.71 > SMA200 7424.11",
+    "Broke previous 20-day high 10165.00 on volume 1.6x average",
+    "Beating NIFTY by 22.3% over 3 months"
+   ],
+   "entry": 10278.0,
+   "ai_p": 0.384,
+   "ai_view": "NEUTRAL"
+  },
+  {
+   "symbol": "UNOMINDA",
+   "score": 5,
+   "reason": "score +5, not strong enough for a SIDEWAYS regime (needs +6)",
+   "why": [
+    "Uptrend: close 1370.00 > SMA50 1188.52 > SMA200 1155.39",
+    "21-day SMA crossed above 50-day within the last 4 bars",
+    "Healthy momentum: RSI 70",
+    "Beating NIFTY by 4.0% over 3 months"
+   ],
+   "entry": 1370.0,
+   "ai_p": 0.379,
+   "ai_view": "NEUTRAL"
+  }
+ ],
+ "scanned": 475,
+ "universe": 499,
+ "universe_source": "Nifty 500 (official NSE list)",
+ "strategy": {
+  "id": "trend_breakout_swing",
+  "name": "Trend + Breakout Swing",
+  "version": "1.1.0",
+  "status": "paper-approved",
+  "universe": "NIFTY 500 (NSE), price >= 50, 20-day turnover >= 10 cr",
+  "timeframe": "1d",
+  "segment": "delivery",
+  "hypothesis": "Stocks in an uptrend that break their 20-day high on above-average volume, while outperforming NIFTY, tend to continue for a few weeks. Only trade when the index itself is in an uptrend.",
+  "rules": {
+   "score": [
+    "+2 price > 50-day SMA > 200-day SMA (uptrend); -2 if the reverse",
+    "+1 21-day SMA crossed above 50-day within 4 bars; -1 if crossed below",
+    "+1 RSI(14) between 50 and 70; -1 if between 30 and 45",
+    "+2 close above previous 20-day high with volume > 1.5x 20-day average; -2 for a 20-day low",
+    "+1 3-month return beats NIFTY; -1 if it lags"
+   ],
+   "entry": "score >= +5 AND index regime BULL (or SIDEWAYS with score >= +6); no news-risk words in last 3 days",
+   "exit": "score <= -5 (SELL), stop 2xATR below entry, target 3xATR above, trailing stop 4% once up 5%, time exit 20 bars, regime turns BEAR",
+   "sizing": "1% of equity at risk between entry and stop; <= 25% of equity; <= 5% of 20-day volume; halve size when index 20-day vol > 25%"
+  },
+  "params": {
+   "buy_score": 5,
+   "sell_score": -5,
+   "stop_atr": 2.0,
+   "target_atr": 3.0,
+   "max_hold": 20,
+   "vol_mult": 1.5,
+   "rs_lookback": 63
+  },
+  "regime_filter": true,
+  "min_capital": 200000,
+  "holding": "5-20 sessions",
+  "failure_modes": [
+   "whipsaw in sideways markets (false breakouts)",
+   "gap-downs through the stop (fill worse than stop)",
+   "regime filter is slow: late entries after long rallies",
+   "news shocks; only headline words are screened"
+  ],
+  "warmup_bars": 200,
+  "param_hash": "b81c4fa041",
+  "code": true
+ },
+ "paper_actions": {
+  "IN-SWING": [
+   "Queued EXIT ANANDRATHI at next open - time exit (20 bars)",
+   "Queued BUY 55 HONASA at next open (stop 487.13, target 580.56; ok)",
+   "INOXINDIA: duplicate order blocked",
+   "SUNTV: duplicate order blocked"
+  ],
+  "US-SWING": [
+   "Nothing to do: no fills, no exits, no new entries."
+  ],
+  "IN-OPTIONS": [
+   "No new options trade: Regime SIDEWAYS; no options trigger (bear: close<SMA50 and RSI<45; bull: 20-day breakout)"
+  ],
+  "IN-BRAIN": [
+   "NO TRADE today: no opportunity passed every check. Waiting is a valid decision."
+  ],
+  "IN-VALUE": [
+   "Nothing to do: holding the long-term book."
+  ],
+  "US-VALUE": [
+   "Nothing to do: holding the long-term book."
+  ]
+ },
+ "rejected_dq": {
+  "USDINR": [
+   "high/low/close inconsistent",
+   "volume unreliable (many zero days)"
+  ],
+  "EURINR": [
+   "high/low/close inconsistent",
+   "volume unreliable (many zero days)"
+  ],
+  "GBPUSD": [
+   "high/low/close inconsistent",
+   "volume unreliable (many zero days)"
+  ],
+  "EURUSD": [
+   "high/low/close inconsistent",
+   "volume unreliable (many zero days)"
+  ],
+  "USDJPY": [
+   "high/low/close inconsistent",
+   "volume unreliable (many zero days)"
+  ],
+  "BRENT": [
+   "high/low/close inconsistent"
+  ],
+  "WTI": [
+   "high/low/close inconsistent"
+  ]
+ },
+ "failed_download": [
+  "^CNXMIDCAP",
+  "BAGMANE.NS",
+  "DUMMYHEG.NS",
+  "MMC"
+ ],
+ "skipped": {
+  "BHARATCOAL": "price 30.66 below minimum 50",
+  "CIEINDIA": "20-day turnover 9.8 (x1e7) below 10",
+  "CANHLIFE": "20-day turnover 9.6 (x1e7) below 10",
+  "CENTRALBK": "price 32.43 below minimum 50",
+  "EIHOTEL": "20-day turnover 7.8 (x1e7) below 10",
+  "IRB": "price 17.63 below minimum 50",
+  "IOB": "price 30.93 below minimum 50",
+  "JPPOWER": "price 13.31 below minimum 50",
+  "MSUMI": "price 39.52 below minimum 50",
+  "NSLNISP": "price 38.78 below minimum 50",
+  "NUVOCO": "20-day turnover 7.9 (x1e7) below 10",
+  "OLAELEC": "price 32.58 below minimum 50",
+  "RPOWER": "price 17.76 below minimum 50",
+  "SAGILITY": "price 45.15 below minimum 50",
+  "SUZLON": "price 36.13 below minimum 50",
+  "TTML": "price 37.06 below minimum 50",
+  "TRIDENT": "price 23.26 below minimum 50",
+  "UCOBANK": "price 24.50 below minimum 50",
+  "UTIAMC": "20-day turnover 8.6 (x1e7) below 10",
+  "VISL": "price 24.17 below minimum 50",
+  "VOGL": "price 29.62 below minimum 50",
+  "VEDPOWER": "price 35.38 below minimum 50",
+  "IDEA": "price 12.10 below minimum 50",
+  "YESBANK": "price 17.68 below minimum 50"
+ }
+}

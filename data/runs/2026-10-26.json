@@ -1,0 +1,551 @@
+{
+ "engine_version": "2.8.0",
+ "run_at": "2026-10-26T20:54:12+05:30",
+ "data_date": "2026-10-26",
+ "mode": "PAPER",
+ "data_status": "OK",
+ "regime": {
+  "state": "BEAR",
+  "text": "Index below its 200-day average and 50-day below 200-day: downtrend. No new buys; protect capital.",
+  "close": 22753.2,
+  "date": "2026-10-26",
+  "sma50": 23370.07,
+  "sma200": 24108.48,
+  "rsi": 46.1,
+  "vol20_annualised_pct": 15.6,
+  "high_vol": false,
+  "ret3m": -0.042673910467424636,
+  "support": [
+   22228.55
+  ],
+  "resistance": [
+   22776.1,
+   23175.25,
+   23532.73
+  ],
+  "rule": "BULL: close>SMA200 and SMA50>SMA200; BEAR: both below; else SIDEWAYS",
+  "computed_at": "2026-10-26T20:43:15+05:30"
+ },
+ "buys": [],
+ "sells": [
+  {
+   "action": "SELL",
+   "score": -6,
+   "why": [
+    "Downtrend: close 141.90 < SMA50 160.92 < SMA200 168.15",
+    "Weak momentum: RSI 32",
+    "Broke previous 20-day low 142.02 on volume 1.5x average",
+    "Lagging NIFTY by 1.8% over 3 months"
+   ],
+   "contrib": [
+    {
+     "points": -2,
+     "rule": "Downtrend: close 141.90 < SMA50 160.92 < SMA200 168.15"
+    },
+    {
+     "points": -1,
+     "rule": "Weak momentum: RSI 32"
+    },
+    {
+     "points": -2,
+     "rule": "Broke previous 20-day low 142.02 on volume 1.5x average"
+    },
+    {
+     "points": -1,
+     "rule": "Lagging NIFTY by 1.8% over 3 months"
+    }
+   ],
+   "entry": 141.9,
+   "stop": 133.89,
+   "target": 153.92,
+   "atr": 4.01,
+   "rsi": 31.6,
+   "sma50": 160.92,
+   "sma200": 168.15,
+   "vol_ratio": 1.51,
+   "turnover_cr": 200.2,
+   "symbol": "ASHOKLEY",
+   "bar": "2026-10-26",
+   "strategy": "trend_breakout_swing",
+   "version": "1.1.0",
+   "sector": "Capital Goods",
+   "vol20": 12899491.55,
+   "signal_id": "trend_breakout_swing|ASHOKLEY|2026-10-26",
+   "news": [],
+   "news_risk": false,
+   "news_status": "ok",
+   "ai_p": 0.384,
+   "ai_view": "NEUTRAL"
+  },
+  {
+   "action": "SELL",
+   "score": -6,
+   "why": [
+    "Downtrend: close 126.32 < SMA50 138.17 < SMA200 144.09",
+    "Weak momentum: RSI 36",
+    "Broke previous 20-day low 126.73 on volume 2.4x average",
+    "Lagging NIFTY by 7.2% over 3 months"
+   ],
+   "contrib": [
+    {
+     "points": -2,
+     "rule": "Downtrend: close 126.32 < SMA50 138.17 < SMA200 144.09"
+    },
+    {
+     "points": -1,
+     "rule": "Weak momentum: RSI 36"
+    },
+    {
+     "points": -2,
+     "rule": "Broke previous 20-day low 126.73 on volume 2.4x average"
+    },
+    {
+     "points": -1,
+     "rule": "Lagging NIFTY by 7.2% over 3 months"
+    }
+   ],
+   "entry": 126.32,
+   "stop": 118.02,
+   "target": 138.77,
+   "atr": 4.15,
+   "rsi": 35.7,
+   "sma50": 138.17,
+   "sma200": 144.09,
+   "vol_ratio": 2.41,
+   "turnover_cr": 112.4,
+   "symbol": "BANKINDIA",
+   "bar": "2026-10-26",
+   "strategy": "trend_breakout_swing",
+   "version": "1.1.0",
+   "sector": "Financial Services",
+   "vol20": 7732437.85,
+   "signal_id": "trend_breakout_swing|BANKINDIA|2026-10-26",
+   "news": [],
+   "news_risk": false,
+   "news_status": "ok",
+   "ai_p": 0.409,
+   "ai_view": "NEUTRAL"
+  },
+  {
+   "action": "SELL",
+   "score": -6,
+   "why": [
+    "Downtrend: close 3250.00 < SMA50 3511.59 < SMA200 3568.36",
+    "Weak momentum: RSI 35",
+    "Broke previous 20-day low 3286.90 on volume 4.7x average",
+    "Lagging NIFTY by 1.8% over 3 months"
+   ],
+   "contrib": [
+    {
+     "points": -2,
+     "rule": "Downtrend: close 3250.00 < SMA50 3511.59 < SMA200 3568.36"
+    },
+    {
+     "points": -1,
+     "rule": "Weak momentum: RSI 35"
+    },
+    {
+     "points": -2,
+     "rule": "Broke previous 20-day low 3286.90 on volume 4.7x average"
+    },
+    {
+     "points": -1,
+     "rule": "Lagging NIFTY by 1.8% over 3 months"
+    }
+   ],
+   "entry": 3250.0,
+   "stop": 3026.88,
+   "target": 3584.67,
+   "atr": 111.56,
+   "rsi": 34.8,
+   "sma50": 3511.59,
+   "sma200": 3568.36,
+   "vol_ratio": 4.68,
+   "turnover_cr": 74.5,
+   "symbol": "SUPREMEIND",
+   "bar": "2026-10-26",
+   "strategy": "trend_breakout_swing",
+   "version": "1.1.0",
+   "sector": "Capital Goods",
+   "vol20": 176825.3,
+   "signal_id": "trend_breakout_swing|SUPREMEIND|2026-10-26",
+   "news": [
+    {
+     "title": "Supreme Industries H1 FY27 Results: Revenue Up 22% YoY - Kalkine India",
+     "link": "https://news.google.com/rss/articles/CBMisAFBVV95cUxPVHJQVUlVLXl6OXVSLXBWbTg1dUtaaVppbWFSRlo2d3VKdk9vX0tlc2VaMTB1TDFDWFdYX0JaY0tsSEZfZ0czd2dMQjlfQm9xOWt6RXN3M0FaSTNSVnBtM0dTYk1PSURZcVM5U0d0R3NXQk9seVk1cFFjVkNwWjRMdXZVa0RaVW10bDZ1a1g0NUJiNnczaW5ZN3J2bFVZc1lIbkhndFJ2cndsS1I5RC0xaw?oc=5",
+     "published_utc": "2026-10-26T07:57:00+00:00",
+     "source": "Kalkine India",
+     "query": "SUPREMEIND NSE share",
+     "id": "f28bff3226c2",
+     "tags": [
+      "EVENT"
+     ],
+     "sentiment": "NEUTRAL",
+     "news_risk": true,
+     "method": "keyword heuristic",
+     "confidence": "low"
+    },
+    {
+     "title": "Supreme Industries Q2 results: Net profit rises 59.3% YoY to Rs 262 crore, revenue grows 40.4% - Business Upturn",
+     "link": "https://news.google.com/rss/articles/CBMi7gFBVV95cUxQTTlyMzdCRjNxNDNFMWY4dEM2NUtuSm8zOHNLckhPUFBpT0pKNXp3N3lLYjN6M041aDRpTWx2Nl9LYXpERTRNSkNjTmJIVV9YaXk5SWpLTEZsaFZtc194cFdmNkZHd0s3b1Bia2NGaGR2T05KR2JJS1EzY3VTTGY5TXl6OUF2VjdBRE5tcXVMakpmTEM0Y01BdmFRQ1dTS3FxM3k2MjF4OFlOSHFzbXhlX1dmNkZsaFZkYldLMzlidGY2V0dLekFNcm9SRWVRNVN1OE9mbzNxSEcyTVNNV2ZweXVNM2xNSXlQY01KVWRB?oc=5",
+     "published_utc": "2026-10-26T07:49:16+00:00",
+     "source": "Business Upturn",
+     "query": "SUPREMEIND NSE share",
+     "id": "1161dde16f42",
+     "tags": [
+      "POSITIVE",
+      "EVENT"
+     ],
+     "sentiment": "POSITIVE",
+     "news_risk": true,
+     "method": "keyword heuristic",
+     "confidence": "low"
+    }
+   ],
+   "news_risk": true,
+   "news_status": "ok",
+   "ai_p": 0.403,
+   "ai_view": "NEUTRAL"
+  },
+  {
+   "action": "SELL",
+   "score": -6,
+   "why": [
+    "Downtrend: close 936.50 < SMA50 1002.37 < SMA200 1093.57",
+    "Weak momentum: RSI 36",
+    "Broke previous 20-day low 945.00 on volume 1.7x average",
+    "Lagging NIFTY by 9.7% over 3 months"
+   ],
+   "contrib": [
+    {
+     "points": -2,
+     "rule": "Downtrend: close 936.50 < SMA50 1002.37 < SMA200 1093.57"
+    },
+    {
+     "points": -1,
+     "rule": "Weak momentum: RSI 36"
+    },
+    {
+     "points": -2,
+     "rule": "Broke previous 20-day low 945.00 on volume 1.7x average"
+    },
+    {
+     "points": -1,
+     "rule": "Lagging NIFTY by 9.7% over 3 months"
+    }
+   ],
+   "entry": 936.5,
+   "stop": 894.44,
+   "target": 999.59,
+   "atr": 21.03,
+   "rsi": 35.8,
+   "sma50": 1002.37,
+   "sma200": 1093.57,
+   "vol_ratio": 1.73,
+   "turnover_cr": 136.5,
+   "symbol": "TATACONSUM",
+   "bar": "2026-10-26",
+   "strategy": "trend_breakout_swing",
+   "version": "1.1.0",
+   "sector": "Fast Moving Consumer Goods",
+   "vol20": 1346959.4,
+   "signal_id": "trend_breakout_swing|TATACONSUM|2026-10-26",
+   "news": [
+    {
+     "title": "Tata Consumer Products Q2 results: Net profit rises 17.6% YoY to Rs 467 crore, beats estimates; Revenue up 14% - Business Upturn",
+     "link": "https://news.google.com/rss/articles/CBMiggJBVV95cUxOZ0IwNDdPanBSdUlMbHRBdm1KOWhRSXhCYlJhc2xmdHdrT2ZPUjZ3UlNpeFBmOUEwbnFxUDEyLWtfWmY4bXlWbENPWkw0VHNKZjBCREMwWlhycUV5MUpkclF3YzVFQ2t0aUdKSG02WHpZcjZCR1QzZTNVM05NaWNRT2VIZ3VHVjFlNDBYQ29KalVQMFVSRTl1WHQ4TE9sLWNlTWZXV0s4TWZ1cEduSmt4T2VIbmZZaW5oLXExUlo5MGMzcWJIVDdCcEs5WThIcUNNZEhxWlJwM29FRkJBMS02Zlh0UUxlb3hBWjlvVWptNXEzeW5SNGV4THVMdGFzUmkxdUE?oc=5",
+     "published_utc": "2026-10-26T11:24:51+00:00",
+     "source": "Business Upturn",
+     "query": "TATACONSUM NSE share",
+     "id": "20dfccfa116e",
+     "tags": [
+      "POSITIVE",
+      "EVENT"
+     ],
+     "sentiment": "POSITIVE",
+     "news_risk": true,
+     "method": "keyword heuristic",
+     "confidence": "low"
+    },
+    {
+     "title": "Tata Consumer Products Concall: Tea prices up 8% to 10%, Salt hiked to \u20b934, Tata Sampann margin at 14% to 15%, Starbucks at 505 stores - Business Upturn",
+     "link": "https://news.google.com/rss/articles/CBMinwJBVV95cUxOVEVEOUNNdWFFWno2Q05ab25JVXYtS1lqa09ReE93YkpIZE9jS3BlQTdGTzBkeGdtZmlKNURLSzNJVmNJM29SR1hlTlRHRWloQW5fMWVoVU5PR0h4MC1LOTJ5VGVMc2VuUldqU1luYjlsWnZsLW1WdV9jbkhjX25sYl9iakd1YWVNZ0NBaVJzbjgtNzlLWDVDUXNIa28tUl9jWnpIU2FINDZMX0V4R21WOE9HV19WQl94UHExUFA4MVYzUkpjd3p2YWxBUWlVNEZxNXJHeXlCWG5feXkwdzg5RUJNTDZVbkVrT3h4UjUxTkZReVVrT1JhcGNKeTVReFJuOHhRQThOcjR5ZHkzaTcxdzBjbm04c0tUMXZ6NWhYUQ?oc=5",
+     "published_utc": "2026-10-26T14:05:23+00:00",
+     "source": "Business Upturn",
+     "query": "TATACONSUM NSE share",
+     "id": "21fc6d2ca4ac",
+     "tags": [
+      "NEUTRAL"
+     ],
+     "sentiment": "NEUTRAL",
+     "news_risk": false,
+     "method": "keyword heuristic",
+     "confidence": "low"
+    }
+   ],
+   "news_risk": true,
+   "news_status": "ok",
+   "ai_p": 0.376,
+   "ai_view": "NEUTRAL"
+  },
+  {
+   "action": "SELL",
+   "score": -5,
+   "why": [
+    "Downtrend: close 25225.00 < SMA50 26239.90 < SMA200 26294.04",
+    "21-day SMA crossed below 50-day within the last 4 bars",
+    "Weak momentum: RSI 39",
+    "Lagging NIFTY by 5.7% over 3 months"
+   ],
+   "contrib": [
+    {
+     "points": -2,
+     "rule": "Downtrend: close 25225.00 < SMA50 26239.90 < SMA200 26294.04"
+    },
+    {
+     "points": -1,
+     "rule": "21-day SMA crossed below 50-day within the last 4 bars"
+    },
+    {
+     "points": -1,
+     "rule": "Weak momentum: RSI 39"
+    },
+    {
+     "points": -1,
+     "rule": "Lagging NIFTY by 5.7% over 3 months"
+    }
+   ],
+   "entry": 25225.0,
+   "stop": 24054.23,
+   "target": 26981.16,
+   "atr": 585.39,
+   "rsi": 38.7,
+   "sma50": 26239.9,
+   "sma200": 26294.04,
+   "vol_ratio": 0.67,
+   "turnover_cr": 15.2,
+   "symbol": "ABBOTINDIA",
+   "bar": "2026-10-26",
+   "strategy": "trend_breakout_swing",
+   "version": "1.1.0",
+   "sector": "Healthcare",
+   "vol20": 5794.95,
+   "signal_id": "trend_breakout_swing|ABBOTINDIA|2026-10-26",
+   "news": [],
+   "news_risk": false,
+   "news_status": "ok",
+   "ai_p": 0.377,
+   "ai_view": "NEUTRAL"
+  }
+ ],
+ "blocked": [
+  {
+   "symbol": "ATHERENERG",
+   "score": 6,
+   "reason": "score +6, but NIFTY regime is BEAR (close < SMA200 and SMA50 < SMA200)",
+   "why": [
+    "Uptrend: close 1575.00 > SMA50 1515.27 > SMA200 1061.78",
+    "Healthy momentum: RSI 60",
+    "Broke previous 20-day high 1550.80 on volume 3.1x average",
+    "Beating NIFTY by 34.6% over 3 months"
+   ],
+   "entry": 1575.0,
+   "ai_p": 0.431,
+   "ai_view": "NEUTRAL"
+  },
+  {
+   "symbol": "COFORGE",
+   "score": 6,
+   "reason": "score +6, but NIFTY regime is BEAR (close < SMA200 and SMA50 < SMA200)",
+   "why": [
+    "Uptrend: close 1993.00 > SMA50 1867.06 > SMA200 1531.00",
+    "Healthy momentum: RSI 64",
+    "Broke previous 20-day high 1992.40 on volume 2.1x average",
+    "Beating NIFTY by 38.8% over 3 months"
+   ],
+   "entry": 1993.0,
+   "ai_p": 0.422,
+   "ai_view": "NEUTRAL"
+  },
+  {
+   "symbol": "FSL",
+   "score": 5,
+   "reason": "score +5, but NIFTY regime is BEAR (close < SMA200 and SMA50 < SMA200)",
+   "why": [
+    "Uptrend: close 292.25 > SMA50 269.23 > SMA200 259.63",
+    "21-day SMA crossed above 50-day within the last 4 bars",
+    "Healthy momentum: RSI 63",
+    "Beating NIFTY by 19.5% over 3 months"
+   ],
+   "entry": 292.25,
+   "ai_p": 0.443,
+   "ai_view": "NEUTRAL"
+  },
+  {
+   "symbol": "MRPL",
+   "score": 5,
+   "reason": "score +5, but NIFTY regime is BEAR (close < SMA200 and SMA50 < SMA200)",
+   "why": [
+    "Uptrend: close 182.61 > SMA50 169.58 > SMA200 165.91",
+    "21-day SMA crossed above 50-day within the last 4 bars",
+    "Healthy momentum: RSI 60",
+    "Beating NIFTY by 13.7% over 3 months"
+   ],
+   "entry": 182.61,
+   "ai_p": 0.421,
+   "ai_view": "NEUTRAL"
+  },
+  {
+   "symbol": "PERSISTENT",
+   "score": 5,
+   "reason": "score +5, but NIFTY regime is BEAR (close < SMA200 and SMA50 < SMA200)",
+   "why": [
+    "Uptrend: close 5850.00 > SMA50 5578.56 > SMA200 5318.88",
+    "21-day SMA crossed above 50-day within the last 4 bars",
+    "Healthy momentum: RSI 59",
+    "Beating NIFTY by 17.1% over 3 months"
+   ],
+   "entry": 5850.0,
+   "ai_p": 0.413,
+   "ai_view": "NEUTRAL"
+  }
+ ],
+ "scanned": 467,
+ "universe": 499,
+ "universe_source": "Nifty 500 (official NSE list)",
+ "strategy": {
+  "id": "trend_breakout_swing",
+  "name": "Trend + Breakout Swing",
+  "version": "1.1.0",
+  "status": "paper-approved",
+  "universe": "NIFTY 500 (NSE), price >= 50, 20-day turnover >= 10 cr",
+  "timeframe": "1d",
+  "segment": "delivery",
+  "hypothesis": "Stocks in an uptrend that break their 20-day high on above-average volume, while outperforming NIFTY, tend to continue for a few weeks. Only trade when the index itself is in an uptrend.",
+  "rules": {
+   "score": [
+    "+2 price > 50-day SMA > 200-day SMA (uptrend); -2 if the reverse",
+    "+1 21-day SMA crossed above 50-day within 4 bars; -1 if crossed below",
+    "+1 RSI(14) between 50 and 70; -1 if between 30 and 45",
+    "+2 close above previous 20-day high with volume > 1.5x 20-day average; -2 for a 20-day low",
+    "+1 3-month return beats NIFTY; -1 if it lags"
+   ],
+   "entry": "score >= +5 AND index regime BULL (or SIDEWAYS with score >= +6); no news-risk words in last 3 days",
+   "exit": "score <= -5 (SELL), stop 2xATR below entry, target 3xATR above, trailing stop 4% once up 5%, time exit 20 bars, regime turns BEAR",
+   "sizing": "1% of equity at risk between entry and stop; <= 25% of equity; <= 5% of 20-day volume; halve size when index 20-day vol > 25%"
+  },
+  "params": {
+   "buy_score": 5,
+   "sell_score": -5,
+   "stop_atr": 2.0,
+   "target_atr": 3.0,
+   "max_hold": 20,
+   "vol_mult": 1.5,
+   "rs_lookback": 63
+  },
+  "regime_filter": true,
+  "min_capital": 200000,
+  "holding": "5-20 sessions",
+  "failure_modes": [
+   "whipsaw in sideways markets (false breakouts)",
+   "gap-downs through the stop (fill worse than stop)",
+   "regime filter is slow: late entries after long rallies",
+   "news shocks; only headline words are screened"
+  ],
+  "warmup_bars": 200,
+  "param_hash": "b81c4fa041",
+  "code": true
+ },
+ "paper_actions": {
+  "IN-SWING": [
+   "Nothing to do: no fills, no exits, no new entries."
+  ],
+  "US-SWING": [
+   "Risk engine REJECTED PGR: maximum open positions reached"
+  ],
+  "IN-OPTIONS": [
+   "HOLD NIFTY 03NOV26 22600/22400 PE DEBIT SPREAD: modeled value 62.92 vs debit 83.74, 8 days left",
+   "No new options trade: Regime BEAR; no options trigger (bear: close<SMA50 and RSI<45; bull: 20-day breakout)"
+  ],
+  "IN-BRAIN": [
+   "NO TRADE today: no opportunity passed every check. Waiting is a valid decision."
+  ],
+  "IN-VALUE": [
+   "Nothing to do: holding the long-term book."
+  ],
+  "US-VALUE": [
+   "Nothing to do: holding the long-term book."
+  ]
+ },
+ "rejected_dq": {
+  "USDINR": [
+   "high/low/close inconsistent",
+   "volume unreliable (many zero days)"
+  ],
+  "EURINR": [
+   "high/low/close inconsistent",
+   "volume unreliable (many zero days)"
+  ],
+  "GBPUSD": [
+   "high/low/close inconsistent",
+   "volume unreliable (many zero days)"
+  ],
+  "EURUSD": [
+   "high/low/close inconsistent",
+   "volume unreliable (many zero days)"
+  ],
+  "USDJPY": [
+   "high/low/close inconsistent",
+   "volume unreliable (many zero days)"
+  ],
+  "C": [
+   "high/low/close inconsistent"
+  ],
+  "COP": [
+   "high/low/close inconsistent"
+  ],
+  "AXP": [
+   "high/low/close inconsistent"
+  ]
+ },
+ "failed_download": [
+  "^CNXMIDCAP",
+  "BAGMANE.NS",
+  "DUMMYHEG.NS",
+  "MMC"
+ ],
+ "skipped": {
+  "AAVAS": "20-day turnover 9.8 (x1e7) below 10",
+  "ASAHIINDIA": "20-day turnover 7.9 (x1e7) below 10",
+  "AIIL": "20-day turnover 9.3 (x1e7) below 10",
+  "BATAINDIA": "20-day turnover 9.3 (x1e7) below 10",
+  "BHARATCOAL": "price 31.02 below minimum 50",
+  "CIEINDIA": "20-day turnover 7.6 (x1e7) below 10",
+  "CENTRALBK": "price 29.09 below minimum 50",
+  "DOMS": "20-day turnover 4.8 (x1e7) below 10",
+  "FACT": "20-day turnover 7.2 (x1e7) below 10",
+  "ICICILIFE": "20-day turnover 0.0 (x1e7) below 10",
+  "IRB": "price 16.26 below minimum 50",
+  "ITI": "20-day turnover 5.2 (x1e7) below 10",
+  "INDIAMART": "20-day turnover 8.2 (x1e7) below 10",
+  "IOB": "price 30.38 below minimum 50",
+  "JPPOWER": "price 13.02 below minimum 50",
+  "MSUMI": "price 35.02 below minimum 50",
+  "NSLNISP": "price 38.56 below minimum 50",
+  "OLAELEC": "price 29.94 below minimum 50",
+  "RPOWER": "price 16.54 below minimum 50",
+  "SJVN": "price 49.00 below minimum 50",
+  "SAGILITY": "price 44.50 below minimum 50",
+  "SUZLON": "price 37.12 below minimum 50",
+  "TTML": "price 41.53 below minimum 50",
+  "TRIDENT": "price 20.63 below minimum 50",
+  "UCOBANK": "price 21.99 below minimum 50",
+  "UTIAMC": "20-day turnover 7.2 (x1e7) below 10",
+  "VISL": "price 26.62 below minimum 50",
+  "VOGL": "price 27.76 below minimum 50",
+  "VEDPOWER": "price 28.21 below minimum 50",
+  "IDEA": "price 11.95 below minimum 50",
+  "YESBANK": "price 15.86 below minimum 50",
+  "ZYDUSWELL": "20-day turnover 6.3 (x1e7) below 10"
+ }
+}
